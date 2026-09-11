@@ -55,5 +55,47 @@ export const issues = [
       { label: "Panic-sell corpus", value: "₹0.43Cr" },
     ],
     chart: sipScenarios,
+    // Full issue body, rendered in the reader modal. Blocks: "p" (paragraph),
+    // "h2" (subheading), "quote" (pull quote), "list" (bulleted items).
+    // To add a new issue: push a new entry into `issues` with the same
+    // shape (id, number, title, hook, date, stats, chart, content).
+    content: [
+      {
+        type: "p",
+        text: "The Rule of 72 says your money doubles every 6 years at 12%. Almost nobody sits still long enough to find out.",
+      },
+      {
+        type: "p",
+        text: "Run the same ₹10,000/mo SIP through three tempers, Aug 1991 to Aug 2026 — 35 years, one index, three different investors.",
+      },
+      {
+        type: "list",
+        items: [
+          "Stay flat: ₹42.1L invested becomes ₹4.72Cr. An 11.2x multiple, no drama, no changes.",
+          "Step up 10% a year: ₹3.28Cr invested becomes ₹14.24Cr — a 4.3x on a much bigger base, because the discipline compounds too.",
+          "Panic-sell every time the index drops 20%: ₹21.2L invested limps back as ₹0.43Cr — roughly 2x, most of it erased by bad timing, not bad luck.",
+        ],
+      },
+      {
+        type: "h2",
+        text: "The Rule of 72",
+      },
+      {
+        type: "p",
+        text: "At 12% a year, money doubles roughly every 6 years — 72 ÷ 12. The maths is simple. Sitting through six years of a flat-looking line is not.",
+      },
+      {
+        type: "quote",
+        text: "Day 25 to Day 30 is where the curve breaks. Everything before that looks like nothing is happening.",
+      },
+      {
+        type: "p",
+        text: "That's the part the spreadsheet doesn't show you: the years the line looks flat are the years the compounding is actually being built. Quit there, and the maths never gets the chance to work.",
+      },
+      {
+        type: "p",
+        text: "Numbers and chart above are pulled from Nifty data via jugaad_data, analysed in pandas — code's on GitHub if you want to run it yourself.",
+      },
+    ],
   },
 ]

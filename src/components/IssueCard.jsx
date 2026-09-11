@@ -33,7 +33,7 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
-export default function IssueCard({ issue }) {
+export default function IssueCard({ issue, onOpen }) {
   const reduceMotion = useReducedMotion()
   const data = toChartData(issue.chart)
 
@@ -50,9 +50,13 @@ export default function IssueCard({ issue }) {
         <span className="font-mono text-xs text-paper/40">{issue.date}</span>
       </div>
 
-      <h3 className="mt-3 font-display text-2xl font-medium leading-snug text-paper sm:text-3xl">
+      <button
+        type="button"
+        onClick={() => onOpen(issue.id)}
+        className="mt-3 text-left font-display text-2xl font-medium leading-snug text-paper transition-colors hover:text-accent sm:text-3xl"
+      >
         {issue.title}
-      </h3>
+      </button>
       <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-paper/70">{issue.hook}</p>
 
       <div className="mt-6 h-64 w-full">
@@ -109,13 +113,20 @@ export default function IssueCard({ issue }) {
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-sm">
+        <button
+          type="button"
+          onClick={() => onOpen(issue.id)}
+          className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
+        >
+          Read the issue
+        </button>
         <a
           href={issue.substackUrl}
           target="_blank"
           rel="noreferrer"
           className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
         >
-          Read the issue
+          Open on Substack
           <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </a>
         <a

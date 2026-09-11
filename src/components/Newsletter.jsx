@@ -1,9 +1,13 @@
+import { useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import { issues } from "../data/newsletter"
 import IssueCard from "./IssueCard"
+import IssueModal from "./IssueModal"
 
 export default function Newsletter() {
   const reduceMotion = useReducedMotion()
+  const [openIssueId, setOpenIssueId] = useState(null)
+  const openIssue = issues.find((i) => i.id === openIssueId) ?? null
 
   return (
     <section id="newsletter" className="border-t hr-line px-6 py-24 sm:px-10 lg:px-16">
@@ -40,9 +44,11 @@ export default function Newsletter() {
 
       <div className="mt-12 flex flex-col gap-8">
         {issues.map((issue) => (
-          <IssueCard key={issue.id} issue={issue} />
+          <IssueCard key={issue.id} issue={issue} onOpen={setOpenIssueId} />
         ))}
       </div>
+
+      <IssueModal issue={openIssue} onClose={() => setOpenIssueId(null)} />
     </section>
   )
 }
