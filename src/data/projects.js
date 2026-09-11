@@ -8,9 +8,9 @@ export const projects = [
     tags: ["Next.js", "Node.js", "PostgreSQL", "Socket.io", "Razorpay"],
   },
   {
-    title: "Compounding Newsletter",
+    title: "Finance Newsletter",
     role: "Writer & data engineer",
-    body: "Finance newsletter on compounding and SIP investing. Every issue's analysis — pandas, matplotlib/plotly, jugaad_data for Nifty pulls — ships publicly.",
+    body: "Personal finance and investing newsletter — SIPs, compounding, market behaviour. Every issue's analysis — pandas, matplotlib/plotly, jugaad_data for Nifty pulls — ships publicly.",
     href: "https://shantanusomwanshi.substack.com",
     repoHref: "https://github.com/shanzxt/n1-Compounding-newsletter",
     tags: ["Python", "pandas", "jugaad_data"],

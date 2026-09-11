@@ -28,7 +28,7 @@ export default function Newsletter() {
         transition={{ duration: 0.55, delay: 0.05 }}
         className="mt-3 max-w-2xl font-display text-3xl font-light leading-tight text-paper sm:text-4xl"
       >
-        A lab notebook on compounding, not a link dump
+        A lab notebook on money, not a link dump
       </motion.h2>
       <motion.p
         initial={reduceMotion ? false : { opacity: 0, y: 12 }}

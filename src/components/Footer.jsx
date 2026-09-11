@@ -33,7 +33,7 @@ export default function Footer() {
         transition={{ duration: 0.55, delay: 0.05 }}
         className="mt-3 max-w-lg font-display text-3xl font-light leading-tight text-paper sm:text-4xl"
       >
-        Writing on compounding, building the software behind it.
+        Writing on personal finance, building the software behind it.
       </motion.h2>
 
       <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 font-mono text-sm">

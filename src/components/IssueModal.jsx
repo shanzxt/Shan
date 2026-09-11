@@ -1,6 +1,6 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import { ArrowUpRight, X } from "lucide-react"
+import { ArrowUpRight, Maximize2, X } from "lucide-react"
 import {
   CartesianGrid,
   Line,
@@ -53,7 +53,7 @@ function renderInline(text) {
   })
 }
 
-function Block({ block }) {
+function Block({ block, onOpenImage }) {
   switch (block.type) {
     case "h2":
       return (
@@ -81,7 +81,22 @@ function Block({ block }) {
     case "image":
       return (
         <figure className="mt-8">
-          <img src={block.src} alt={block.alt} loading="lazy" className="w-full border hr-line" />
+          <button
+            type="button"
+            onClick={() => onOpenImage(block)}
+            className="group relative block w-full cursor-zoom-in border hr-line"
+          >
+            <img src={block.src} alt={block.alt} loading="lazy" className="w-full transition-opacity group-hover:opacity-80" />
+            <span className="absolute inset-0 hidden items-center justify-center bg-bg/40 opacity-0 transition-opacity group-hover:flex group-hover:opacity-100 sm:flex">
+              <span className="inline-flex items-center gap-1.5 border hr-line bg-bg px-3 py-1.5 font-mono text-xs text-paper">
+                <Maximize2 size={13} />
+                View full size
+              </span>
+            </span>
+            <span className="absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center bg-bg/70 text-paper/80 sm:hidden">
+              <Maximize2 size={14} />
+            </span>
+          </button>
           {block.caption && (
             <figcaption className="mt-2 text-xs leading-relaxed text-paper/45">{block.caption}</figcaption>
           )}
@@ -95,9 +110,70 @@ function Block({ block }) {
   }
 }
 
+function Lightbox({ image, onClose }) {
+  const reduceMotion = useReducedMotion()
+
+  useEffect(() => {
+    if (!image) return
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") onClose()
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [image, onClose])
+
+  return (
+    <AnimatePresence>
+      {image && (
+        <motion.div
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={reduceMotion ? undefined : { opacity: 0 }}
+          transition={{ duration: 0.15 }}
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-bg/95 p-4 backdrop-blur-sm sm:p-10"
+          onMouseDown={(e) => {
+            if (e.target === e.currentTarget) onClose()
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={image.alt}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center border hr-line bg-bg text-paper/60 transition-colors hover:border-accent hover:text-accent sm:right-6 sm:top-6"
+          >
+            <X size={18} />
+          </button>
+          <motion.img
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={reduceMotion ? undefined : { opacity: 0, scale: 0.97 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            src={image.src}
+            alt={image.alt}
+            className="max-h-full max-w-full object-contain"
+            onMouseDown={(e) => e.stopPropagation()}
+          />
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
+
 export default function IssueModal({ issue, onClose }) {
   const reduceMotion = useReducedMotion()
   const closeRef = useRef(null)
+  const [lightboxImage, setLightboxImage] = useState(null)
+  // Reset the lightbox whenever the reader closes or switches issues, using
+  // the render-time "adjust state on prop change" pattern instead of an
+  // effect, since it's derived from `issue` rather than an external system.
+  const [trackedIssueId, setTrackedIssueId] = useState(issue?.id)
+  if (issue?.id !== trackedIssueId) {
+    setTrackedIssueId(issue?.id)
+    if (lightboxImage) setLightboxImage(null)
+  }
 
   useEffect(() => {
     if (!issue) return
@@ -106,7 +182,8 @@ export default function IssueModal({ issue, onClose }) {
     closeRef.current?.focus()
 
     const onKeyDown = (e) => {
-      if (e.key === "Escape") onClose()
+      // Let the lightbox handle its own Escape when it's open.
+      if (e.key === "Escape" && !lightboxImage) onClose()
     }
     window.addEventListener("keydown", onKeyDown)
 
@@ -114,11 +191,12 @@ export default function IssueModal({ issue, onClose }) {
       document.body.style.overflow = previousOverflow
       window.removeEventListener("keydown", onKeyDown)
     }
-  }, [issue, onClose])
+  }, [issue, onClose, lightboxImage])
 
   const data = issue ? toChartData(issue.chart) : null
 
   return (
+    <>
     <AnimatePresence>
       {issue && (
         <motion.div
@@ -216,7 +294,9 @@ export default function IssueModal({ issue, onClose }) {
             {/* Full issue body, styled like a Substack post: serif type,
                 generous line height, real reading measure. */}
             <div className="mt-10 border-t hr-line pt-8">
-              {issue.content?.map((block, i) => <Block key={i} block={block} />)}
+              {issue.content?.map((block, i) => (
+                <Block key={i} block={block} onOpenImage={setLightboxImage} />
+              ))}
             </div>
 
             <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t hr-line pt-6 font-mono text-sm">
@@ -243,5 +323,7 @@ export default function IssueModal({ issue, onClose }) {
         </motion.div>
       )}
     </AnimatePresence>
+    <Lightbox image={lightboxImage} onClose={() => setLightboxImage(null)} />
+    </>
   )
 }

@@ -112,8 +112,8 @@ export default function Hero() {
           className="mt-5 max-w-xl font-body text-lg text-paper/80 sm:text-xl"
         >
           Instrumentation engineer and CFA Level I candidate. I write a
-          newsletter on compounding and build the software behind it — with
-          the code and data shipped alongside every issue.
+          newsletter on personal finance and build the software behind it —
+          with the code and data shipped alongside every issue.
         </motion.p>
 
         <motion.div

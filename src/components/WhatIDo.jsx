@@ -11,8 +11,8 @@ const blocks = [
   },
   {
     tag: "02",
-    title: "The compounding newsletter",
-    body: "A running record of what actually happens when you let money sit for decades — SIPs, step-ups, panic-selling, the maths of Rule of 72. Every issue ships with the Python behind it, in the open. I'm also a CFA Level I candidate.",
+    title: "The finance newsletter",
+    body: "A running record of what actually happens with money — SIPs, step-ups, panic-selling, the maths of compounding, and whatever else the data says. Every issue ships with the Python behind it, in the open. I'm also a CFA Level I candidate.",
     href: links.newsletter,
     linkLabel: "shantanusomwanshi.substack.com",
   },
