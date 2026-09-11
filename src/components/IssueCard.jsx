@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from "framer-motion"
-import { ArrowUpRight } from "lucide-react"
+import { ArrowUpRight, BookOpen } from "lucide-react"
 import {
   CartesianGrid,
   Line,
@@ -112,19 +112,20 @@ export default function IssueCard({ issue, onOpen }) {
         ))}
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-sm">
+      <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-sm">
         <button
           type="button"
           onClick={() => onOpen(issue.id)}
-          className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
+          className="inline-flex items-center gap-2 bg-accent px-4 py-2.5 font-medium text-ink transition-opacity hover:opacity-85"
         >
+          <BookOpen size={15} />
           Read the issue
         </button>
         <a
           href={issue.substackUrl}
           target="_blank"
           rel="noreferrer"
-          className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
+          className="group inline-flex items-center gap-1.5 text-paper/60 transition-colors hover:text-accent"
         >
           Open on Substack
           <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />

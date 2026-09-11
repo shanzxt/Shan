@@ -34,34 +34,64 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
+// Renders **bold** and *italic* markers inside plain text, matching the
+// lightweight formatting used in the newsletter data.
+function renderInline(text) {
+  const parts = text.split(/(\*\*.+?\*\*|\*.+?\*)/g).filter(Boolean)
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return (
+        <strong key={i} className="font-semibold text-paper">
+          {part.slice(2, -2)}
+        </strong>
+      )
+    }
+    if (part.startsWith("*") && part.endsWith("*")) {
+      return <em key={i}>{part.slice(1, -1)}</em>
+    }
+    return part
+  })
+}
+
 function Block({ block }) {
   switch (block.type) {
     case "h2":
       return (
-        <h3 className="mt-8 font-display text-xl font-medium text-paper first:mt-0 sm:text-2xl">
+        <h3 className="mt-10 font-display text-xl font-semibold text-paper first:mt-0 sm:text-2xl">
           {block.text}
         </h3>
       )
     case "quote":
       return (
         <blockquote className="mt-6 border-l-2 border-accent pl-4 font-display text-lg italic leading-snug text-paper/90 sm:text-xl">
-          {block.text}
+          {renderInline(block.text)}
         </blockquote>
       )
     case "list":
       return (
-        <ul className="mt-4 flex flex-col gap-2">
+        <ul className="mt-4 flex flex-col gap-3">
           {block.items.map((item) => (
-            <li key={item} className="flex gap-3 text-[15px] leading-relaxed text-paper/70">
-              <span className="mt-2.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
-              {item}
+            <li key={item} className="flex gap-3 text-[17px] leading-[1.75] text-paper/80">
+              <span className="mt-3 h-1 w-1 shrink-0 rounded-full bg-accent" />
+              <span>{renderInline(item)}</span>
             </li>
           ))}
         </ul>
       )
+    case "image":
+      return (
+        <figure className="mt-8">
+          <img src={block.src} alt={block.alt} loading="lazy" className="w-full border hr-line" />
+          {block.caption && (
+            <figcaption className="mt-2 text-xs leading-relaxed text-paper/45">{block.caption}</figcaption>
+          )}
+        </figure>
+      )
     case "p":
     default:
-      return <p className="mt-4 text-[15px] leading-relaxed text-paper/70 first:mt-0">{block.text}</p>
+      return (
+        <p className="mt-5 text-[17px] leading-[1.75] text-paper/80 first:mt-0">{renderInline(block.text)}</p>
+      )
   }
 }
 
@@ -116,21 +146,30 @@ export default function IssueModal({ issue, onClose }) {
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="absolute right-4 top-4 inline-flex h-8 w-8 items-center justify-center text-paper/50 transition-colors hover:text-accent sm:right-6 sm:top-6"
+              className="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center border hr-line text-paper/60 transition-colors hover:border-accent hover:text-accent sm:right-6 sm:top-6"
             >
               <X size={18} />
             </button>
 
-            <div className="flex flex-wrap items-baseline justify-between gap-2 pr-10">
-              <span className="font-mono text-xs text-teal">Issue {issue.number}</span>
-              <span className="font-mono text-xs text-paper/40">{issue.date}</span>
-            </div>
-
-            <h2 className="mt-3 max-w-xl font-display text-2xl font-medium leading-snug text-paper sm:text-3xl">
+            {/* Substack-style masthead: byline, title, subtitle, date */}
+            <p className="pr-12 font-mono text-xs uppercase tracking-wider text-paper/45">
+              Shantanu Somwanshi
+            </p>
+            <h2 className="mt-3 max-w-xl font-display text-3xl font-semibold leading-tight text-paper sm:text-4xl">
               {issue.title}
             </h2>
+            {issue.hook && (
+              <p className="mt-3 max-w-xl font-display text-lg italic leading-snug text-paper/55">
+                {issue.hook}
+              </p>
+            )}
+            <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b hr-line pb-6 font-mono text-xs text-paper/40">
+              <span className="text-teal">Issue {issue.number}</span>
+              <span>·</span>
+              <span>{issue.date}</span>
+            </div>
 
-            <div className="mt-6 h-64 w-full">
+            <div className="mt-8 h-64 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                   <CartesianGrid stroke="var(--color-line)" vertical={false} />
@@ -174,7 +213,9 @@ export default function IssueModal({ issue, onClose }) {
               ))}
             </div>
 
-            <div className="mt-8 border-t hr-line pt-8">
+            {/* Full issue body, styled like a Substack post: serif type,
+                generous line height, real reading measure. */}
+            <div className="mt-10 border-t hr-line pt-8">
               {issue.content?.map((block, i) => <Block key={i} block={block} />)}
             </div>
 
