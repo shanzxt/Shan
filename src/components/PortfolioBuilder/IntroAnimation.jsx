@@ -111,6 +111,15 @@ export default function IntroAnimation() {
               <p className="max-w-md text-[15px] text-paper/60">
                 Next, we'll run exactly this math on real mutual funds.
               </p>
+              <button
+                type="button"
+                onClick={() =>
+                  document.getElementById("fund-picker")?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="mt-2 rounded-md bg-accent px-5 py-2 font-mono text-sm text-ink transition-colors hover:bg-accent/85"
+              >
+                Try it on real funds ↓
+              </button>
             </motion.div>
           ) : (
             <motion.div

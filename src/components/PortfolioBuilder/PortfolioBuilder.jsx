@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import IntroAnimation from "./IntroAnimation"
+import FundPickerTool from "./FundPickerTool"
 
 export default function PortfolioBuilder() {
   return (
@@ -15,6 +16,10 @@ export default function PortfolioBuilder() {
 
       <div className="flex min-h-[75vh] flex-col items-center justify-center">
         <IntroAnimation />
+      </div>
+
+      <div id="fund-picker" className="flex flex-col items-center pt-8">
+        <FundPickerTool />
       </div>
     </div>
   )

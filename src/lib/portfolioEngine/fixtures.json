@@ -1,0 +1,288 @@
+{
+  "toy_3fund": {
+    "correlation_matrix": [
+      [
+        1.0,
+        0.9,
+        0.1
+      ],
+      [
+        0.9,
+        1.0,
+        0.1
+      ],
+      [
+        0.1,
+        0.1,
+        1.0
+      ]
+    ],
+    "eigenvalues": [
+      1.9216990566028302,
+      0.9783009433971701,
+      0.09999999999999998
+    ],
+    "effective_n": 2.147050259266011
+  },
+  "overlap_window": {
+    "all_44_funds": {
+      "fund_ids": [
+        118632,
+        120586,
+        119598,
+        118825,
+        119018,
+        122639,
+        118955,
+        120166,
+        120662,
+        118535,
+        147704,
+        118834,
+        120158,
+        118989,
+        119775,
+        118668,
+        127042,
+        120505,
+        118778,
+        125497,
+        130503,
+        125354,
+        147946,
+        118650,
+        120823,
+        120503,
+        135781,
+        120847,
+        119723,
+        120323,
+        120751,
+        119727,
+        118950,
+        120716,
+        119065,
+        143341,
+        147622,
+        148519,
+        152881,
+        151739,
+        118968,
+        119091,
+        120754,
+        120186,
+        145552
+      ],
+      "result": {
+        "fund_ids": [
+          118632,
+          120586,
+          119598,
+          118825,
+          119018,
+          122639,
+          118955,
+          120166,
+          120662,
+          118535,
+          147704,
+          118834,
+          120158,
+          118989,
+          119775,
+          118668,
+          127042,
+          120505,
+          118778,
+          125497,
+          130503,
+          125354,
+          147946,
+          118650,
+          120823,
+          120503,
+          135781,
+          120847,
+          119723,
+          120323,
+          120751,
+          119727,
+          118950,
+          120716,
+          119065,
+          143341,
+          147622,
+          148519,
+          152881,
+          151739,
+          118968,
+          119091,
+          120754,
+          120186,
+          145552
+        ],
+        "start_idx": 142,
+        "end_idx": 163,
+        "start_date": "2024-11",
+        "end_date": "2026-08",
+        "n_months": 22
+      }
+    },
+    "first_two_funds": {
+      "fund_ids": [
+        118632,
+        120586
+      ],
+      "result": {
+        "fund_ids": [
+          118632,
+          120586
+        ],
+        "start_idx": 1,
+        "end_idx": 163,
+        "start_date": "2013-02",
+        "end_date": "2026-08",
+        "n_months": 163
+      }
+    },
+    "single_fund_119091": {
+      "fund_ids": [
+        119091
+      ],
+      "result": {
+        "fund_ids": [
+          119091
+        ],
+        "start_idx": 0,
+        "end_idx": 163,
+        "start_date": "2013-01",
+        "end_date": "2026-08",
+        "n_months": 164
+      }
+    }
+  },
+  "fund_118632_within_44_fund_window": {
+    "mean": 0.003208681818181819,
+    "std": 0.042003270739297216
+  },
+  "correlation_cells": {
+    "corr_152881_151739": 0.7543051829241404,
+    "corr_119091_118632": 0.47767122058269523
+  },
+  "maths_small_multi_fund": {
+    "fund_ids": [
+      118632,
+      118955,
+      119091
+    ],
+    "window": {
+      "fund_ids": [
+        118632,
+        118955,
+        119091
+      ],
+      "start_idx": 1,
+      "end_idx": 163,
+      "start_date": "2013-02",
+      "end_date": "2026-08",
+      "n_months": 163
+    },
+    "means": {
+      "118632": 0.013230429447852757,
+      "118955": 0.013984815950920243,
+      "119091": 0.005488365030674848
+    },
+    "stds": {
+      "118632": 0.049921788427272906,
+      "118955": 0.05266923977788868,
+      "119091": 0.0014782612211120443
+    },
+    "covariance_matrix": {
+      "118632": {
+        "118632": 0.002492184959777399,
+        "118955": 0.002546559190733848,
+        "119091": 4.3875837004847237e-07
+      },
+      "118955": {
+        "118632": 0.002546559190733848,
+        "118955": 0.002774048818780731,
+        "119091": 3.497505614254373e-07
+      },
+      "119091": {
+        "118632": 4.3875837004847237e-07,
+        "118955": 3.497505614254373e-07,
+        "119091": 2.1852562378436724e-06
+      }
+    },
+    "correlation_matrix": {
+      "118632": {
+        "118632": 1.0,
+        "118955": 0.9685155321059434,
+        "119091": 0.005945441288190887
+      },
+      "118955": {
+        "118632": 0.9685155321059434,
+        "118955": 1.0,
+        "119091": 0.004492107969579713
+      },
+      "119091": {
+        "118632": 0.005945441288190887,
+        "118955": 0.004492107969579713,
+        "119091": 1.0
+      }
+    }
+  },
+  "full_universe_eigen": {
+    "n_funds": 44,
+    "effective_n": 2.0402912374157536,
+    "top_eigenvalue": 37.493217031771465
+  },
+  "portfolio_single_fund_validation": {
+    "test_fid": 118632,
+    "portfolio_monthly_return": 0.003208681818181819,
+    "portfolio_monthly_std": 0.042003270739297216,
+    "expected_mean": 0.003208681818181819,
+    "expected_std": 0.042003270739297216
+  },
+  "portfolio_normalization_validation": {
+    "raw_weights": {
+      "118632": 3.0,
+      "118955": 1.0
+    },
+    "pre_normalized_weights": {
+      "118632": 0.75,
+      "118955": 0.25
+    },
+    "raw_weights_return": 0.003957909090909091,
+    "normalized_return": 0.003957909090909091
+  },
+  "thesis_test": {
+    "all_equity_effective_n": 1.2431758154172698,
+    "equity_plus_debt_effective_n": 1.6605580942449014
+  },
+  "confidence_flags": {
+    "portfolio_window_note": {
+      "reason": "short_shared_window",
+      "detail": "All stats in this selection are computed over a shared window of only 22 months (2024-11 to 2026-08), even though most funds here have far longer individual histories. This is driven by fund 152881, which only has 22 months of its own history and sets the floor for the whole selection."
+    },
+    "flags_152881": [
+      {
+        "reason": "intrinsically_short_history",
+        "detail": "This fund only has 22 months of history in total (under 36 months) \u2014 likely a recently-launched fund. Its own stats, not just the shared window, are based on limited data."
+      }
+    ],
+    "flags_119091": [
+      {
+        "reason": "low_variance_relative_to_group",
+        "detail": "Std dev (0.0679%) is under 10% of the group's median (4.7241%). Correlations involving this fund can be noisy \u2014 a handful of months can swing the coefficient with limited underlying signal."
+      }
+    ],
+    "flags_120754": [
+      {
+        "reason": "low_variance_relative_to_group",
+        "detail": "Std dev (0.4367%) is under 10% of the group's median (4.7241%). Correlations involving this fund can be noisy \u2014 a handful of months can swing the coefficient with limited underlying signal."
+      }
+    ],
+    "n_flagged_funds": 3
+  }
+}
