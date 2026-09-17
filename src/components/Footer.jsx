@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
+import { Link } from "react-router-dom"
 import { links as siteLinks } from "../data/links"
 import GithubMark from "./icons/GithubMark"
 import LinkedinMark from "./icons/LinkedinMark"
@@ -37,6 +38,16 @@ export default function Footer() {
       </motion.h2>
 
       <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 font-mono text-sm">
+        <Link
+          to="/portfolio"
+          className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
+        >
+          Portfolio builder
+          <ArrowUpRight
+            size={14}
+            className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
+        </Link>
         {footerLinks.map((l) => {
           const Icon = l.icon
           return (
