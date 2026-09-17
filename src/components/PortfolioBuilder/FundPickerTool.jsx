@@ -108,6 +108,18 @@ export default function FundPickerTool() {
   const stats = useMemo(() => {
     if (weights.size === 0) return null;
     try {
+      // A single selected fund has nothing to share a window with — the
+      // "shared window" concept (and the universe-wide 22-month window it
+      // produces, driven by the newest fund in the 44-fund set) doesn't
+      // apply. Use that fund's own overlap window (= its own full
+      // available history) instead of slicing into the precomputed
+      // universe stats, so a lone fund's return/std/Sharpe reflect its
+      // real history rather than an unrelated fund's recent inception.
+      if (weights.size === 1) {
+        const [singleId] = weights.keys();
+        const ownWindow = getOverlapWindow([singleId], fundsData);
+        return computePortfolioStats(weights, [singleId], ownWindow, fundsData);
+      }
       return computePortfolioStats(
         weights,
         UNIVERSE_FUND_IDS,
