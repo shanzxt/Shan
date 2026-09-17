@@ -15,6 +15,7 @@ import { EASE_OUT } from "../../lib/motion";
 import FundList from "./FundList";
 import CorrelationHeatmap from "./CorrelationHeatmap";
 import StatsPanel from "./StatsPanel";
+import DiversificationBars from "./DiversificationBars";
 
 const UNIVERSE_FUND_IDS = fundsData.funds
   .map((f) => f.id)
@@ -267,6 +268,8 @@ export default function FundPickerTool() {
             fundsById={FUNDS_BY_ID}
             corr={UNIVERSE_CORR}
           />
+
+          <DiversificationBars stats={stats} fundsById={FUNDS_BY_ID} />
         </div>
       </div>
     </div>

@@ -195,6 +195,12 @@ function computePortfolioStats(rawWeights, fundIds, window, data, means = null, 
     annual_std: annualStd,
     sharpe_ratio: sharpe,
     effective_n: effectiveN,
+    // Raw eigenvalues of the selected subset's correlation matrix, same
+    // order as `selectedIds` above (not sorted) — the perceived-vs-actual
+    // bar visual sorts and groups these for display; sum equals
+    // selectedIds.length (correlation matrix trace), per
+    // sanityCheckEigenvaluesSumToN above.
+    eigenvalues,
     n_funds_selected: selectedIds.length,
     confidence_flags: relevantFlags,
     portfolio_window_note: portfolioNote,
