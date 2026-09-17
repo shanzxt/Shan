@@ -15,6 +15,10 @@ function mix(c1, c2, t) {
   return `rgb(${lerp(c1[0], c2[0], t)}, ${lerp(c1[1], c2[1], t)}, ${lerp(c1[2], c2[2], t)})`;
 }
 
+function rgbStr(c) {
+  return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+}
+
 // -1..0 fades teal -> dark bg, 0..1 rises from dark bg -> amber, so the
 // bg genuinely "shows through" at low/negative correlation rather than
 // just being one end of a two-color gradient.
@@ -29,13 +33,46 @@ function colorForCorrelation(r) {
 const CELL = 100;
 const LABEL_SPACE = 26;
 
+function Legend() {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div
+        className="h-2 w-full max-w-xs rounded-full border hr-line"
+        style={{
+          background: `linear-gradient(to right, ${rgbStr(ACCENT)}, ${rgbStr(BG)}, ${rgbStr(TEAL)})`,
+        }}
+      />
+      <div className="flex w-full max-w-xs justify-between font-mono text-[10px] text-paper/40">
+        <span>moves together</span>
+        <span></span>
+        <span>moves independently</span>
+      </div>
+    </div>
+  );
+}
+
 export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
   const [hovered, setHovered] = useState(null);
 
+  const caption = (
+    <>
+      <span className="font-mono text-xs tracking-wide text-teal">correlation heatmap</span>
+      <p className="max-w-md text-[13px] text-paper/60">
+        Each square shows how closely two funds move together. Bright amber =
+        they rise and fall almost in lockstep. Dark = one goes its own way. A
+        portfolio that's all bright squares isn't as diversified as it looks.
+      </p>
+      <Legend />
+    </>
+  );
+
   if (fundIds.length < 2) {
     return (
-      <div className="rounded-lg border hr-line px-4 py-6 text-center text-sm text-paper/40">
-        Select at least two funds to see their correlation heatmap.
+      <div className="flex flex-col gap-3">
+        {caption}
+        <div className="rounded-lg border hr-line px-4 py-6 text-center text-sm text-paper/40">
+          Select at least two funds to see their correlation heatmap.
+        </div>
       </div>
     );
   }
@@ -63,7 +100,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="font-mono text-xs tracking-wide text-teal">correlation heatmap</span>
+      {caption}
       <div className="relative">
         <svg
           viewBox={`0 0 ${size} ${size}`}

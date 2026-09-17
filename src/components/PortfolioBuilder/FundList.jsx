@@ -41,11 +41,21 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
 
   return (
     <div className="flex flex-col gap-5">
+      <p className="text-[13px] text-paper/60">
+        Pick a few funds below, or tap a preset. Every number on the right
+        updates as you go.
+      </p>
+
       {selectedFunds.length > 0 && (
         <div className="flex flex-col gap-2 rounded-lg border hr-line p-4">
           <span className="font-mono text-xs tracking-wide text-teal">
             selected ({selectedFunds.length})
           </span>
+          <p className="text-[12px] text-paper/45">
+            Drag to change how much of the portfolio goes into each fund.
+            These always add up to 100% — dragging one down means the others
+            take up the slack.
+          </p>
           <AnimatePresence initial={false}>
             {selectedFunds.map((f) => (
               <motion.div
@@ -72,6 +82,7 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
                 <WeightSlider
                   fundId={f.id}
                   value={weights.get(f.id)}
+                  allWeights={weights}
                   onChange={onWeightChange}
                   color={colorForCategory.get(f.category)}
                 />

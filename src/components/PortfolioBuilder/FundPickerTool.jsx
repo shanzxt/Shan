@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import fundsData from "../../lib/portfolioEngine/funds_aligned.json";
 import { getOverlapWindow } from "../../lib/portfolioEngine/overlap.js";
@@ -47,6 +47,30 @@ export default function FundPickerTool() {
   const [weights, setWeights] = useState(() => new Map());
   const [highlightPreset, setHighlightPreset] = useState(null);
 
+  // "Bridge back to the intro animation" tooltip, anchored to the
+  // effective-N number — shown once, the first time a number appears
+  // (whether via manual pick or preset), then stays dismissed for the
+  // rest of the visit.
+  const [introTooltipShown, setIntroTooltipShown] = useState(false);
+  const [introTooltipDismissed, setIntroTooltipDismissed] = useState(false);
+  const showIntroTooltip = introTooltipShown && !introTooltipDismissed;
+  const dismissIntroTooltip = useCallback(() => setIntroTooltipDismissed(true), []);
+
+  // Transient "that's a real jump" note after a preset click. Tracked via
+  // a ref (not state) for the pending before-value so it survives the
+  // setWeights -> recompute round trip without re-rendering twice.
+  const [presetJump, setPresetJump] = useState(null);
+  const pendingJumpFromRef = useRef(null);
+  const jumpTimeoutRef = useRef(null);
+
+  const clearPresetJump = useCallback(() => {
+    pendingJumpFromRef.current = null;
+    clearTimeout(jumpTimeoutRef.current);
+    setPresetJump(null);
+  }, []);
+
+  useEffect(() => () => clearTimeout(jumpTimeoutRef.current), []);
+
   const selectedIds = useMemo(() => [...weights.keys()], [weights]);
 
   const addFund = useCallback((fundId) => {
@@ -57,7 +81,8 @@ export default function FundPickerTool() {
       return next;
     });
     setHighlightPreset(null);
-  }, []);
+    clearPresetJump();
+  }, [clearPresetJump]);
 
   const removeFund = useCallback((fundId) => {
     setWeights((prev) => {
@@ -67,7 +92,8 @@ export default function FundPickerTool() {
       return next;
     });
     setHighlightPreset(null);
-  }, []);
+    clearPresetJump();
+  }, [clearPresetJump]);
 
   const setWeight = useCallback((fundId, rawWeight) => {
     setWeights((prev) => {
@@ -76,13 +102,8 @@ export default function FundPickerTool() {
       next.set(fundId, rawWeight);
       return next;
     });
-  }, []);
-
-  const applyPreset = useCallback((preset) => {
-    const next = new Map(preset.fundIds.map((id) => [id, DEFAULT_RAW_WEIGHT]));
-    setWeights(next);
-    setHighlightPreset(preset.label);
-  }, []);
+    clearPresetJump();
+  }, [clearPresetJump]);
 
   const stats = useMemo(() => {
     if (weights.size === 0) return null;
@@ -105,6 +126,42 @@ export default function FundPickerTool() {
     }
   }, [weights]);
 
+  // First time a real number appears on screen (manual pick or preset),
+  // surface the one-time bridge-back-to-the-animation tooltip.
+  useEffect(() => {
+    if (stats && !introTooltipShown) {
+      setIntroTooltipShown(true);
+    }
+  }, [stats, introTooltipShown]);
+
+  const applyPreset = useCallback((preset) => {
+    // If the intro tooltip is about to show (or already showing), don't
+    // also fire the jump note on top of it — see the ordering rule in
+    // the prompt. Otherwise capture the pre-click effective N so the
+    // jump note can state a real "from ~X to ~Y" once stats recompute.
+    const introWillOccupyTheSpot = !introTooltipShown || showIntroTooltip;
+    pendingJumpFromRef.current = introWillOccupyTheSpot ? null : (stats ? stats.effective_n : null);
+    clearTimeout(jumpTimeoutRef.current);
+    setPresetJump(null);
+
+    const next = new Map(preset.fundIds.map((id) => [id, DEFAULT_RAW_WEIGHT]));
+    setWeights(next);
+    setHighlightPreset(preset.label);
+  }, [introTooltipShown, showIntroTooltip, stats]);
+
+  // Resolve the pending jump note once new stats land from a preset click.
+  useEffect(() => {
+    if (pendingJumpFromRef.current === null || !stats) return;
+    const from = pendingJumpFromRef.current;
+    const to = stats.effective_n;
+    pendingJumpFromRef.current = null;
+    if (to > from) {
+      setPresetJump({ from, to });
+      clearTimeout(jumpTimeoutRef.current);
+      jumpTimeoutRef.current = setTimeout(() => setPresetJump(null), 6000);
+    }
+  }, [stats]);
+
   return (
     <div className="w-full max-w-5xl flex flex-col gap-10">
       <div className="flex flex-col items-center gap-3 text-center">
@@ -119,6 +176,11 @@ export default function FundPickerTool() {
           the animation above, running live on real NAV history.
         </p>
       </div>
+
+      <p className="max-w-md text-center text-[13px] text-teal">
+        Try it: start all-equity, then add one low-correlation fund and watch
+        what happens to the number on the right.
+      </p>
 
       <div className="flex flex-wrap justify-center gap-3 font-mono text-sm">
         <button
@@ -141,6 +203,7 @@ export default function FundPickerTool() {
             onClick={() => {
               setWeights(new Map());
               setHighlightPreset(null);
+              clearPresetJump();
             }}
             className="rounded-md px-4 py-2 text-paper/40 transition-colors hover:text-paper/70"
           >
@@ -167,7 +230,13 @@ export default function FundPickerTool() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, ease: EASE_OUT }}
               >
-                <StatsPanel stats={stats} highlightPreset={highlightPreset} />
+                <StatsPanel
+                  stats={stats}
+                  highlightPreset={highlightPreset}
+                  showIntroTooltip={showIntroTooltip}
+                  onDismissIntroTooltip={dismissIntroTooltip}
+                  presetJump={presetJump}
+                />
               </motion.div>
             ) : (
               <motion.p
