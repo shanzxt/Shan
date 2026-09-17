@@ -4,7 +4,6 @@ import { useState } from "react";
 // tokens (index.css) — needed as literal hex here because SVG fill
 // interpolation happens in JS, not CSS, so var() alone can't be blended.
 const TEAL = [0x4e, 0x7c, 0x7a];
-const BG = [0x12, 0x15, 0x1a];
 const ACCENT = [0xff, 0xb0, 0x00];
 
 function lerp(a, b, t) {
@@ -19,15 +18,17 @@ function rgbStr(c) {
   return `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
 }
 
-// -1..0 fades teal -> dark bg, 0..1 rises from dark bg -> amber, so the
-// bg genuinely "shows through" at low/negative correlation rather than
-// just being one end of a two-color gradient.
+// Direct hue blend from teal (r = -1, "moves independently") to amber
+// (r = +1, "moves together") — NOT a fade through the dark bg. Mixing
+// through bg at r = 0 meant any positive r (the overwhelming majority of
+// real pairs here) only ever mixed toward amber, so cells only varied in
+// amber's lightness and never actually read as teal-shifted, even for
+// comparatively low-but-still-positive correlations. Must match the
+// legend gradient exactly (see Legend below) — same two colors, same t.
 function colorForCorrelation(r) {
   const clamped = Math.max(-1, Math.min(1, r));
-  if (clamped <= 0) {
-    return mix(BG, TEAL, -clamped);
-  }
-  return mix(BG, ACCENT, clamped);
+  const t = (clamped + 1) / 2;
+  return mix(TEAL, ACCENT, t);
 }
 
 const CELL = 100;
@@ -39,7 +40,7 @@ function Legend() {
       <div
         className="h-2 w-full max-w-xs rounded-full border hr-line"
         style={{
-          background: `linear-gradient(to right, ${rgbStr(ACCENT)}, ${rgbStr(BG)}, ${rgbStr(TEAL)})`,
+          background: `linear-gradient(to right, ${rgbStr(ACCENT)}, ${rgbStr(TEAL)})`,
         }}
       />
       <div className="flex w-full max-w-xs justify-between font-mono text-[10px] text-paper/40">
