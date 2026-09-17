@@ -173,7 +173,7 @@ function computePortfolioStats(rawWeights, fundIds, window, data, means = null, 
   // Effective N for just this subset — decompose the subset's OWN
   // correlation matrix, not the full 44-fund one.
   const subsetCorrMatrix = correlationDictToMatrix(corr, selectedIds);
-  const [eigenvalues] = jacobiEigen(subsetCorrMatrix);
+  const [eigenvalues, eigenvectors] = jacobiEigen(subsetCorrMatrix);
   sanityCheckEigenvaluesSumToN(eigenvalues, selectedIds.length);
   const effectiveN = computeEffectiveN(eigenvalues);
 
@@ -196,11 +196,17 @@ function computePortfolioStats(rawWeights, fundIds, window, data, means = null, 
     sharpe_ratio: sharpe,
     effective_n: effectiveN,
     // Raw eigenvalues of the selected subset's correlation matrix, same
-    // order as `selectedIds` above (not sorted) — the perceived-vs-actual
-    // bar visual sorts and groups these for display; sum equals
+    // order as `selectedIds` above (not sorted) — sum equals
     // selectedIds.length (correlation matrix trace), per
     // sanityCheckEigenvaluesSumToN above.
     eigenvalues,
+    // jacobiEigen's `v`: eigenvectors[i][k] is fund i's (selectedIds
+    // order) component on eigenvector k (same, unsorted, index space as
+    // `eigenvalues` above). Previously computed and discarded — now
+    // exposed so callers (the perceived-vs-actual floor visual) can plot
+    // each fund's loading on the dominant common factor(s) instead of
+    // recomputing the decomposition a second time.
+    eigenvectors,
     n_funds_selected: selectedIds.length,
     confidence_flags: relevantFlags,
     portfolio_window_note: portfolioNote,
