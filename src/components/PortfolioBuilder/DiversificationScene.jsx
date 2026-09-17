@@ -10,7 +10,11 @@ const ACCENT = [0xff, 0xb0, 0x00];
 
 const AMPLITUDE = 110; // px — how far a fund's floor position can spread from center
 const TILT_DEG = 55; // stage rotateX — viewing angle onto the floor
-const HEIGHTS = [72, 96, 58, 88, 108, 64, 92, 78, 110, 68]; // decorative float heights, cycled by index
+// Fixed, identical for every fund — purely decorative spacing off the
+// floor. Screen height is otherwise a genuine function of floor (x, z)
+// only (via the shared group's translate3d + the stage's rotateX/
+// perspective), not an arbitrary per-fund value.
+const FLOAT_OFFSET = 86;
 
 function lerp(a, b, t) {
   return a + (b - a) * t;
@@ -53,12 +57,7 @@ function computeFloorPositions(stats, fundsById) {
   const maxAbs = Math.max(1e-6, ...raw.map((p) => Math.max(Math.abs(p.x), Math.abs(p.z))));
   const scale = AMPLITUDE / maxAbs;
 
-  const scaled = raw.map((p, i) => ({
-    ...p,
-    x: p.x * scale,
-    z: p.z * scale,
-    height: HEIGHTS[i % HEIGHTS.length],
-  }));
+  const scaled = raw.map((p) => ({ ...p, x: p.x * scale, z: p.z * scale }));
 
   const cx = scaled.reduce((s, p) => s + p.x, 0) / n;
   const cz = scaled.reduce((s, p) => s + p.z, 0) / n;
@@ -72,9 +71,54 @@ function computeFloorPositions(stats, fundsById) {
     dMax += 0.5;
   }
 
-  const points = scaled.map((p, i) => {
+  // Depth cue: a point's z alone (not x, not index) sets how "far back" on
+  // the grid it reads — nearer points render slightly larger/brighter,
+  // farther points slightly smaller/dimmer, the same way a real object
+  // recedes on a tilted plane. Consistent single source, no per-fund
+  // arbitrary jitter.
+  const zMin = Math.min(...scaled.map((p) => p.z));
+  const zMax = Math.max(...scaled.map((p) => p.z));
+  const zSpan = zMax - zMin;
+
+  const rawPoints = scaled.map((p, i) => {
     const t = Math.max(0, Math.min(1, (distances[i] - dMin) / (dMax - dMin)));
-    return { ...p, shadowColor: mixColor(ACCENT, TEAL, t), distance: distances[i] };
+    const depthT = zSpan > 1e-6 ? (p.z - zMin) / zSpan : 0.5;
+    return {
+      ...p,
+      shadowColor: mixColor(ACCENT, TEAL, t),
+      distance: distances[i],
+      depthScale: lerp(1.15, 0.8, depthT),
+      depthOpacity: lerp(1, 0.6, depthT),
+    };
+  });
+
+  // Real fund data regularly puts several near-identical funds on
+  // essentially the same floor spot (that's the whole thesis — a "tight
+  // cluster" of funds making the same bet). Rendered literally, their
+  // spheres/shadows/labels stack into one unreadable blob. Nudge only the
+  // ON-SCREEN position apart when points collide, in a small spiral, so a
+  // tight cluster reads as "several dots huddled together" instead of a
+  // single dot hiding how many funds are really there — renderX/renderZ
+  // are display-only, distance/color/isolation logic above already used
+  // the real x/z.
+  const COLLISION_RADIUS = 15;
+  const placedRender = [];
+  const points = rawPoints.map((p) => {
+    let rx = p.x;
+    let rz = p.z;
+    let attempt = 0;
+    while (
+      placedRender.some((q) => Math.hypot(rx - q.x, rz - q.z) < COLLISION_RADIUS) &&
+      attempt < 12
+    ) {
+      attempt += 1;
+      const angle = attempt * 2.4;
+      const radius = COLLISION_RADIUS * 0.55 * attempt;
+      rx = p.x + Math.cos(angle) * radius;
+      rz = p.z + Math.sin(angle) * radius;
+    }
+    placedRender.push({ x: rx, z: rz });
+    return { ...p, renderX: rx, renderZ: rz };
   });
 
   // Flag a fund whose shadow clearly separates from the rest, for the
@@ -104,6 +148,7 @@ export default function DiversificationScene({ stats, fundsById }) {
 
   const { points, isolated } = scene;
   const n = points.length;
+  const isolatedIndex = isolated ? points.findIndex((p) => p.fid === isolated.fid) + 1 : null;
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border hr-line p-5">
@@ -117,16 +162,17 @@ export default function DiversificationScene({ stats, fundsById }) {
         </p>
         {isolated && (
           <p className="mt-1 max-w-md text-[13px] text-teal">
-            {isolated.name}'s shadow lands clearly apart from the rest — a real
-            diversification win, not just a different-looking fund.
+            Fund {isolatedIndex} — {isolated.name}'s shadow lands clearly apart
+            from the rest, ringed below — a real diversification win, not
+            just a different-looking fund.
           </p>
         )}
       </div>
 
-      <div className="mx-auto w-full max-w-sm" style={{ perspective: 900 }}>
+      <div className="mx-auto mt-4 w-full max-w-sm" style={{ perspective: 900 }}>
         <motion.div
           className="relative"
-          style={{ height: 260, transformStyle: "preserve-3d" }}
+          style={{ height: 320, transformStyle: "preserve-3d" }}
           animate={{ rotateY: [-6, 6, -6] }}
           transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
         >
@@ -150,56 +196,122 @@ export default function DiversificationScene({ stats, fundsById }) {
               }}
             />
 
-            {points.map((p) => (
-              <motion.div
-                key={p.fid}
-                className="absolute"
-                style={{ left: "50%", top: "50%", transformStyle: "preserve-3d" }}
-                animate={{ x: p.x, z: p.z }}
-                transition={SPRING_SNAP}
-              >
-                {/* shadow — stays on the floor plane; this is the "actual" position */}
+            {points.map((p, i) => {
+              const isIsolated = isolated?.fid === p.fid;
+              return (
                 <motion.div
-                  className="absolute rounded-full"
-                  style={{
-                    left: -9,
-                    top: -9,
-                    width: 18,
-                    height: 18,
-                    filter: "blur(1px)",
-                  }}
-                  animate={{ backgroundColor: p.shadowColor, opacity: 0.85 }}
+                  key={p.fid}
+                  className="absolute"
+                  style={{ left: "50%", top: "50%", transformStyle: "preserve-3d" }}
+                  animate={{ x: p.renderX, z: p.renderZ }}
                   transition={SPRING_SNAP}
-                  title={p.name}
-                />
-                {/* sphere — floats up from the floor on first reveal, decorative height only */}
-                <motion.div
-                  className="absolute rounded-full border hr-line"
-                  style={{
-                    left: -7,
-                    top: -7,
-                    width: 14,
-                    height: 14,
-                    background: "rgba(237, 234, 226, 0.55)",
-                    boxShadow: "0 0 10px rgba(237, 234, 226, 0.35)",
-                  }}
-                  initial={{ y: 0, opacity: 0 }}
-                  whileInView={{ y: -p.height, opacity: 1 }}
-                  viewport={{ once: true, amount: 0.4 }}
-                  animate={{ y: -p.height }}
-                  transition={SPRING_SNAP}
-                  title={p.name}
-                />
-              </motion.div>
-            ))}
+                >
+                  {/* connecting beam — the one element that makes "floating fund" and
+                      "where it actually lands" read as the same object, not two
+                      unrelated dots. Fixed length (FLOAT_OFFSET), fades toward the
+                      floating end. */}
+                  <div
+                    className="absolute"
+                    style={{
+                      left: -1,
+                      top: -FLOAT_OFFSET,
+                      width: 2,
+                      height: FLOAT_OFFSET,
+                      background:
+                        "linear-gradient(to top, rgba(237, 234, 226, 0.45) 0%, rgba(237, 234, 226, 0.04) 100%)",
+                      opacity: p.depthOpacity,
+                    }}
+                  />
+
+                  {/* isolation ring — visually ties the dynamic callout sentence to a
+                      specific dot instead of asking the reader to take it on faith. */}
+                  {isIsolated && (
+                    <motion.div
+                      className="absolute rounded-full"
+                      style={{
+                        left: -16,
+                        top: -16,
+                        width: 32,
+                        height: 32,
+                        border: "1.5px solid var(--color-teal)",
+                      }}
+                      animate={{ opacity: [0.85, 0.35, 0.85], scale: [1, 1.12, 1] }}
+                      transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  )}
+
+                  {/* shadow — stays on the floor plane; this is the "actual" position.
+                      Color is the only place amber/teal cluster meaning lives. */}
+                  <motion.div
+                    className="absolute rounded-full"
+                    style={{
+                      left: -9,
+                      top: -9,
+                      width: 18,
+                      height: 18,
+                      filter: "blur(1px)",
+                    }}
+                    animate={{
+                      backgroundColor: p.shadowColor,
+                      opacity: 0.85 * p.depthOpacity,
+                      scale: p.depthScale,
+                    }}
+                    transition={SPRING_SNAP}
+                    title={p.name}
+                  />
+
+                  {/* sphere — floats up from the floor on first reveal. Neutral/muted
+                      only, so color meaning stays exclusive to the shadow below it. */}
+                  <motion.div
+                    className="absolute rounded-full border hr-line"
+                    style={{
+                      left: -7,
+                      top: -7,
+                      width: 14,
+                      height: 14,
+                      background:
+                        "radial-gradient(circle at 35% 30%, rgba(237, 234, 226, 0.9), rgba(237, 234, 226, 0.35) 70%)",
+                      boxShadow: "0 0 10px rgba(237, 234, 226, 0.35)",
+                    }}
+                    initial={{ y: 0, opacity: 0, scale: p.depthScale }}
+                    whileInView={{ y: -FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    animate={{ y: -FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
+                    transition={SPRING_SNAP}
+                    title={p.name}
+                  />
+
+                  {/* persistent numeric label — identifies the fund at a glance,
+                      matching the same 1..n convention the correlation heatmap's
+                      row/column labels use, without requiring hover. */}
+                  <div
+                    className="absolute select-none whitespace-nowrap rounded px-1 font-mono text-[9px] leading-[14px]"
+                    style={{
+                      left: 10,
+                      top: -FLOAT_OFFSET - 5,
+                      background: "rgba(0, 0, 0, 0.45)",
+                      color: isIsolated ? "var(--color-teal)" : "var(--color-paper)",
+                      opacity: p.depthOpacity,
+                    }}
+                  >
+                    {i + 1}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>
 
+      <p className="text-center text-[11px] leading-relaxed text-paper/35">
+        {points.map((p, i) => `${i + 1}. ${p.name}`).join("  ·  ")}
+      </p>
+
       <p className="text-center text-[11px] text-paper/35">
-        Height is just spacing so the spheres don't overlap. The shadow below
-        each one is the fund's real position — its loading on the dominant
-        shared factor(s) behind your current selection.
+        Each sphere's shadow is the fund's real position — its loading on the
+        dominant shared factor(s) behind your current selection. The line
+        between them is just the tether; height and size are depth cues, not
+        data.
       </p>
     </div>
   );
