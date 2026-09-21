@@ -158,7 +158,67 @@ function computeFloorPositions(stats, fundsById) {
     }
   }
 
-  return { points, isolated };
+  // Which shadows actually read as "the same bet" vs. "its own thing" — for
+  // the on-floor cluster/outlier labels. The cluster is every point except
+  // the flagged isolated one (or, when nothing is isolated, the whole
+  // selection — e.g. the all-equity preset, where there's no outlier to
+  // split off). Bounds are padded past the shadows themselves and floored
+  // at a minimum size so a genuinely tight cluster (the interesting case —
+  // several shadows nearly on top of each other) still draws a visible ring
+  // rather than collapsing to nothing.
+  const clusterPoints = isolated ? points.filter((p) => p.fid !== isolated.fid) : points;
+  let clusterBounds = null;
+  if (clusterPoints.length >= 2) {
+    const xs = clusterPoints.map((p) => p.renderX);
+    const zs = clusterPoints.map((p) => p.renderZ);
+    const PAD = 26;
+    const MIN_SIZE = 56;
+    clusterBounds = {
+      cx: (Math.min(...xs) + Math.max(...xs)) / 2,
+      cz: (Math.min(...zs) + Math.max(...zs)) / 2,
+      w: Math.max(Math.max(...xs) - Math.min(...xs) + PAD * 2, MIN_SIZE),
+      h: Math.max(Math.max(...zs) - Math.min(...zs) + PAD * 2, MIN_SIZE),
+    };
+  }
+
+  return { points, isolated, clusterBounds };
+}
+
+// Static, non-interactive callout showing the encoding once, in isolation,
+// before the reader looks at the real (data-driven) scene below — visually
+// distinct (dashed border, smaller scale, muted) so it reads as a legend,
+// never mistaken for another data point.
+function ReadingLegend() {
+  return (
+    <div className="mx-auto flex w-full max-w-xs items-center gap-3 rounded-md border border-dashed hr-line bg-paper/[0.03] px-3 py-2.5">
+      <div className="relative h-16 w-8 shrink-0">
+        <div
+          className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 rounded-full border hr-line"
+          style={{
+            background:
+              "radial-gradient(circle at 35% 30%, rgba(237, 234, 226, 0.9), rgba(237, 234, 226, 0.35) 70%)",
+          }}
+        />
+        <div
+          className="absolute left-1/2 top-3 w-px -translate-x-1/2"
+          style={{
+            height: 34,
+            background:
+              "linear-gradient(to bottom, rgba(237, 234, 226, 0.45) 0%, rgba(237, 234, 226, 0.1) 100%)",
+          }}
+        />
+        <div
+          className="absolute left-1/2 h-3 w-3 -translate-x-1/2 rounded-full"
+          style={{ top: 46, background: "var(--color-accent)", opacity: 0.85 }}
+        />
+      </div>
+      <div className="flex flex-col gap-1 font-mono text-[10px] leading-tight text-paper/45">
+        <span>sphere — a fund</span>
+        <span>line — just spacing, ignore the length</span>
+        <span>shadow — where it really sits, based on how it moves with the others</span>
+      </div>
+    </div>
+  );
 }
 
 export default function DiversificationScene({ stats, fundsById }) {
@@ -171,7 +231,7 @@ export default function DiversificationScene({ stats, fundsById }) {
 
   if (!scene) return null;
 
-  const { points, isolated } = scene;
+  const { points, isolated, clusterBounds } = scene;
   const n = points.length;
   const isolatedIndex = isolated ? points.findIndex((p) => p.fid === isolated.fid) + 1 : null;
   const hoveredPoint = hovered !== null ? points.find((p) => p.fid === hovered) : null;
@@ -195,6 +255,8 @@ export default function DiversificationScene({ stats, fundsById }) {
           </p>
         )}
       </div>
+
+      <ReadingLegend />
 
       <div className="mx-auto mt-4 w-full max-w-sm" style={{ perspective: 900 }}>
         <motion.div
@@ -222,6 +284,80 @@ export default function DiversificationScene({ stats, fundsById }) {
                 backgroundColor: "rgba(0,0,0,0.15)",
               }}
             />
+
+            {/* Shared direction, cluster centroid -> isolated point. The
+                cluster label is pushed to the opposite side of the ring from
+                the isolated point, and the isolated label is pushed further
+                out beyond the isolated point in the same direction — so the
+                two labels always move apart from each other instead of
+                landing on top of one another, whichever way the isolated
+                fund happens to sit relative to the cluster this selection. */}
+            {(() => {
+              if (!clusterBounds) return null;
+              const dir = isolated
+                ? (() => {
+                    const dx = isolated.renderX - clusterBounds.cx;
+                    const dz = isolated.renderZ - clusterBounds.cz;
+                    const dist = Math.hypot(dx, dz) || 1;
+                    return { x: dx / dist, z: dz / dist };
+                  })()
+                : { x: 0, z: 1 };
+              return (
+                <>
+                  {/* cluster ring + label — makes "these shadows are close
+                      together" explicit on the floor itself instead of
+                      asking the reader to eyeball it. Amber, matching the
+                      heatmap's "moves together" color; covers every shadow
+                      except the isolated one (or the whole selection when
+                      nothing is isolated). */}
+                  <div
+                    className="absolute rounded-full border border-dashed"
+                    style={{
+                      left: `calc(50% + ${clusterBounds.cx}px)`,
+                      top: `calc(50% + ${clusterBounds.cz}px)`,
+                      width: clusterBounds.w,
+                      height: clusterBounds.h,
+                      transform: "translate(-50%, -50%)",
+                      borderColor: "var(--color-accent)",
+                      opacity: 0.3,
+                    }}
+                  />
+                  <div
+                    className="absolute select-none whitespace-nowrap rounded px-1.5 py-0.5 font-mono text-[9px] tracking-wide"
+                    style={{
+                      left: `calc(50% + ${clusterBounds.cx - dir.x * (clusterBounds.w / 2 + 14)}px)`,
+                      top: `calc(50% + ${clusterBounds.cz - dir.z * (clusterBounds.h / 2 + 14)}px)`,
+                      transform: "translate(-50%, -50%)",
+                      background: "rgba(0, 0, 0, 0.5)",
+                      color: "var(--color-accent)",
+                      opacity: 0.85,
+                    }}
+                  >
+                    these move almost identically
+                  </div>
+
+                  {/* isolated label — teal, matching the heatmap's "moves
+                      independently" color; sits beside the ringed shadow so
+                      the reading doesn't depend on the paragraph text
+                      above. */}
+                  {isolated && (
+                    <div
+                      className="absolute select-none whitespace-nowrap rounded px-1.5 py-0.5 font-mono text-[9px] tracking-wide"
+                      style={{
+                        left: `calc(50% + ${isolated.renderX + dir.x * 26}px)`,
+                        top: `calc(50% + ${isolated.renderZ + dir.z * 26}px)`,
+                        transform: "translate(-50%, -50%)",
+                        background: "rgba(0, 0, 0, 0.5)",
+                        color: "var(--color-teal)",
+                        opacity: 0.9,
+                      }}
+                    >
+                      moves on its own
+                    </div>
+                  )}
+                </>
+              );
+            })()}
 
             {points.map((p, i) => {
               const isIsolated = isolated?.fid === p.fid;
@@ -348,7 +484,7 @@ export default function DiversificationScene({ stats, fundsById }) {
         </motion.div>
       </div>
 
-      <HoverDetail placeholder="Hover or tap a sphere for the fund and its loadings.">
+      <HoverDetail placeholder="Shadows close together = funds that move almost identically. A shadow standing apart = a fund that actually moves on its own. Hover or tap a sphere for the fund and its loadings.">
         {hoveredPoint ? (
           <span>
             <span className="text-paper/40">{hoveredIndex}. </span>
