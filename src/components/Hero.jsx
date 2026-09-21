@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { links } from "../data/links"
 import { buildTracePath, TRACE_HEIGHT, TRACE_WIDTH } from "../lib/tracePath"
 import GithubMark from "./icons/GithubMark"
+import KineticHeading from "./KineticHeading"
 import LinkedinMark from "./icons/LinkedinMark"
 
 const trace = buildTracePath()
@@ -96,14 +97,14 @@ export default function Hero() {
           Day 30 — trace resolved
         </motion.p>
 
-        <motion.h1
-          initial={reduceMotion ? false : { opacity: 0, y: 14 }}
-          animate={resolved ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease: "easeOut", delay: 0.08 }}
+        <KineticHeading
+          as="h1"
+          show={resolved}
+          delay={0.08}
           className="max-w-3xl font-display text-5xl font-light leading-[1.05] tracking-tight text-paper sm:text-6xl lg:text-7xl"
         >
           Shantanu Somwanshi
-        </motion.h1>
+        </KineticHeading>
 
         <motion.p
           initial={reduceMotion ? false : { opacity: 0, y: 14 }}

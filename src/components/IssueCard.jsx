@@ -9,6 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts"
+import ClipReveal from "./ClipReveal"
 import GithubMark from "./icons/GithubMark"
 
 function toChartData(chart) {
@@ -59,7 +60,7 @@ export default function IssueCard({ issue, onOpen }) {
       </button>
       <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-paper/70">{issue.hook}</p>
 
-      <div className="mt-6 h-64 w-full">
+      <ClipReveal className="mt-6 h-64 w-full" margin="-40px">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
             <CartesianGrid stroke="var(--color-line)" vertical={false} />
@@ -92,7 +93,7 @@ export default function IssueCard({ issue, onOpen }) {
             ))}
           </LineChart>
         </ResponsiveContainer>
-      </div>
+      </ClipReveal>
 
       <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs">
         {issue.chart.series.map((s) => (

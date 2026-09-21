@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "framer-motion"
 import { issues } from "../data/newsletter"
 import IssueCard from "./IssueCard"
 import IssueModal from "./IssueModal"
+import KineticHeading from "./KineticHeading"
 
 export default function Newsletter() {
   const reduceMotion = useReducedMotion()
@@ -21,15 +22,13 @@ export default function Newsletter() {
         the newsletter
       </motion.p>
 
-      <motion.h2
-        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.55, delay: 0.05 }}
+      <KineticHeading
+        as="h2"
+        delay={0.05}
         className="mt-3 max-w-2xl font-display text-3xl font-light leading-tight text-paper sm:text-4xl"
       >
         A lab notebook on money, not a link dump
-      </motion.h2>
+      </KineticHeading>
       <motion.p
         initial={reduceMotion ? false : { opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}

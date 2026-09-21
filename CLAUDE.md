@@ -83,6 +83,76 @@ Motion: `framer-motion`, gated by `useReducedMotion()` everywhere —
 `initial={reduceMotion ? false : {...}}` is the standard pattern. Section
 reveals use `whileInView` with `viewport={{ once: true, margin: "-80px" }}`.
 
+## Design pass (site-wide motion/visual upgrade)
+
+A full presentation-layer pass, mechanisms adapted from `EshaniWebsite`'s
+`design_guidelines.json` but built entirely on this site's own locked
+tokens/type — no palette, typeface, or theme-switcher import from that
+reference. Content (copy, numbers, labels) was left untouched except for
+one new section called out below.
+
+- **New shared chrome** (`src/components/chrome/`): `GrainOverlay.jsx`
+  (always-on low-opacity SVG noise, site-wide) and `Header.jsx` (the site's
+  first persistent header — fixed, backdrop-blur, compresses on scroll via
+  `useScroll`/`useTransform`, scroll-progress hairline along its bottom
+  edge, nav to the existing section anchor ids). `Home` in `App.jsx` scrolls
+  to `location.hash` on mount so `/#id` links work whether you're already
+  on `/` or crossing over from `/portfolio`.
+- **`KineticHeading.jsx`**: line-reveal (`overflow-hidden` + `y: '100%' →
+  0`) for section-opening headings only — Hero's `<h1>`, `WhatIDo`'s three
+  item titles, `Newsletter`'s and Footer's `<h2>`. Simplified to a
+  single-block reveal rather than true per-line splitting, since none of
+  this site's headings wrap unpredictably across breakpoints.
+- **`ClipReveal.jsx`**: clip-path wipe (`inset(100% 0 0 0) → inset(0)`) for
+  distinct visual chunks — the `IssueCard`/`IssueModal` Recharts blocks,
+  the in-article chart images, and the `/portfolio` page's `IntroAnimation`
+  and `FundPickerTool` container mounts (their own internal animations are
+  untouched, only the container entrance is wrapped).
+- **`useCountUp.js`** + **`ProofStrip.jsx`**: tabular-nums count-up stats
+  under Hero — 45 funds analyzed, 164 months of NAV history, effective N ≈
+  2.04, 25 engineering gotchas logged. All four pulled directly from
+  `src/lib/portfolioEngine/funds_aligned.json` and
+  `n2-Diversification/Code/GOTCHAS.md`, not invented.
+- **`UnderTheHood.jsx`** (new content, not a restyle — flagged here for
+  that reason): a bento-grid block on `/portfolio`, below the fund picker,
+  restating facts already published in `n2-Diversification/Code`'s own
+  docs (offline pipeline, ported math engine, dataset size, gotchas log)
+  rather than introducing new claims.
+- **Footer inversion**: the closing section flips to an amber-forward
+  surface (`bg-accent`, ink text) instead of the site's usual dark
+  background, oversized heading treatment, and a CSS-driven (`.animate-
+  marquee` in `index.css`) horizontal loop of the same real contact email
+  already used elsewhere on the page — swapped for a single static line
+  under `useReducedMotion`.
+- All new motion reuses `EASE_OUT`/`SPRING_SNAP`/`SPRING_SOFT` from
+  `src/lib/motion.js` rather than introducing a second easing language,
+  and every new animated piece is gated by `useReducedMotion()` per the
+  existing pattern (`initial={reduceMotion ? false : {...}}`).
+
+**Deliberately not ported from `EshaniWebsite`:**
+- Lenis smooth-scroll — native `scroll-behavior: smooth` plus the existing
+  reduced-motion CSS block already cover this; a second scroll-owning
+  library was judged not worth the added dependency/a11y surface here.
+- The three-theme switcher and her typefaces (Outfit/Manrope/JetBrains
+  Mono) — this site keeps its single locked dark identity and
+  Fraunces/Source Serif 4/IBM Plex Mono throughout.
+- Sticky-rail case-study scroll narrative — no case-study-length content
+  exists yet (the one newsletter issue is read via `IssueModal`, not a
+  scroll narrative); worth revisiting once an issue like n2-Diversification
+  is actually written up as a walkthrough.
+- Unequal/bento grid treatment for `WhatIDo` (3 equal-weight blocks) and
+  `Work` (a 4-row list, not a 2-3-item side-by-side grid) — neither has the
+  shape that technique is for, so it was left alone rather than forced.
+
+**Known caveat, not a regression**: `mcp__claude-in-chrome`'s
+`resize_window` tool does not actually change `window.innerWidth` in this
+environment (confirmed via `window.innerWidth` staying at the real window
+size after calling it) — narrow-viewport behavior for everything in this
+pass (header nav wrap, `ProofStrip`/bento grid stacking, footer marquee)
+was verified by Tailwind responsive-class code review rather than a live
+narrow-viewport screenshot. Same open caution already on record for the
+`/portfolio` tool itself.
+
 ## Commands
 
 ```

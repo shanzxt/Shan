@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { projects } from "../data/projects"
+import { EASE_OUT } from "../lib/motion"
 import GithubMark from "./icons/GithubMark"
 
 export default function Work() {
@@ -25,7 +26,7 @@ export default function Work() {
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.5, delay: reduceMotion ? 0 : i * 0.06, ease: "easeOut" }}
+            transition={{ duration: 0.5, delay: reduceMotion ? 0 : i * 0.06, ease: EASE_OUT }}
             className={`group relative grid grid-cols-1 gap-3 border-t hr-line py-8 last:border-b sm:grid-cols-[1fr_2fr] ${p.href ? "" : "cursor-default"}`}
           >
             {p.href && (

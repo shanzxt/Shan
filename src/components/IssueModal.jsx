@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight, Maximize2, X } from "lucide-react"
+import ClipReveal from "./ClipReveal"
 import {
   CartesianGrid,
   Line,
@@ -81,6 +82,7 @@ function Block({ block, onOpenImage }) {
     case "image":
       return (
         <figure className="mt-8">
+          <ClipReveal duration={0.7} margin="-40px">
           <button
             type="button"
             onClick={() => onOpenImage(block)}
@@ -97,6 +99,7 @@ function Block({ block, onOpenImage }) {
               <Maximize2 size={14} />
             </span>
           </button>
+          </ClipReveal>
           {block.caption && (
             <figcaption className="mt-2 text-xs leading-relaxed text-paper/45">{block.caption}</figcaption>
           )}
@@ -247,7 +250,7 @@ export default function IssueModal({ issue, onClose }) {
               <span>{issue.date}</span>
             </div>
 
-            <div className="mt-8 h-64 w-full">
+            <ClipReveal className="mt-8 h-64 w-full" duration={0.7} margin="-40px">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                   <CartesianGrid stroke="var(--color-line)" vertical={false} />
@@ -280,7 +283,7 @@ export default function IssueModal({ issue, onClose }) {
                   ))}
                 </LineChart>
               </ResponsiveContainer>
-            </div>
+            </ClipReveal>
 
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs">
               {issue.chart.series.map((s) => (

@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { links } from "../data/links"
+import KineticHeading from "./KineticHeading"
 
 const blocks = [
   {
@@ -51,7 +52,13 @@ export default function WhatIDo() {
             className="border-t hr-line pt-6"
           >
             <span className="font-mono text-xs text-paper/40">{b.tag}</span>
-            <h3 className="mt-2 font-display text-2xl font-medium text-paper">{b.title}</h3>
+            <KineticHeading
+              as="h3"
+              delay={reduceMotion ? 0 : i * 0.08 + 0.1}
+              className="mt-2 font-display text-2xl font-medium text-paper"
+            >
+              {b.title}
+            </KineticHeading>
             <p className="mt-3 text-[15px] leading-relaxed text-paper/70">{b.body}</p>
             <a
               href={b.href}

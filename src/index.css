@@ -54,3 +54,20 @@ body {
 .hr-line {
   border-color: var(--color-line);
 }
+
+/* slow horizontal loop for the footer's inverted closing marquee — driven
+   by CSS rather than a JS animation loop, since it just needs to run
+   forever in the background. Footer.jsx skips mounting this entirely under
+   reduced motion instead of trying to pause it. */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 22s linear infinite;
+}
