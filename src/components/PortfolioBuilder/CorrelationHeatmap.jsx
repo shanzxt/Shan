@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import HoverDetail from "./HoverDetail";
 
 // Hardcoded to match the site's actual --color-accent/--color-teal/--color-bg
 // tokens (index.css) — needed as literal hex here because SVG fill
@@ -235,7 +236,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
         </svg>
       </div>
 
-      <div className="flex min-h-[3rem] items-center justify-center rounded-md border hr-line px-4 py-2 text-center font-mono text-xs tabular-nums text-paper/70">
+      <HoverDetail placeholder="Hover or tap a cell for the exact correlation.">
         {hovered ? (
           <span>
             <span className="text-paper/90">
@@ -247,10 +248,8 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
             </span>
             <span className="text-accent"> · {hovered.value.toFixed(3)}</span>
           </span>
-        ) : (
-          <span className="text-paper/30">Hover or tap a cell for the exact correlation.</span>
-        )}
-      </div>
+        ) : null}
+      </HoverDetail>
     </div>
   );
 }

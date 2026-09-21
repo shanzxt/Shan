@@ -1,6 +1,7 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { SPRING_SNAP } from "../../lib/motion";
+import HoverDetail from "./HoverDetail";
 
 // Same two colors the correlation heatmap uses, so "amber = moves
 // together / teal = moves independently" stays one consistent color
@@ -39,6 +40,8 @@ function computeFloorPositions(stats, fundsById) {
   const projected = selectedIds.map((fid, i) => ({
     fid,
     name: fundsById.get(fid)?.name ?? String(fid),
+    loading0: eigenvectors[i][k0],
+    loading1: eigenvectors[i][k1],
     x: eigenvectors[i][k0] * Math.sqrt(Math.max(eigenvalues[k0], 0)),
     z: eigenvectors[i][k1] * Math.sqrt(Math.max(eigenvalues[k1], 0)),
   }));
@@ -82,7 +85,9 @@ function computeFloorPositions(stats, fundsById) {
 
   const rawPoints = scaled.map((p, i) => {
     const t = Math.max(0, Math.min(1, (distances[i] - dMin) / (dMax - dMin)));
-    const depthT = zSpan > 1e-6 ? (p.z - zMin) / zSpan : 0.5;
+    // z is the floor's depth axis: the largest z sits nearest the viewer,
+    // so it reads largest/brightest.
+    const depthT = zSpan > 1e-6 ? (zMax - p.z) / zSpan : 0.5;
     return {
       ...p,
       shadowColor: mixColor(ACCENT, TEAL, t),
@@ -103,7 +108,7 @@ function computeFloorPositions(stats, fundsById) {
   // the real x/z.
   const COLLISION_RADIUS = 15;
   const placedRender = [];
-  const points = rawPoints.map((p) => {
+  const nudged = rawPoints.map((p) => {
     let rx = p.x;
     let rz = p.z;
     let attempt = 0;
@@ -120,6 +125,24 @@ function computeFloorPositions(stats, fundsById) {
     placedRender.push({ x: rx, z: rz });
     return { ...p, renderX: rx, renderZ: rz };
   });
+
+  // Final fit-to-floor pass. The scaling above normalizes the *projections*,
+  // but the anti-collision nudges are added afterwards and can push an
+  // outlier past the rendered floor's edge (which is what sent a lone
+  // independent fund, plus its tether, off the panel entirely). Rescale all
+  // render positions by one shared factor — proportional, never a per-point
+  // clamp — so the widest point lands just inside the floor and the
+  // relative spread that makes an outlier read as separate is preserved.
+  const spread = Math.max(
+    1e-6,
+    ...nudged.map((p) => Math.max(Math.abs(p.renderX), Math.abs(p.renderZ)))
+  );
+  const fit = Math.min(1, AMPLITUDE / spread);
+  const points = nudged.map((p) => ({
+    ...p,
+    renderX: p.renderX * fit,
+    renderZ: p.renderZ * fit,
+  }));
 
   // Flag a fund whose shadow clearly separates from the rest, for the
   // dynamic callout line — only meaningful with a real "rest" to compare
@@ -139,6 +162,8 @@ function computeFloorPositions(stats, fundsById) {
 }
 
 export default function DiversificationScene({ stats, fundsById }) {
+  const [hovered, setHovered] = useState(null);
+
   const scene = useMemo(() => {
     if (!stats || stats.n_funds_selected < 2) return null;
     return computeFloorPositions(stats, fundsById);
@@ -149,6 +174,8 @@ export default function DiversificationScene({ stats, fundsById }) {
   const { points, isolated } = scene;
   const n = points.length;
   const isolatedIndex = isolated ? points.findIndex((p) => p.fid === isolated.fid) + 1 : null;
+  const hoveredPoint = hovered !== null ? points.find((p) => p.fid === hovered) : null;
+  const hoveredIndex = hoveredPoint ? points.indexOf(hoveredPoint) + 1 : null;
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border hr-line p-5">
@@ -198,12 +225,20 @@ export default function DiversificationScene({ stats, fundsById }) {
 
             {points.map((p, i) => {
               const isIsolated = isolated?.fid === p.fid;
+              const hoverProps = {
+                onPointerEnter: () => setHovered(p.fid),
+                onPointerLeave: () => setHovered(null),
+                onClick: () => setHovered(p.fid),
+              };
               return (
                 <motion.div
                   key={p.fid}
                   className="absolute"
                   style={{ left: "50%", top: "50%", transformStyle: "preserve-3d" }}
-                  animate={{ x: p.renderX, z: p.renderZ }}
+                  // x and y are the two in-plane floor axes (y is depth on the
+                  // tilted floor); height off the floor is the plane's normal,
+                  // handled per-element below with translateZ.
+                  animate={{ x: p.renderX, y: p.renderZ }}
                   transition={SPRING_SNAP}
                 >
                   {/* connecting beam — the one element that makes "floating fund" and
@@ -217,6 +252,11 @@ export default function DiversificationScene({ stats, fundsById }) {
                       top: -FLOAT_OFFSET,
                       width: 2,
                       height: FLOAT_OFFSET,
+                      // Stood up perpendicular to the floor plane, so it
+                      // always runs from the shadow to the sphere directly
+                      // above it and can never stretch off the panel.
+                      transformOrigin: "bottom center",
+                      transform: "rotateX(-90deg)",
                       background:
                         "linear-gradient(to top, rgba(237, 234, 226, 0.45) 0%, rgba(237, 234, 226, 0.04) 100%)",
                       opacity: p.depthOpacity,
@@ -250,7 +290,9 @@ export default function DiversificationScene({ stats, fundsById }) {
                       width: 18,
                       height: 18,
                       filter: "blur(1px)",
+                      cursor: "pointer",
                     }}
+                    {...hoverProps}
                     animate={{
                       backgroundColor: p.shadowColor,
                       opacity: 0.85 * p.depthOpacity,
@@ -272,13 +314,15 @@ export default function DiversificationScene({ stats, fundsById }) {
                       background:
                         "radial-gradient(circle at 35% 30%, rgba(237, 234, 226, 0.9), rgba(237, 234, 226, 0.35) 70%)",
                       boxShadow: "0 0 10px rgba(237, 234, 226, 0.35)",
+                      cursor: "pointer",
                     }}
-                    initial={{ y: 0, opacity: 0, scale: p.depthScale }}
-                    whileInView={{ y: -FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
+                    initial={{ z: 0, opacity: 0, scale: p.depthScale }}
+                    whileInView={{ z: FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
                     viewport={{ once: true, amount: 0.4 }}
-                    animate={{ y: -FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
+                    animate={{ z: FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
                     transition={SPRING_SNAP}
                     title={p.name}
+                    {...hoverProps}
                   />
 
                   {/* persistent numeric label — identifies the fund at a glance,
@@ -288,7 +332,8 @@ export default function DiversificationScene({ stats, fundsById }) {
                     className="absolute select-none whitespace-nowrap rounded px-1 font-mono text-[9px] leading-[14px]"
                     style={{
                       left: 10,
-                      top: -FLOAT_OFFSET - 5,
+                      top: -5,
+                      transform: `translateZ(${FLOAT_OFFSET}px)`,
                       background: "rgba(0, 0, 0, 0.45)",
                       color: isIsolated ? "var(--color-teal)" : "var(--color-paper)",
                       opacity: p.depthOpacity,
@@ -303,9 +348,40 @@ export default function DiversificationScene({ stats, fundsById }) {
         </motion.div>
       </div>
 
-      <p className="text-center text-[11px] leading-relaxed text-paper/35">
-        {points.map((p, i) => `${i + 1}. ${p.name}`).join("  ·  ")}
-      </p>
+      <HoverDetail placeholder="Hover or tap a sphere for the fund and its loadings.">
+        {hoveredPoint ? (
+          <span>
+            <span className="text-paper/40">{hoveredIndex}. </span>
+            <span className="text-paper/90">{hoveredPoint.name}</span>
+            <span className="text-accent">
+              {" "}
+              · main factor {hoveredPoint.loading0.toFixed(3)}
+            </span>
+            <span className="text-teal"> · second {hoveredPoint.loading1.toFixed(3)}</span>
+          </span>
+        ) : null}
+      </HoverDetail>
+
+      <div className="grid grid-cols-1 overflow-hidden rounded-lg border hr-line sm:grid-cols-2">
+        {points.map((p, i) => {
+          const isIsolated = isolated?.fid === p.fid;
+          return (
+            <div
+              key={p.fid}
+              onPointerEnter={() => setHovered(p.fid)}
+              onPointerLeave={() => setHovered(null)}
+              className={`flex items-center gap-2 border-t hr-line px-3 py-2 text-left text-sm transition-colors ${
+                hovered === p.fid ? "bg-paper/5" : ""
+              } ${isIsolated ? "text-teal" : "text-paper/70"}`}
+            >
+              <span className="w-4 shrink-0 font-mono text-[11px] text-paper/35">{i + 1}</span>
+              <span className="truncate" title={p.name}>
+                {p.name}
+              </span>
+            </div>
+          );
+        })}
+      </div>
 
       <p className="text-center text-[11px] text-paper/35">
         Each sphere's shadow is the fund's real position — its loading on the
