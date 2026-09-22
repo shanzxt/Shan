@@ -45,7 +45,7 @@ export default function UnderTheHood() {
             key={c.tag}
             initial={reduceMotion ? false : { opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, amount: 0 }}
             transition={{ duration: 0.5, delay: reduceMotion ? 0 : i * 0.06, ease: "easeOut" }}
             className="border-b hr-line p-6 last:border-b-0 sm:border-r sm:p-8 sm:[&:nth-child(2n)]:border-r-0"
           >

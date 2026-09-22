@@ -10,7 +10,7 @@ export default function ClipReveal({
   className = "",
   delay = 0,
   duration = 0.8,
-  margin = "-80px",
+  amount = 0,
   ...rest
 }) {
   const reduceMotion = useReducedMotion()
@@ -27,7 +27,7 @@ export default function ClipReveal({
     <motion.div
       initial={{ clipPath: "inset(100% 0 0 0)" }}
       whileInView={{ clipPath: "inset(0% 0 0 0)" }}
-      viewport={{ once: true, margin }}
+      viewport={{ once: true, amount }}
       transition={{ duration, ease: EASE_OUT, delay }}
       className={className}
       {...rest}

@@ -12,7 +12,7 @@ export default function Work() {
       <motion.p
         initial={reduceMotion ? false : { opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
+        viewport={{ once: true, amount: 0 }}
         transition={{ duration: 0.5 }}
         className="font-mono text-sm text-teal"
       >
@@ -25,7 +25,7 @@ export default function Work() {
             key={p.title}
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-80px" }}
+            viewport={{ once: true, amount: 0 }}
             transition={{ duration: 0.5, delay: reduceMotion ? 0 : i * 0.06, ease: EASE_OUT }}
             className={`group relative grid grid-cols-1 gap-3 border-t hr-line py-8 last:border-b sm:grid-cols-[1fr_2fr] ${p.href ? "" : "cursor-default"}`}
           >

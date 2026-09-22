@@ -14,7 +14,7 @@ export default function KineticHeading({
   children,
   delay = 0,
   show,
-  viewportMargin = "-80px",
+  viewportAmount = 0,
 }) {
   const reduceMotion = useReducedMotion()
   const controlled = typeof show === "boolean"
@@ -31,7 +31,7 @@ export default function KineticHeading({
     : {
         initial: reduceMotion ? false : { y: "100%" },
         whileInView: { y: 0 },
-        viewport: { once: true, margin: viewportMargin },
+        viewport: { once: true, amount: viewportAmount },
       }
 
   return (

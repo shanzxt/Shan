@@ -42,7 +42,7 @@ export default function IssueCard({ issue, onOpen }) {
     <motion.article
       initial={reduceMotion ? false : { opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: true, amount: 0 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="border hr-line bg-paper/[0.03] p-6 sm:p-8"
     >
@@ -60,7 +60,7 @@ export default function IssueCard({ issue, onOpen }) {
       </button>
       <p className="mt-2 max-w-xl text-[15px] leading-relaxed text-paper/70">{issue.hook}</p>
 
-      <ClipReveal className="mt-6 h-64 w-full" margin="-40px">
+      <ClipReveal className="mt-6 h-64 w-full" amount={0}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
             <CartesianGrid stroke="var(--color-line)" vertical={false} />

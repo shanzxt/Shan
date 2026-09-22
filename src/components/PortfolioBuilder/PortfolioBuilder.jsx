@@ -19,7 +19,7 @@ export default function PortfolioBuilder() {
       {/* The intro animation is the site's own strongest motion moment —
           only its container entrance gets the clip-path treatment, its
           internal stages are untouched. */}
-      <ClipReveal className="flex min-h-[75vh] flex-col items-center justify-center" margin="-40px">
+      <ClipReveal className="flex min-h-[75vh] flex-col items-center justify-center" amount={0}>
         <IntroAnimation />
       </ClipReveal>
 

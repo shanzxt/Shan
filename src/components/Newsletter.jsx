@@ -15,7 +15,7 @@ export default function Newsletter() {
       <motion.p
         initial={reduceMotion ? false : { opacity: 0, y: 8 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
+        viewport={{ once: true, amount: 0 }}
         transition={{ duration: 0.5 }}
         className="font-mono text-sm text-teal"
       >
@@ -32,7 +32,7 @@ export default function Newsletter() {
       <motion.p
         initial={reduceMotion ? false : { opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-80px" }}
+        viewport={{ once: true, amount: 0 }}
         transition={{ duration: 0.55, delay: 0.1 }}
         className="mt-3 max-w-xl text-[15px] leading-relaxed text-paper/70"
       >

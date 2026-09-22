@@ -153,6 +153,29 @@ was verified by Tailwind responsive-class code review rather than a live
 narrow-viewport screenshot. Same open caution already on record for the
 `/portfolio` tool itself.
 
+**Bug fixed post-launch: every `whileInView` scroll reveal used a negative
+`rootMargin` (`margin: "-80px"` / `"-40px"`), which made anything mounted
+off-screen at load — e.g. `/portfolio`'s fund-picker section, ~800px down
+the page — permanently stuck at its `initial` state (for `ClipReveal` that
+means `clipPath: inset(100%)`, i.e. invisible content on a dark background,
+reported as "the portfolio builder section is black"). Root cause,
+confirmed directly against the native `IntersectionObserver` API bypassing
+framer-motion entirely: in this environment, an observer with any negative
+`rootMargin` (or any nonzero `threshold`/`amount`) delivers its correct
+initial entry but never fires again on subsequent scroll —
+`intersectionRatio` reads `0` even while `isIntersecting` is `true`. Only
+`threshold: 0` (any nonzero overlap) reliably re-fires. Fixed by replacing
+every `viewport={{ margin: "-Npx" }}` with `viewport={{ amount: 0 }}`
+site-wide (`ClipReveal.jsx`'s and `KineticHeading.jsx`'s own defaults, plus
+every direct `motion.*` `whileInView` in `Footer.jsx`, `IssueCard.jsx`,
+`IssueModal.jsx`, `Newsletter.jsx`, `ProofStrip.jsx`, `UnderTheHood.jsx`,
+`WhatIDo.jsx`, `Work.jsx`, `PortfolioBuilder.jsx`, and
+`DiversificationScene.jsx`, which had used `amount: 0.4` and hit the same
+bug). Re-verified live: `/portfolio`'s fund list, heatmap, and
+`UnderTheHood` bento grid now reveal correctly on scroll; Home's
+Newsletter/Work/Footer sections re-checked too. `npm run build` and
+`npm run lint` clean (same pre-existing unrelated warnings only).
+
 ## Commands
 
 ```

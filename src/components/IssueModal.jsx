@@ -82,7 +82,7 @@ function Block({ block, onOpenImage }) {
     case "image":
       return (
         <figure className="mt-8">
-          <ClipReveal duration={0.7} margin="-40px">
+          <ClipReveal duration={0.7} amount={0}>
           <button
             type="button"
             onClick={() => onOpenImage(block)}
@@ -250,7 +250,7 @@ export default function IssueModal({ issue, onClose }) {
               <span>{issue.date}</span>
             </div>
 
-            <ClipReveal className="mt-8 h-64 w-full" duration={0.7} margin="-40px">
+            <ClipReveal className="mt-8 h-64 w-full" duration={0.7} amount={0}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
                   <CartesianGrid stroke="var(--color-line)" vertical={false} />

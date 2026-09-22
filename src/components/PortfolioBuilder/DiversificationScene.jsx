@@ -454,7 +454,7 @@ export default function DiversificationScene({ stats, fundsById }) {
                     }}
                     initial={{ z: 0, opacity: 0, scale: p.depthScale }}
                     whileInView={{ z: FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
-                    viewport={{ once: true, amount: 0.4 }}
+                    viewport={{ once: true, amount: 0 }}
                     animate={{ z: FLOAT_OFFSET, opacity: p.depthOpacity, scale: p.depthScale }}
                     transition={SPRING_SNAP}
                     title={p.name}

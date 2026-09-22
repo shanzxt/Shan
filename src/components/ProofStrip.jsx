@@ -22,7 +22,7 @@ function Stat({ stat, delay }) {
       initial={reduceMotion ? false : { opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       onViewportEnter={onViewportEnter}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: true, amount: 0 }}
       transition={{ duration: 0.5, delay: reduceMotion ? 0 : delay, ease: "easeOut" }}
     >
       <div className="font-mono text-3xl tabular-nums text-accent sm:text-4xl">
