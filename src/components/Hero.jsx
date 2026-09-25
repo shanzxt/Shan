@@ -112,9 +112,10 @@ export default function Hero() {
           transition={{ duration: 0.7, ease: "easeOut", delay: 0.16 }}
           className="mt-5 max-w-xl font-body text-lg text-paper/80 sm:text-xl"
         >
-          Instrumentation engineer and CFA Level I. I write a
-          newsletter on personal finance and build the software behind it —
-          with the code and data shipped alongside every issue.
+          Instrumentation engineer, currently pursuing the CFA Program
+          (Level I passed). I write a newsletter on personal finance and
+          build the software behind it — with the code and data shipped
+          alongside every issue.
         </motion.p>
 
         <motion.div

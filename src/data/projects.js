@@ -23,12 +23,4 @@ export const projects = [
     repoHref: null,
     tags: ["C", "Arduino UNO", "Proteus", "L298N"],
   },
-  {
-    title: "Eshani Somwanshi — Portfolio",
-    role: "Built for my sister",
-    body: "A portfolio site for Eshani, a product designer — warm, minimal, built to her register rather than mine.",
-    href: "https://eshanisomwanshi.com",
-    repoHref: "https://github.com/shanzxt/EshaniWebsite",
-    tags: ["Vite", "React", "Framer Motion"],
-  },
 ]
