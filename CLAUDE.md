@@ -1,7 +1,7 @@
 # shantanusomwanshi.com
 
-Personal site for Shantanu Somwanshi — instrumentation engineer, CFA Level I
-candidate, and writer of a personal finance/investing newsletter. Vite +
+Personal site for Shantanu Somwanshi — instrumentation engineer, CFA Level I,
+and writer of a personal finance/investing newsletter. Vite +
 React 19 + Tailwind CSS v4 + Framer Motion + Recharts + lucide-react, no
 backend, no CMS. Deployed as a static build (see README for dev/build
 commands).

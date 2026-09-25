@@ -13,7 +13,7 @@ const blocks = [
   {
     tag: "02",
     title: "The finance newsletter",
-    body: "A running record of what actually happens with money — SIPs, step-ups, panic-selling, the maths of compounding, and whatever else the data says. Every issue ships with the Python behind it, in the open. I'm also a CFA Level I candidate.",
+    body: "A running record of what actually happens with money — SIPs, step-ups, panic-selling, the maths of compounding, and whatever else the data says. Every issue ships with the Python behind it, in the open. I've also passed CFA Level I.",
     href: links.newsletter,
     linkLabel: "shantanusomwanshi.substack.com",
   },
