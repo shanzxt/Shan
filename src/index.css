@@ -29,6 +29,9 @@
 html {
   scroll-behavior: smooth;
   color-scheme: dark;
+  /* nothing may widen the layout viewport on phones (e.g. fallback-font
+     text before the web fonts arrive); clip, unlike hidden, keeps sticky */
+  overflow-x: clip;
 }
 
 /* Lenis owns scrolling when it's active (desktop fine pointer only). */
@@ -55,6 +58,13 @@ html.lenis body {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Horizontal clip for the page content (kinetic headings start wider than
+   they rest). `clip`, unlike `hidden`, doesn't create a scroll container,
+   so sticky rails inside still work. */
+main {
+  overflow-x: clip;
 }
 
 body {

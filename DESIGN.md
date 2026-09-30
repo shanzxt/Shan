@@ -137,3 +137,32 @@ Rules:
   have added texture, not meaning.
 - No GSAP: Framer Motion (already shipped) covers springs, scroll-linked
   values and presence; a second animation runtime would double the cost.
+
+## Result (measured, local `vite preview`, Lighthouse 12 mobile)
+
+| Page | Before (perf / a11y / BP / SEO, LCP) | After |
+| --- | --- | --- |
+| `/` | 75 / 88 / 96 / 100, 4.5 s | 75 / 100 / 96 / 100, 4.4 s |
+| `/newsletters/day-29` | 75 / 94 / 96 / 100, 4.5 s | 73 / 100 / 96 / 100, 4.8 s |
+| `/portfolio` | — | 80 / 100 / 96 / 100, 4.0 s |
+
+Initial JS (entry + modulepreloads, gzip): 133 kB → 145 kB. CSS gzip
+7.5 kB → 12 kB. Web fonts: three variable faces, ~120 kB latin total
+(Newsreader requested without `opsz`: 24 kB instead of 147 kB).
+
+Budget rules that got perf back to baseline after the first build
+dropped it to 67: the boot curtain animates only transform / clip-path
+(no per-frame SVG `drop-shadow`, no `@property` counter); the hero
+canvas starts only after boot + `requestIdleCallback` (the static SVG
+curve is the first paint and LCP stays the text); phones draw at 30 fps.
+
+## Cut, and why
+
+- **WebGL / shader hero** — Canvas 2D gives the phosphor look at a
+  fraction of the cost and without a dependency.
+- **Pinned / horizontal-scroll sections** — only two issues and three
+  projects exist; pinning that little content would be scroll-jacking
+  for its own sake.
+- **Light theme** — see Colour.
+- **Per-page custom OG images** — the existing credential-free card
+  stays; not a visual-overhaul item.

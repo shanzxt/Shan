@@ -69,19 +69,27 @@ above. No component changes needed.
 
 ## Styling conventions
 
-Theme tokens live in `src/index.css` under `@theme` — always use these
-instead of hardcoding colors:
+**Superseded by the SIGNAL / NOISE overhaul — see `DESIGN.md`** for the
+concept, palette, type and motion rules. Tokens live in `src/index.css`
+under `@theme`; always use them instead of hardcoding colours:
 
-- `--color-bg` (near-black), `--color-paper` (off-white text),
-  `--color-accent` (amber), `--color-teal`, `--color-line` (hairline
-  borders, used via the `.hr-line` utility class), `--color-ink`.
-- `--font-display` (Fraunces, headings), `--font-body` (Source Serif 4,
-  default body — already Substack-like serif), `--font-mono` (IBM Plex
-  Mono, labels/eyebrows/metadata).
+- Colours: `--color-bg`, `--color-panel`, `--color-ink`, `--color-paper`,
+  `--color-accent` (amber CH1), `--color-teal` (cyan CH2), `--color-alarm`,
+  `--color-line`, `--color-grid`.
+- Type: `--font-display` (Anybody, variable wdth/wght — use
+  `font-[800]` + `[font-stretch:80%]`, never `font-variation-settings`
+  with `var()`), `--font-body` (Newsreader), `--font-mono` (Martian Mono).
+- Utilities: `readout` (mono label), `panel`, `graticule`, `glow`,
+  `text-outline`, `hr-line`.
+- Easing: `ease-sweep` / `ease-settle` / `ease-switch` classes;
+  `EASE_OUT`, `SETTLE` in `src/lib/motion.js`.
 
-Motion: `framer-motion`, gated by `useReducedMotion()` everywhere —
-`initial={reduceMotion ? false : {...}}` is the standard pattern. Section
-reveals use `whileInView` with `viewport={{ once: true, margin: "-80px" }}`.
+Motion: gated by `useReducedMotion()` (or `useReducedMotionPref()` from
+`src/lib/env.js` for client-only effects). Reveals use `whileInView` with
+`viewport={{ once: true, amount: 0 }}` driven from the parent element
+(see Gotchas in PROGRESS.md). Anything touching `window`/canvas must be
+client-only so prerender keeps working. Internal links use
+`chrome/TransitionLink` (View Transitions + chunk preload).
 
 ## Design pass (site-wide motion/visual upgrade)
 

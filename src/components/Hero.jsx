@@ -1,4 +1,4 @@
-import { useEffect, useRef, useSyncExternalStore } from "react"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { links } from "../data/links"
 import { hasFinePointer, isCapableDevice, useReducedMotionPref } from "../lib/env"
@@ -54,7 +54,26 @@ function HeroLink({ href, children, primary = false }) {
 export default function Hero() {
   const isClient = useIsClient()
   const reduced = useReducedMotionPref()
-  const live = isClient && !reduced
+  // The canvas takes over from the static SVG only once the boot sequence
+  // has lifted and the browser is idle, so first paint and the page's own
+  // loading work never compete with the animation loop.
+  const [armed, setArmed] = useState(false)
+  const live = isClient && !reduced && armed
+
+  useEffect(() => {
+    if (reduced) return
+    let cancelled = false
+    let idle = 0
+    whenBootDone().then(() => {
+      if (cancelled) return
+      const ric = window.requestIdleCallback ?? ((cb) => setTimeout(cb, 400))
+      idle = ric(() => !cancelled && setArmed(true), { timeout: 1800 })
+    })
+    return () => {
+      cancelled = true
+      window.cancelIdleCallback?.(idle)
+    }
+  }, [reduced])
 
   const sectionRef = useRef(null)
   const canvasRef = useRef(null)
@@ -103,8 +122,8 @@ export default function Hero() {
     ro.observe(canvas.parentElement)
 
     // state
-    let level = 1 // global noise amplitude
-    let target = 1
+    let level = 0.7 // global noise amplitude: starts noisy, then locks
+    let target = 0.14
     let probe = null // pointer x as fraction of canvas width
     let probeSmooth = null
     let pointer = null // client coords, for the letter lens
@@ -115,7 +134,6 @@ export default function Hero() {
     let running = false
     const letterState = letters.map(() => ({ wght: 820, wdth: baseWdth }))
 
-    whenBootDone().then(() => setTimeout(() => (target = 0.14), 250))
 
     const onPointerMove = (e) => {
       const r = canvas.getBoundingClientRect()
@@ -228,8 +246,11 @@ export default function Hero() {
       }
     }
 
+    // phones and tablets draw every other frame (30 fps)
+    let tick = 0
     const loop = (time) => {
       raf = requestAnimationFrame(loop)
+      if (!desktop && tick++ % 2) return
       draw(time)
     }
     const start = () => {
@@ -286,7 +307,7 @@ export default function Hero() {
             <span className="hidden sm:inline"> · Signal / Noise</span>
           </p>
           <p className="readout text-paper/60" aria-hidden="true">
-            Noise <span ref={noiseReadRef} className="tabular-nums text-accent">{live ? "1.00" : "0.00"}</span> ·{" "}
+            Noise <span ref={noiseReadRef} className="tabular-nums text-accent">{live ? "0.70" : "0.00"}</span> ·{" "}
             <span ref={stateReadRef} className="text-teal">
               {live ? "Acquiring" : "Locked"}
             </span>

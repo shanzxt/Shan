@@ -111,11 +111,26 @@ panel). Nothing pushed. Content (copy, numbers, links) must stay word-for-word; 
   Shared: `SectionHeader.jsx` (CH-0X strip), `SplitHeading.jsx` (word reveal + wdth settle), `Magnetic.jsx`.
   Verified 1440 + 390 at every scroll depth.
 
-## In progress
-- Newsletters index (`src/pages/NewslettersIndex.jsx`).
+- Newsletters index: signal-timeline archive (scroll-drawn spine, parallax cover screens, outlined issue numerals,
+  title `view-transition-name` morph into the issue h1).
+- Issue page: editorial masthead, § numbered section heads, drop cap, figure "screens" with Fig. numbers, pull quotes,
+  `ReadingRecorder.jsx` strip-chart progress (sections ticked at real positions), channel TOC rail (xl) / details
+  (below xl), `SignalChart` masthead that draws in view, restyled lightbox, prev/next panels.
+- Tools: `/portfolio` rack-mount frames, `EffectiveNGauge.jsx` needle (settle spring), heatmap cell ripple
+  (`.heat-cell`), preset toggle switches with LEDs, contrast bump on all tool text (presentation classes only —
+  engine untouched, 17/17 tests pass). `/tools` hub with pixel-ripple preview. UnderTheHood bento.
+- 404 "NO SIGNAL" test pattern + `Flatline.jsx`; error-boundary screen restyled.
+- Verified: palette (/ and ⌘K) → navigate via View Transition, Konami → CRT on/off, mobile menu focus + Escape,
+  reduced-motion render (no boot, no canvas, no probe, static SVG curve), no console errors.
+- Perf pass (see DESIGN.md → Result). Lighthouse a11y 100 on every page measured.
 
-## Next
-- Issue page → tools/portfolio → 404/error → final perf/a11y pass + Lighthouse after.
+## In progress
+- (none) — overhaul complete.
+
+## Next (optional)
+- Issue page CLS 0.03 (masthead chart Suspense fallback height vs real chart) — could reserve exact height.
+- Self-host the three variable fonts to cut the Google Fonts round-trip on mobile LCP.
+- Real-device check of the hero canvas at 30 fps on a mid-range Android.
 
 ## Decisions
 - Canvas 2D instead of WebGL (see DESIGN.md → Dependencies). Only new dep: `lenis`.
@@ -123,7 +138,17 @@ panel). Nothing pushed. Content (copy, numbers, links) must stay word-for-word; 
 - Hero letter lens changes letter widths (layout) — deliberate exception to "transform only", scoped with
   `contain: layout` on the h1, desktop fine pointer only.
 
+- Old dark teal `#4e7c7a` kept only inside the correlation heatmap (its caption says "dark teal"); site token is
+  the brighter `#5ad1c1`.
+- CRT mode uses `backdrop-filter` on an overlay, not `filter` on #root (filter makes #root the containing block for
+  every `position: fixed` child and broke the header).
+- The 404/boot/hero never hide prerendered text; entrance animations only run after a client-side navigation
+  (`isInitialLoad()`).
+
 ## Gotchas
+- `html.boot { overflow: hidden }` beat `overflow-x: clip` on html; the real fix for the 417px mobile layout
+  viewport was `main { overflow-x: clip }` (kinetic headings start 125% wide) — check `innerWidth` at 390, not just
+  scrollWidth.
 - `font-variation-settings` with a CSS `var()` inside computed as invalid → fell back to regular weight. Use
   `font-weight` / `font-stretch` (registered axes) instead.
 - Inline-block letter spans kill kerning ("SHANT ANU"); use plain inline spans.

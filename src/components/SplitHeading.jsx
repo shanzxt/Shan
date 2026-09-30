@@ -38,7 +38,7 @@ export default function SplitHeading({ as = "h2", text, className = "", delay = 
           <motion.span
             className="inline-block"
             variants={{
-              hidden: { y: "105%", fontStretch: "150%" },
+              hidden: { y: "105%", fontStretch: "125%" },
               show: {
                 y: "0%",
                 fontStretch: "100%",

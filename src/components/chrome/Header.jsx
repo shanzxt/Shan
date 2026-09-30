@@ -155,10 +155,10 @@ export default function Header() {
           <TransitionLink
             to="/"
             data-cursor="lock"
-            className="group flex items-center gap-3 text-paper transition-colors hover:text-accent"
+            className="group flex min-w-0 items-center gap-3 text-paper transition-colors hover:text-accent"
           >
-            <span className="led" aria-hidden="true" />
-            <span className="readout text-[12px] text-paper/90 group-hover:text-accent">Shantanu Somwanshi</span>
+            <span className="led shrink-0" aria-hidden="true" />
+            <span className="readout truncate text-[12px] text-paper/90 group-hover:text-accent">Shantanu Somwanshi</span>
           </TransitionLink>
 
           <nav aria-label="Main" className="hidden items-center gap-1 lg:flex">

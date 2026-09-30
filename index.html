@@ -32,7 +32,7 @@
           }
           addEventListener("keydown", function () { end(true) }, { once: true })
           addEventListener("pointerdown", function () { end(true) }, { once: true })
-          setTimeout(function () { end(false) }, 2150)
+          setTimeout(function () { end(false) }, 1650)
         } catch (e) {}
       })()
     </script>
@@ -42,7 +42,7 @@
       html.boot #boot {
         display: block; position: fixed; inset: 0; z-index: 100; background: #07090a; color: #ebe7dc;
         font: 500 11px/1.4 "Martian Mono", ui-monospace, monospace; letter-spacing: .12em; text-transform: uppercase;
-        animation: boot-off .38s cubic-bezier(.65,0,.35,1) 1.75s forwards;
+        animation: boot-off .36s cubic-bezier(.65,0,.35,1) 1.28s forwards;
       }
       html.boot-skip #boot { animation: boot-off .24s cubic-bezier(.65,0,.35,1) forwards }
       #boot .grid {
@@ -50,23 +50,21 @@
         background-image: linear-gradient(rgba(255,176,0,.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,176,0,.08) 1px, transparent 1px);
         background-size: 10% 12.5%; animation: boot-grid .5s cubic-bezier(.16,.9,.2,1) both;
       }
-      #boot svg { position: absolute; inset: 12vh 6vw; width: 88vw; height: 76vh; overflow: visible }
+      #boot svg { position: absolute; top: 12vh; left: 6vw; width: 88vw; height: 76vh; clip-path: inset(0 100% 0 0); animation: boot-trace .85s cubic-bezier(.16,.9,.2,1) .2s forwards }
       #boot path {
         fill: none; stroke: #ffb000; stroke-width: 2.5; stroke-linejoin: round; vector-effect: non-scaling-stroke;
-        filter: drop-shadow(0 0 6px rgba(255,176,0,.7)); stroke-dasharray: 1; stroke-dashoffset: 1;
-        animation: boot-trace 1.05s cubic-bezier(.16,.9,.2,1) .3s forwards;
       }
+      #boot path.bloom { stroke: rgba(255,176,0,.18); stroke-width: 10 }
       #boot .tl, #boot .br, #boot .bl { position: absolute; opacity: .75 }
       #boot .tl { top: calc(12vh - 26px); left: 6vw }
       #boot .bl { bottom: calc(12vh - 26px); left: 6vw }
       #boot .br { bottom: calc(12vh - 26px); right: 6vw; color: #ffb000; opacity: 1 }
-      #boot .br::after { content: "acquiring"; animation: boot-lock 0s 1.3s forwards }
-      #boot .n { counter-reset: n var(--n); animation: boot-count 1.3s steps(100) .1s forwards }
-      #boot .n::after { content: counter(n, decimal-leading-zero) "%" }
-      @property --n { syntax: "<integer>"; inherits: false; initial-value: 0 }
-      @keyframes boot-count { to { --n: 100 } }
+      #boot .br::after { content: "acquiring"; animation: boot-lock 0s 1.05s forwards }
+      #boot .bar { position: absolute; left: 6vw; right: 6vw; bottom: calc(12vh - 8px); height: 1px; background: rgba(255,176,0,.25) }
+      #boot .bar::after { content: ""; position: absolute; inset: 0; background: #ffb000; transform-origin: left; transform: scaleX(0); animation: boot-bar 1.05s cubic-bezier(.16,.9,.2,1) forwards }
+      @keyframes boot-bar { to { transform: scaleX(1) } }
       @keyframes boot-grid { from { clip-path: inset(50% 50%); opacity: 0 } }
-      @keyframes boot-trace { to { stroke-dashoffset: 0 } }
+      @keyframes boot-trace { to { clip-path: inset(0 0 0 0) } }
       @keyframes boot-lock { to { content: "signal locked" } }
       @keyframes boot-off {
         0% { transform: none; opacity: 1 }
@@ -78,10 +76,11 @@
   <body>
     <div id="boot" aria-hidden="true">
       <div class="grid"></div>
-      <svg viewBox="0 0 1000 400" preserveAspectRatio="none"><path pathLength="1" d="M0,330L8,334L17,336L25,339L33,338L42,338L50,334L58,333L67,327L75,326L83,320L92,323L100,320L108,326L117,325L125,333L133,332L142,340L150,336L158,342L167,334L175,338L183,328L192,331L200,321L208,325L217,317L225,326L233,320L242,331L250,327L258,339L267,333L275,343L283,334L292,341L300,329L308,335L317,322L325,328L333,317L342,326L350,317L358,329L367,323L375,337L383,330L392,343L400,334L408,344L417,332L425,338L433,325L442,331L450,318L458,326L467,316L475,327L483,320L492,333L500,328L508,340L517,333L525,344L533,334L542,341L550,329L558,333L567,321L575,327L583,317L592,325L600,319L608,329L617,326L625,337L633,333L642,342L650,336L658,341L667,333L675,335L683,326L692,328L700,321L708,324L717,320L725,325L733,324L742,329L750,329L758,332L767,330L775,329L783,325L792,322L800,315L808,310L817,304L825,299L833,293L842,288L850,284L858,278L867,273L875,266L883,259L892,249L900,239L908,226L917,214L925,200L933,186L942,170L950,155L958,138L967,121L975,102L983,83L992,62L1000,40" /></svg>
+      <svg viewBox="0 0 1000 400" preserveAspectRatio="none"><path class="bloom" d="M0,330L8,334L17,336L25,339L33,338L42,338L50,334L58,333L67,327L75,326L83,320L92,323L100,320L108,326L117,325L125,333L133,332L142,340L150,336L158,342L167,334L175,338L183,328L192,331L200,321L208,325L217,317L225,326L233,320L242,331L250,327L258,339L267,333L275,343L283,334L292,341L300,329L308,335L317,322L325,328L333,317L342,326L350,317L358,329L367,323L375,337L383,330L392,343L400,334L408,344L417,332L425,338L433,325L442,331L450,318L458,326L467,316L475,327L483,320L492,333L500,328L508,340L517,333L525,344L533,334L542,341L550,329L558,333L567,321L575,327L583,317L592,325L600,319L608,329L617,326L625,337L633,333L642,342L650,336L658,341L667,333L675,335L683,326L692,328L700,321L708,324L717,320L725,325L733,324L742,329L750,329L758,332L767,330L775,329L783,325L792,322L800,315L808,310L817,304L825,299L833,293L842,288L850,284L858,278L867,273L875,266L883,259L892,249L900,239L908,226L917,214L925,200L933,186L942,170L950,155L958,138L967,121L975,102L983,83L992,62L1000,40" /><path d="M0,330L8,334L17,336L25,339L33,338L42,338L50,334L58,333L67,327L75,326L83,320L92,323L100,320L108,326L117,325L125,333L133,332L142,340L150,336L158,342L167,334L175,338L183,328L192,331L200,321L208,325L217,317L225,326L233,320L242,331L250,327L258,339L267,333L275,343L283,334L292,341L300,329L308,335L317,322L325,328L333,317L342,326L350,317L358,329L367,323L375,337L383,330L392,343L400,334L408,344L417,332L425,338L433,325L442,331L450,318L458,326L467,316L475,327L483,320L492,333L500,328L508,340L517,333L525,344L533,334L542,341L550,329L558,333L567,321L575,327L583,317L592,325L600,319L608,329L617,326L625,337L633,333L642,342L650,336L658,341L667,333L675,335L683,326L692,328L700,321L708,324L717,320L725,325L733,324L742,329L750,329L758,332L767,330L775,329L783,325L792,322L800,315L808,310L817,304L825,299L833,293L842,288L850,284L858,278L867,273L875,266L883,259L892,249L900,239L908,226L917,214L925,200L933,186L942,170L950,155L958,138L967,121L975,102L983,83L992,62L1000,40" /></svg>
       <span class="tl">Signal / Noise &middot; CH-01</span>
       <span class="bl">Press any key to skip</span>
-      <span class="br"><span class="n"></span>&nbsp;&nbsp;</span>
+      <span class="bar"></span>
+      <span class="br"></span>
     </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
