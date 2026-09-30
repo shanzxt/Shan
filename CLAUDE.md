@@ -186,3 +186,43 @@ npm run lint      # oxlint
 ```
 
 No test suite currently exists.
+
+## Deployment workflow (HARD RULE, applies every session)
+
+This repo has two deploy targets on Vercel:
+
+- `staging` branch → Vercel preview/testing URL (safe to push)
+- `main` branch → LIVE production site (protected)
+
+Trigger phrases from the user, and only these phrases:
+
+1. **"push"** (on its own, or "push it", "push this", "push changes") →
+   Commit any pending work, make sure it's on `staging` (if the user is on
+   a feature branch, merge it into `staging`), push **only** `staging`.
+   Never push `main` for this phrase, under any circumstances. After
+   pushing, tell the user the testing URL: use the fixed staging domain if
+   one is configured, otherwise find the latest preview deployment URL
+   (via `gh` or the Vercel CLI if available), otherwise tell the user to
+   open the Vercel dashboard's Deployments tab. Wait for the user to
+   verify before doing anything further.
+2. **"push to main site"** (or "push main", "push production", "go live")
+   → Promote `staging` to `main`: make sure `staging` is pushed and clean,
+   then `git checkout main && git pull && git merge --ff-only staging`. If
+   fast-forward isn't possible, or `main` is protected, open a PR from
+   `staging` into `main` with `gh` and merge it instead; if `gh` is
+   unavailable, tell the user and stop. Push `main` using the override
+   described below. Only proceed when the user says one of these exact
+   phrases — if wording is ambiguous ("deploy it", "ship it", "publish"),
+   ask which one is meant instead of guessing.
+3. **Never**, without explicit instruction in the user's current message:
+   - push `main`
+   - run `vercel --prod` or promote a deployment to production via the
+     Vercel CLI/dashboard
+   - force-push (`--force` / `-f`) to `main` or `staging`
+   - change Vercel's production branch or domain settings
+
+Local safety hook: `.git/hooks/pre-push` blocks pushes to `main` unless
+the env var `ALLOW_MAIN_PUSH=1` is set. Only set `ALLOW_MAIN_PUSH=1` for
+the "push to main site" flow above. If `git branch --show-current` is
+unexpected, or the user is on `main` when they say "push", stop and tell
+the user before pushing anything.
