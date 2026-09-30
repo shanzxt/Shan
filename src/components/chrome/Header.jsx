@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScro
 import { Command, Menu, Volume2, VolumeX, X } from "lucide-react"
 import { links } from "../../data/links"
 import { EASE_OUT } from "../../lib/motion"
+import { openCommandPalette } from "../../lib/palette"
 import { lockScroll } from "../../lib/scroll"
 import { toggleSetting, useSetting } from "../../lib/settings"
 import TransitionLink from "./TransitionLink"
@@ -38,10 +39,6 @@ function useIstClock() {
     return () => clearInterval(id)
   }, [])
   return time ?? "--:--"
-}
-
-export function openCommandPalette() {
-  window.dispatchEvent(new CustomEvent("palette:open"))
 }
 
 function SoundToggle({ className = "" }) {

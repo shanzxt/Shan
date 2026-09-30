@@ -21,6 +21,7 @@ export function scrollToElement(el, { immediate = false } = {}) {
 
 export function lockScroll(locked) {
   const lenis = getLenis()
-  if (lenis) (locked ? lenis.stop() : lenis.start())
+  if (lenis && locked) lenis.stop()
+  else if (lenis) lenis.start()
   document.documentElement.style.overflow = locked ? "hidden" : ""
 }
