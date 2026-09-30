@@ -18,12 +18,14 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
   Bundles gzip before -> after: article body chunk 112.3 kB (`IssueContent`, carried Recharts) -> 3.1 kB
   (`NewsletterIssue`) + 102.7 kB `IssueChart` only on issues with a chart; main `index` 92.3 -> 92.4; `motion` 43.8 -> 42.5.
   Chart images: PNG 90-380 kB -> WebP 45-170 kB.
+- Item 3: `chrome/ErrorBoundary.jsx` wraps `<Routes>`, keyed by pathname (navigation resets it); fallback offers
+  reload (covers stale lazy chunks after a redeploy). 404 page + `dist/404.html` already done in item 1.
 
 ## In progress
 - (none)
 
 ## Next
-- Item 3 in ROADMAP.md (404 page exists; error boundary remaining), then 4-9
+- Item 4 reading experience, then 5-9
 
 ## Decisions
 - Site URL for canonical/sitemap/feed: `https://www.shantests.in` (live domain per user; README/CLAUDE.md still say shantanusomwanshi.com).
