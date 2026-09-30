@@ -1,9 +1,9 @@
 // Dev-only visual check: true-width viewport screenshot + horizontal-overflow report via
 // Chrome DevTools Protocol (Node's built-in WebSocket, no dependency). Needs `npm run preview` running.
 // Headless Chrome's --window-size can't go below ~500px, so this emulates the width instead.
-// usage: node scripts/screenshot.mjs <url> <width> <out.png> [scrollY]
+// usage: node scripts/screenshot.mjs <url> <width> <out.png> [scrollY] [js-to-run-before-capture]
 import { spawn } from "node:child_process"
-const [url, width, out, scrollY = "0"] = process.argv.slice(2)
+const [url, width, out, scrollY = "0", js] = process.argv.slice(2)
 const chrome = spawn("C:/Program Files/Google/Chrome/Application/chrome.exe",
   ["--headless=new", "--remote-debugging-port=9333", "--user-data-dir=" + process.env.TEMP + "/cdp-prof", "about:blank"])
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
@@ -19,6 +19,7 @@ await send("Page.navigate", { url })
 await sleep(2500)
 const ev = async (expr) => (await send("Runtime.evaluate", { expression: expr, returnByValue: true, awaitPromise: true })).result.value
 await ev(`window.scrollTo(0, ${scrollY})`); await sleep(1500)
+if (js) { await ev(js); await sleep(600) }
 console.log(JSON.stringify(await ev(`({inner: innerWidth, scrollW: document.documentElement.scrollWidth,
   wide: [...document.querySelectorAll("body *")].filter(e => e.getBoundingClientRect().right > innerWidth + 1 && !e.closest("nav")).slice(0,5).map(e => e.tagName + "." + (e.className+"").slice(0,40))})`)))
 const { data } = await send("Page.captureScreenshot", { format: "png" })

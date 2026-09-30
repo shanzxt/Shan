@@ -1,5 +1,6 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Link, useLocation } from "react-router-dom"
+import { Menu, X } from "lucide-react"
 import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from "framer-motion"
 
 const navItems = [
@@ -17,6 +18,21 @@ export default function Header() {
   const reduceMotion = useReducedMotion()
   const { scrollY, scrollYProgress } = useScroll()
   const [compact, setCompact] = useState(false)
+  // The mobile menu remembers which location it was opened on, so any
+  // navigation (including same-page /#id jumps) closes it; Escape does too.
+  const location = useLocation()
+  const [menuKey, setMenuKey] = useState(null)
+  const menuOpen = menuKey === location.key
+  const setMenuOpen = (open) => setMenuKey(open ? location.key : null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setMenuKey(null)
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [menuOpen])
 
   useMotionValueEvent(scrollY, "change", (v) => {
     setCompact(v > 80)
@@ -42,14 +58,46 @@ export default function Header() {
           </motion.span>
         </Link>
 
-        <nav className="flex items-center gap-4 overflow-x-auto whitespace-nowrap font-mono text-xs text-paper/60 sm:gap-6">
+        <nav
+          aria-label="Main"
+          className="hidden items-center gap-6 whitespace-nowrap font-mono text-xs text-paper/60 sm:flex"
+        >
           {navItems.map((item) => (
             <Link key={item.label} to={item.href} className="transition-colors hover:text-accent">
               {item.label}
             </Link>
           ))}
         </nav>
+
+        <button
+          type="button"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-expanded={menuOpen}
+          aria-controls="mobile-nav"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          className="-mr-2 inline-flex h-10 w-10 items-center justify-center text-paper/70 transition-colors hover:text-accent sm:hidden"
+        >
+          {menuOpen ? <X size={18} /> : <Menu size={18} />}
+        </button>
       </div>
+
+      {menuOpen && (
+        <nav
+          id="mobile-nav"
+          aria-label="Main"
+          className="absolute inset-x-0 top-full border-b hr-line bg-bg px-6 py-2 font-mono text-sm sm:hidden"
+        >
+          {navItems.map((item) => (
+            <Link
+              key={item.label}
+              to={item.href}
+              className="block py-3 text-paper/75 transition-colors hover:text-accent"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       {/* scroll-progress hairline */}
       <motion.div

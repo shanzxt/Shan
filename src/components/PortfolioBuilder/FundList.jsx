@@ -102,7 +102,7 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by fund name or category…"
-          className="w-full rounded-md border hr-line bg-transparent py-2 pl-9 pr-3 font-mono text-sm text-paper placeholder:text-paper/30 focus:border-accent/50 focus:outline-none"
+          className="w-full rounded-md border hr-line bg-transparent py-2 pl-9 pr-3 font-mono text-sm text-paper placeholder:text-paper/30 focus:border-accent focus:outline-none"
         />
       </div>
 

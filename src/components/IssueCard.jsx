@@ -67,7 +67,7 @@ export default function IssueCard({ issue }) {
       {issue.chart ? (
         <ClipReveal className="mt-6 h-64 w-full" amount={0}>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={toChartData(issue.chart)} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
+            <LineChart data={toChartData(issue.chart)} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
               <CartesianGrid stroke="var(--color-line)" vertical={false} />
               <XAxis
                 dataKey="year"

@@ -71,47 +71,55 @@ export default function App() {
 
   return (
     <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-accent focus:px-3 focus:py-2 focus:font-mono focus:text-sm focus:text-ink"
+      >
+        Skip to content
+      </a>
       <GrainOverlay />
       <Header />
       <RouteEffects />
-      <ErrorBoundary key={pathname}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/portfolio"
-            element={
-              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                <PortfolioBuilder />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/newsletters"
-            element={
-              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                <NewslettersIndex />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/newsletters/:slug"
-            element={
-              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                <NewsletterIssue />
-              </Suspense>
-            }
-          />
-          <Route
-            path="/tools"
-            element={
-              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                <Tools />
-              </Suspense>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </ErrorBoundary>
+      <main id="main" tabIndex={-1} className="outline-none">
+        <ErrorBoundary key={pathname}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/portfolio"
+              element={
+                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                  <PortfolioBuilder />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/newsletters"
+              element={
+                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                  <NewslettersIndex />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/newsletters/:slug"
+              element={
+                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                  <NewsletterIssue />
+                </Suspense>
+              }
+            />
+            <Route
+              path="/tools"
+              element={
+                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                  <Tools />
+                </Suspense>
+              }
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </ErrorBoundary>
+      </main>
     </>
   )
 }

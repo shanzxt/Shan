@@ -50,6 +50,11 @@ body {
   outline-offset: 3px;
 }
 
+/* the footer is an amber surface, where the amber ring would vanish */
+#contact :focus-visible {
+  outline-color: var(--color-ink);
+}
+
 /* hairline rule utility */
 .hr-line {
   border-color: var(--color-line);
