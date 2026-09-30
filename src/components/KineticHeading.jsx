@@ -1,8 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { EASE_OUT } from "../lib/motion"
 
-const motionTags = {}
-const motionTag = (tag) => (motionTags[tag] ??= motion.create(tag))
+const MOTION_TAGS = { h1: motion.h1, h2: motion.h2, h3: motion.h3, p: motion.p, div: motion.div }
 
 // Line-reveal for headings: an overflow-hidden wrapper with the text
 // translating up from below. The heading element observes the viewport
@@ -29,7 +28,7 @@ export default function KineticHeading({
     )
   }
 
-  const MotionTag = motionTag(Tag)
+  const MotionTag = MOTION_TAGS[Tag] ?? motion.h2
   const controlled = typeof show === "boolean"
   const trigger = controlled
     ? { animate: show ? "show" : "hidden" }

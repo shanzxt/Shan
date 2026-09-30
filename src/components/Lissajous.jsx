@@ -88,7 +88,10 @@ export default function Lissajous({ className = "", ratioRef }) {
     const draw = (time) => {
       if (!pointerActive && time - lastSwitch > 4200) {
         lastSwitch = time
-        ;[ta, tb] = IDLE_RATIOS[idleIndex++ % IDLE_RATIOS.length]
+        const next = IDLE_RATIOS[idleIndex % IDLE_RATIOS.length]
+        idleIndex += 1
+        ta = next[0]
+        tb = next[1]
       }
       a += (ta - a) * 0.05
       b += (tb - b) * 0.05

@@ -1,8 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { EASE_OUT } from "../lib/motion"
 
-const motionTags = {}
-const motionTag = (tag) => (motionTags[tag] ??= motion.create(tag))
+const MOTION_TAGS = { h1: motion.h1, h2: motion.h2, h3: motion.h3, p: motion.p, div: motion.div }
 
 // Kinetic heading: each word rises out of its own mask while Anybody's
 // width axis settles from stretched to rest — the signal "tuning in".
@@ -22,7 +21,7 @@ export default function SplitHeading({ as = "h2", text, className = "", delay = 
     )
   }
 
-  const MotionTag = motionTag(as)
+  const MotionTag = MOTION_TAGS[as] ?? motion.h2
   const words = text.split(" ")
 
   return (
