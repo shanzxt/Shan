@@ -159,7 +159,7 @@ export default function CommandPalette({ onClose }) {
             placeholder="type a command or page…"
             spellCheck={false}
             autoComplete="off"
-            className="h-14 w-full bg-transparent font-mono text-[15px] text-paper caret-accent placeholder:text-paper/35 focus:outline-none"
+            className="h-14 w-full bg-transparent font-mono text-[15px] text-paper caret-accent placeholder:text-paper/50 focus:outline-none focus-visible:outline-none"
           />
         </div>
         <ul id="palette-list" ref={listRef} role="listbox" data-lenis-prevent className="max-h-[52vh] overflow-y-auto py-2">
