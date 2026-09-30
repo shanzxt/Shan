@@ -159,7 +159,7 @@ export default function WhatIDo() {
           >
             <span
               aria-hidden="true"
-              className="text-outline pointer-events-none absolute -right-3 -top-8 font-display text-[9rem] font-[900] leading-none text-paper/[0.07] transition-colors duration-500 group-hover:text-accent/25 lg:text-[12rem]"
+              className="pointer-events-none absolute -right-3 -top-8 font-display text-[9rem] font-[900] leading-none text-paper/[0.07] transition-colors duration-500 group-hover:text-accent/25 lg:text-[12rem]"
             >
               {b.tag}
             </span>
