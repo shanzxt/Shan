@@ -1,13 +1,16 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { EASE_OUT } from "../lib/motion"
 
-// Line-reveal for section-opening headings: an overflow-hidden wrapper with
-// the text translating up from below, rather than a plain fade. Reserved
-// for hero-level headings and major section openers — body copy keeps its
-// existing fade-up so this stays an accent, not background noise.
+const motionTags = {}
+const motionTag = (tag) => (motionTags[tag] ??= motion.create(tag))
+
+// Line-reveal for headings: an overflow-hidden wrapper with the text
+// translating up from below. The heading element observes the viewport
+// and drives the inner span through variants — the inner span starts
+// fully masked, so it can't reliably observe itself.
 //
-// `show`, when passed, puts the reveal under external control (e.g. Hero's
-// trace-resolved gate) instead of the default scroll-into-view trigger.
+// `show`, when passed, puts the reveal under external control instead of
+// the default scroll-into-view trigger.
 export default function KineticHeading({
   as: Tag = "h2",
   className = "",
@@ -17,28 +20,32 @@ export default function KineticHeading({
   viewportAmount = 0,
 }) {
   const reduceMotion = useReducedMotion()
+
+  if (reduceMotion) {
+    return (
+      <Tag className={className}>
+        <span className="block">{children}</span>
+      </Tag>
+    )
+  }
+
+  const MotionTag = motionTag(Tag)
   const controlled = typeof show === "boolean"
-
-  const transition = reduceMotion
-    ? { duration: 0 }
-    : { duration: 0.7, ease: EASE_OUT, delay }
-
-  const motionProps = controlled
-    ? {
-        initial: reduceMotion ? false : { y: "100%" },
-        animate: reduceMotion ? { y: 0 } : { y: show ? "0%" : "100%" },
-      }
-    : {
-        initial: reduceMotion ? false : { y: "100%" },
-        whileInView: { y: 0 },
-        viewport: { once: true, amount: viewportAmount },
-      }
+  const trigger = controlled
+    ? { animate: show ? "show" : "hidden" }
+    : { whileInView: "show", viewport: { once: true, amount: viewportAmount } }
 
   return (
-    <Tag className={`overflow-hidden ${className}`}>
-      <motion.span {...motionProps} transition={transition} className="block">
+    <MotionTag className={`overflow-hidden ${className}`} initial="hidden" {...trigger}>
+      <motion.span
+        className="block"
+        variants={{
+          hidden: { y: "100%" },
+          show: { y: "0%", transition: { duration: 0.7, ease: EASE_OUT, delay } },
+        }}
+      >
         {children}
       </motion.span>
-    </Tag>
+    </MotionTag>
   )
 }

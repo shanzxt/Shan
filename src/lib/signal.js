@@ -42,3 +42,19 @@ export function signalPath(w, h, top, bottom, points = 120) {
   }
   return d
 }
+
+// Unit step response of an underdamped second-order system (ζ < 1) — the
+// PID "settle" the site's motion language is named after. Returns an SVG
+// path over t ∈ [0, span] seconds (ωn = 1), scaled so y = 1 sits at `sp`.
+export function stepResponsePath(w, h, { zeta = 0.5, span = 14, sp = 0.62, points = 90 } = {}) {
+  const wd = Math.sqrt(1 - zeta * zeta)
+  let d = ""
+  for (let i = 0; i <= points; i++) {
+    const t = (i / points) * span
+    const y = 1 - Math.exp(-zeta * t) * (Math.cos(wd * t) + (zeta / wd) * Math.sin(wd * t))
+    const px = (i / points) * w
+    const py = h - y * sp * h - h * 0.08
+    d += `${i ? "L" : "M"}${px.toFixed(1)},${py.toFixed(1)}`
+  }
+  return d
+}
