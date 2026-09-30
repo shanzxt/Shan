@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect, useRef } from "react"
 import { Routes, Route, useLocation } from "react-router-dom"
+import { Analytics } from "@vercel/analytics/react"
 import Footer from "./components/Footer"
 import Hero from "./components/Hero"
 import ProofStrip from "./components/ProofStrip"
@@ -120,6 +121,8 @@ export default function App() {
           </Routes>
         </ErrorBoundary>
       </main>
+      {/* Cookieless page views; only reports on Vercel once enabled in the dashboard. */}
+      <Analytics />
     </>
   )
 }
