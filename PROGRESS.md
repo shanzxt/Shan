@@ -38,12 +38,19 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
   already existed. Verified 390 (menu open) and 1440.
 - Item 8 analytics: `@vercel/analytics` `<Analytics />` in App.jsx (+~1 kB gzip on main chunk). Inert until enabled
   in the Vercel dashboard (see manual steps).
+- Item 9 repo hygiene: README rewritten (setup, scripts, routes, adding an issue/tool, deploy pointer);
+  `.github/workflows/ci.yml` (lint, test, build, route smoke on PRs + pushes to staging/main); `.env*` ignored.
+
+**Roadmap complete.** Final gzip sizes: main `index` 92.3 -> 94.3 kB (+analytics, mobile menu, error boundary);
+issue body chunk 112.3 -> 4.1 kB, Recharts (102.7 kB) only fetched for issues with a masthead chart.
 
 ## In progress
 - (none)
 
 ## Next
-- Item 9 repo hygiene (README, GitHub Action, .gitignore)
+- Nothing on the roadmap. Candidates for a later pass: Lighthouse run on the staging preview (CLI not installed here);
+  LazyMotion (~15 kB); self-hosting fonts; move Footer out of `<main>`; CLAUDE.md still describes `IssueModal.jsx`
+  and shantanusomwanshi.com and could be refreshed.
 
 ## Decisions
 - Site URL for canonical/sitemap/feed: `https://www.shantests.in` (live domain per user; README/CLAUDE.md still say shantanusomwanshi.com).
