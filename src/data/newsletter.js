@@ -46,6 +46,8 @@ export const issues = [
     title: "Day 29: Why You'll Quit Before the Maths Starts Working",
     hook: "Everyone quits on Day 28. This is a newsletter for Day 29 people.",
     date: "Sep 6, 2026",
+    readingTime: "8 min read",
+    coverImage: "/newsletter/day29-reveal-chart.png",
     substackUrl: "https://shantanusomwanshi.substack.com",
     githubUrl: "https://github.com/shanzxt/n1-Compounding-newsletter",
     stats: [
@@ -110,6 +112,8 @@ export const issues = [
       {
         type: "image",
         src: "/newsletter/day29-reveal-chart.png",
+        width: 1800,
+        height: 1800,
         alt: "Two line charts showing a flat SIP and a 10% step-up SIP both staying near zero for years before growing sharply at the end.",
         caption:
           "Flat SIP vs 10% step-up, Nifty 50, Aug 1991–Aug 2026. Both cross 3% of their final value early — 8 years in and 12 years in — then spend the remaining decades doing almost all of the work. 31% and 37% of the final value arrives in the last five years.",
@@ -129,6 +133,8 @@ export const issues = [
       {
         type: "image",
         src: "/newsletter/day29-sip-holding-period.png",
+        width: 2400,
+        height: 1440,
         alt: "Stacked bar chart comparing how long direct-plan and regular-plan SIP money has been invested.",
         caption:
           "Source: AMFI Annual Report, Fiscal 2026 — holding period of SIP AUM as of March 2026. Each column sums to 100%.",
@@ -164,6 +170,8 @@ export const issues = [
       {
         type: "image",
         src: "/newsletter/day29-sip-portfolio.png",
+        width: 2400,
+        height: 1520,
         alt: "Line chart comparing step-up SIP, flat SIP, and a panic-selling SIP over 35 years.",
         caption:
           "Three versions of the same SIP. Step-up ₹14.24 crore on ₹3.28 crore invested; flat ₹4.72 crore on ₹42.1 lakh; panic-seller ₹0.43 crore on ₹21.2 lakh. Selling at every −20% drawdown cost ₹4.29 crore against simply staying in.",
@@ -240,4 +248,149 @@ export const issues = [
       { type: "p", text: "If you spot a bug in the maths, that's the whole point of shipping the code — tell me." },
     ],
   },
+  {
+    id: "44-funds-2-bets",
+    number: 2,
+    title: "44 funds, 2 bets",
+    hook: "Why you might be putting all your eggs in one basket (unknowingly)",
+    date: "Sep 30, 2026",
+    readingTime: "6 min read",
+    coverImage: "/newsletters/44-funds-2-bets/1_correlation_heatmap.png",
+    substackUrl: "https://shantanusomwanshi.substack.com/p/44-funds-2-bets",
+    githubUrl: "https://github.com/shanzxt/n2-Diversification",
+    tool: "fund-picker",
+    // No time-series chart for this issue (unlike Day 29's line chart) — the
+    // card/reader fall back to `coverImage` when `chart` is absent.
+    stats: [
+      { label: "Funds analyzed", value: "44" },
+      { label: "Fund categories", value: "13" },
+      { label: "Driven by one factor", value: "85%" },
+      { label: "Effective bets", value: "~2" },
+    ],
+    content: [
+      {
+        type: "p",
+        text: "I, like many others, like to use AI to assess my financial investments from time to time. Recently, when I was doing exactly that, the response had a surprising ending. It basically said that I was investing in the same companies at the end of the day under different mutual fund names.",
+      },
+      {
+        type: "p",
+        text: "After reading that, I went down a rabbit hole and started figuring out how **diversified** I actually was, and to my surprise, the funds moved as if they held the **same few companies.**",
+      },
+      {
+        type: "image",
+        src: "/newsletters/44-funds-2-bets/1_correlation_heatmap.png",
+        width: 1456,
+        height: 1320,
+        alt: "Correlation heatmap of monthly returns between 44 mutual funds in 13 categories, mostly dark blue, meaning most funds move together",
+      },
+      {
+        type: "p",
+        text: "This is a **correlation heatmap** I made for some well-known mutual funds, 44 to be exact. A shade of dark blue indicates that a fund moves similarly to the fund in comparison, while a shade of light blue means that they have a lower correlation and do not move in a trend together, while the lightest shade would indicate that the funds move in opposite directions.",
+      },
+      {
+        type: "p",
+        text: "Notice how a lot of the heatmap is relatively a shade of dark blue, and that is exactly why you may be **under the illusion that you are diversified**.",
+      },
+      {
+        type: "p",
+        text: "On the other hand, some funds like the Debt or International funds seem to have a lighter shade, and in my analysis I clubbed 3, 5, 7 and 10 equity funds to see how much diversification was provided with each addition of an equity fund, as it may be evident by now – not much.",
+      },
+      {
+        type: "p",
+        text: "When we simply add 1 debt fund to an existing equity portfolio, the effective number of bets we take, i.e. diversification, increases significantly – way more than adding an equity fund would result in.",
+      },
+      {
+        type: "image",
+        src: "/newsletters/44-funds-2-bets/4_debt_fund_effect.png",
+        alt: "Bar chart: median effective bets over 1,500 random equity portfolios before and after adding one more equity fund versus one liquid debt fund. Adding a debt fund lifts effective bets to about 1.95–1.97 in every case, while adding an equity fund barely moves them",
+      },
+      {
+        type: "p",
+        text: "This chart shows exactly that: our effective number of bets went from 1.32 to 1.39 when we added 1 equity fund to an existing 3-fund portfolio, a difference of 0.07, but simply adding one liquid debt fund took the effective number of bets to 1.97, a difference of 0.65, about a 9-fold increase in the difference of effective number of bets.",
+      },
+      {
+        type: "image",
+        src: "/newsletters/44-funds-2-bets/5_risk_vs_correlation.png",
+        alt: "Line chart: portfolio risk of a 50/50 two-fund portfolio versus correlation between the funds. At correlation 0 risk falls about 29 percent; the typical pair in the data, at 0.89, cuts risk by only 3 percent",
+      },
+      {
+        type: "p",
+        text: "A correlation of 0 would provide a 29% reduction in risk according to the formula, while a typical pair in the data had a positive correlation of 0.89, moving almost identically and giving only a 3% reduction in risk as compared to holding the same fund instead of diversifying.",
+      },
+      {
+        type: "p",
+        text: "Without getting into the mathematics behind it, if we use Principal Component Analysis (PCA), we can find a pattern of sorts. This pattern is just a row of numbers, like a mood: when the numbers go up, the funds also tend to go up. The factor we found has a positive correlation of 0.95 with the Nifty 50, so we can assume for now that the factor closely follows the Nifty 50.",
+      },
+      {
+        type: "image",
+        src: "/newsletters/44-funds-2-bets/2_one_factor.png",
+        alt: "Bar chart of the share of total variation in fund returns explained by each hidden factor. The first factor explains 85 percent, the rest 4.6 percent or less",
+      },
+      {
+        type: "p",
+        text: "This one factor alone drives 85% of the funds' movement. If all 44 funds were completely independent, each factor would explain an equal share of the drive, i.e. 100/44 ≈ 2.3%.",
+      },
+      { type: "p", text: "Basically, most of the equity funds move in a highly similar fashion to the Nifty 50." },
+      {
+        type: "image",
+        src: "/newsletters/44-funds-2-bets/7_window_robustness.png",
+        alt: "Bar chart: effective independent bets stay between 2.04 and 2.55 across history windows from 22 to 128 months",
+      },
+      {
+        type: "p",
+        text: "When the same analysis was done for longer durations – up to 128 months – the result was almost the same.",
+      },
+
+      { type: "h2", text: "How I Built This" },
+      {
+        type: "p",
+        text: "An interesting thing I noticed while collecting the data is how most of it was mainly available from 2013. It turns out SEBI had made it mandatory for every fund house to offer a separate direct plan for every mutual fund they offered, from 1 January 2013.",
+      },
+      { type: "p", text: "Every chart in this issue is built on real data, and the code is public." },
+      {
+        type: "p",
+        text: "**Fund data:** Daily NAV histories for 44 mutual funds across 13 categories, pulled from mfapi.in. I used only Direct plans, Growth option, and converted month-end NAVs into monthly returns.",
+      },
+      {
+        type: "p",
+        text: "**Method:** Correlations between every pair of funds, then Principal Component Analysis to find the shared movement (the \"one factor\"), then the effective number of bets, a measure of how evenly that movement is spread across factors. Portfolio charts use random combinations of funds: 600 per size for the funds-vs-bets chart and 1,500 for the debt-fund chart. Everything is in Python.",
+      },
+      {
+        type: "p",
+        text: "**The window:** The main results use the 22 months (Nov 2024 – Aug 2026) that all 44 funds have in common. I repeated the analysis on longer histories, up to 128 months, in the robustness chart.",
+      },
+      { type: "p", text: "**What's excluded, on purpose:**" },
+      {
+        type: "list",
+        items: [
+          "**Holdings.** I measured how funds move, not what they own, so I haven't measured overlap between portfolios.",
+          "**Short window.** Longer histories gave slightly more bets (2.3–2.6 vs 2.04), so the headline \"about 2\" is if anything on the low side, and may slightly exaggerate the problem.",
+          "**Equal weighting.** Every fund counts the same. Real portfolios have unequal weights, which changes the numbers.",
+          "**The liquid fund.** Its correlations are noisy because its returns barely move, so treat the debt-fund result as a direction, not a precise figure.",
+          "**Data fixes.** HDFC Liquid Fund's return for Aug 2015 was distorted by a face-value change, so it was dropped and that month was filled with the average of the months either side. This doesn't affect any result in this issue, and it's documented in the repo.",
+          "**The Nifty check.** It uses the UTI Nifty 50 Index Fund (Direct plan) as a stand-in for the Nifty 50. That fund is one of the 44, but rebuilding the factor from the other 43 gives almost the same result (0.94).",
+        ],
+      },
+      { type: "p", text: "Fund names appear as examples of data, not recommendations." },
+      {
+        type: "p",
+        text: "*This newsletter is for educational purposes and is not investment advice. Past returns are not indicative of future results.*",
+      },
+      {
+        type: "p",
+        text: "Code: [github.com/shanzxt/n2-Diversification](https://github.com/shanzxt/n2-Diversification), covering the data pull, cleaning and the maths.",
+      },
+      {
+        type: "p",
+        text: "**Try it yourself:** the fund-picker tool on my website lets you enter your own funds and see your real bets.",
+      },
+      { type: "tool", name: "fund-picker" },
+      { type: "p", text: "*If you spot a bug in the maths, tell me. That's the whole point of shipping the code.*" },
+    ],
+  },
 ]
+
+// Issues are authored in `issues` in whatever order they were added, not
+// necessarily publish order — this is the one list every newsletter page
+// reads from, newest first.
+export const issuesByDate = [...issues].sort((a, b) => new Date(b.date) - new Date(a.date))
