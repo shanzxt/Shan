@@ -19,6 +19,7 @@ const PortfolioBuilder = lazy(() => import("./components/PortfolioBuilder/Portfo
 
 const NewslettersIndex = lazy(() => import("./pages/NewslettersIndex"))
 const NewsletterIssue = lazy(() => import("./pages/NewsletterIssue"))
+const Tools = lazy(() => import("./pages/Tools"))
 
 // Keeps <head> in sync on client-side navigation and resets scroll for
 // plain route changes. The first render is skipped: the prerendered HTML
@@ -97,6 +98,14 @@ export default function App() {
             element={
               <Suspense fallback={<div className="min-h-screen bg-bg" />}>
                 <NewsletterIssue />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/tools"
+            element={
+              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                <Tools />
               </Suspense>
             }
           />

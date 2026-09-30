@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { ArrowLeft } from "lucide-react"
 import ClipReveal from "../ClipReveal"
+import ToolDisclaimer from "../ToolDisclaimer"
 import UnderTheHood from "../UnderTheHood"
 import IntroAnimation from "./IntroAnimation"
 import FundPickerTool from "./FundPickerTool"
@@ -25,6 +26,7 @@ export default function PortfolioBuilder() {
 
       <ClipReveal id="fund-picker" className="flex flex-col items-center pt-8">
         <FundPickerTool />
+        <ToolDisclaimer className="mt-6 max-w-xl text-center" />
       </ClipReveal>
 
       <div className="mx-auto max-w-5xl px-0 sm:px-4">

@@ -4,6 +4,7 @@ import { Maximize2, X } from "lucide-react"
 import { toolRegistry } from "../data/toolRegistry"
 import { headingId } from "../lib/headings"
 import ClipReveal from "./ClipReveal"
+import ToolDisclaimer from "./ToolDisclaimer"
 
 // Renders **bold**, *italic* and [text](url) markers inside plain text,
 // matching the lightweight formatting used in the newsletter data.
@@ -55,6 +56,7 @@ function ToolPanel({ name }) {
             <ToolComponent />
           </div>
         </Suspense>
+        <ToolDisclaimer className="mt-6 text-center" />
       </div>
     </ClipReveal>
   )

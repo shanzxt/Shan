@@ -108,7 +108,7 @@ export function routeMeta(pathname) {
 
 // Every route the prerenderer writes, in sitemap order.
 export function prerenderRoutes() {
-  return ["/", "/newsletters", ...issuesByDate.map(issuePath), "/portfolio"]
+  return ["/", "/newsletters", ...issuesByDate.map(issuePath), "/tools", "/portfolio"]
 }
 
 function metaTags(meta) {
