@@ -71,3 +71,35 @@ body {
 .animate-marquee {
   animation: marquee 22s linear infinite;
 }
+
+/* Print: issue pages come out as a plain black-on-white article. Chrome,
+   the lightbox and interactive tool panels are hidden via `print:hidden`. */
+@media print {
+  @page {
+    margin: 18mm;
+  }
+  * {
+    color: #000 !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    /* scroll reveals that never ran would otherwise print clipped/hidden */
+    clip-path: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  article a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    word-break: break-all;
+  }
+  figure,
+  img,
+  blockquote {
+    break-inside: avoid;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+}

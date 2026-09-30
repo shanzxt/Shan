@@ -5,7 +5,7 @@ export default function GrainOverlay() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-40 opacity-[0.16] mix-blend-overlay"
+      className="pointer-events-none fixed inset-0 z-40 print:hidden opacity-[0.16] mix-blend-overlay"
     >
       <svg className="h-full w-full">
         <filter id="site-grain">

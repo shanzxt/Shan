@@ -2,6 +2,7 @@ import { Suspense, useEffect, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Maximize2, X } from "lucide-react"
 import { toolRegistry } from "../data/toolRegistry"
+import { headingId } from "../lib/headings"
 import ClipReveal from "./ClipReveal"
 
 // Renders **bold**, *italic* and [text](url) markers inside plain text,
@@ -44,7 +45,7 @@ function ToolPanel({ name }) {
   if (!ToolComponent) return null
 
   return (
-    <ClipReveal duration={0.7} amount={0} className="mt-8">
+    <ClipReveal duration={0.7} amount={0} className="mt-8 print:hidden">
       <div className="border-2 border-accent/60 bg-paper/[0.03] px-4 py-8 sm:px-8">
         <p className="mb-6 text-center font-mono text-xs uppercase tracking-wider text-accent">
           Try it yourself
@@ -63,7 +64,7 @@ function Block({ block, onOpenImage }) {
   switch (block.type) {
     case "h2":
       return (
-        <h3 className="mt-10 font-display text-xl font-semibold text-paper first:mt-0 sm:text-2xl">
+        <h3 id={headingId(block.text)} className="mt-10 scroll-mt-28 font-display text-xl font-semibold text-paper first:mt-0 sm:text-2xl">
           {block.text}
         </h3>
       )
@@ -161,7 +162,7 @@ export function Lightbox({ image, onClose }) {
           animate={{ opacity: 1 }}
           exit={reduceMotion ? undefined : { opacity: 0 }}
           transition={{ duration: 0.15 }}
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-bg/95 p-4 backdrop-blur-sm sm:p-10"
+          className="print:hidden fixed inset-0 z-[60] flex items-center justify-center bg-bg/95 p-4 backdrop-blur-sm sm:p-10"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) onClose()
           }}

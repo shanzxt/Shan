@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react"
+import { Suspense, lazy, useMemo } from "react"
 import { Link, useParams } from "react-router-dom"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
@@ -6,6 +6,9 @@ import { issuesByDate } from "../data/newsletter"
 import { IssueBody, Lightbox, useLightbox } from "../components/IssueContent"
 import { links } from "../data/links"
 import GithubMark from "../components/icons/GithubMark"
+import IssueToc from "../components/IssueToc"
+import ShareButton from "../components/ShareButton"
+import { issueHeadings } from "../lib/headings"
 import NotFound from "./NotFound"
 
 // Recharts only ships for issues that actually have a masthead chart.
@@ -17,6 +20,7 @@ export default function NewsletterIssue() {
   const index = issuesByDate.findIndex((i) => i.id === slug)
   const issue = index === -1 ? null : issuesByDate[index]
   const [lightboxImage, setLightboxImage] = useLightbox(issue?.id)
+  const headings = useMemo(() => issueHeadings(issue?.content), [issue])
 
   if (!issue) return <NotFound />
 
@@ -30,7 +34,7 @@ export default function NewsletterIssue() {
       <div className="min-h-screen bg-bg px-6 pb-24 pt-28 sm:px-10 sm:pt-32">
         <Link
           to="/newsletters"
-          className="group inline-flex items-center gap-1.5 font-mono text-sm text-paper/60 transition-colors hover:text-accent"
+          className="group inline-flex items-center gap-1.5 font-mono text-sm text-paper/60 transition-colors hover:text-accent print:hidden"
         >
           <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
           all issues
@@ -40,7 +44,7 @@ export default function NewsletterIssue() {
           initial={reduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
-          className="mx-auto mt-8 max-w-2xl"
+          className="relative mx-auto mt-8 max-w-2xl"
         >
           <p className="font-mono text-xs uppercase tracking-wider text-paper/45">Shantanu Somwanshi</p>
           <h1 className="mt-3 font-display text-3xl font-semibold leading-tight text-paper sm:text-4xl">
@@ -68,10 +72,11 @@ export default function NewsletterIssue() {
           )}
 
           <div className="border-t hr-line pt-8">
+            <IssueToc key={issue.id} headings={headings} />
             <IssueBody content={issue.content} onOpenImage={setLightboxImage} />
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t hr-line pt-6 font-mono text-sm">
+          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t hr-line pt-6 font-mono text-sm print:hidden">
             <a
               href={issue.substackUrl}
               target="_blank"
@@ -90,6 +95,7 @@ export default function NewsletterIssue() {
               <GithubMark size={14} />
               View the code
             </a>
+            <ShareButton title={issue.title} />
             <a
               href={links.newsletter}
               target="_blank"
@@ -102,7 +108,7 @@ export default function NewsletterIssue() {
           </div>
 
           {(prevIssue || nextIssue) && (
-            <div className="mt-10 grid grid-cols-1 gap-4 border-t hr-line pt-6 sm:grid-cols-2">
+            <div className="mt-10 grid grid-cols-1 gap-4 border-t hr-line pt-6 sm:grid-cols-2 print:hidden">
               {prevIssue ? (
                 <Link
                   to={`/newsletters/${prevIssue.id}`}

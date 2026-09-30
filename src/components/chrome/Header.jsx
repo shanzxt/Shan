@@ -28,7 +28,7 @@ export default function Header() {
   return (
     <motion.header
       style={reduceMotion ? { height: compact ? COMPACT_HEIGHT : EXPANDED_HEIGHT } : { height }}
-      className={`fixed inset-x-0 top-0 z-40 border-b hr-line backdrop-blur-md transition-colors duration-300 ${
+      className={`fixed inset-x-0 top-0 z-40 print:hidden border-b hr-line backdrop-blur-md transition-colors duration-300 ${
         compact ? "bg-bg/85" : "bg-bg/35"
       }`}
     >
