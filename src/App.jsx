@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react"
+import { Suspense, lazy, useEffect, useRef } from "react"
 import { Routes, Route, useLocation } from "react-router-dom"
 import Footer from "./components/Footer"
 import Hero from "./components/Hero"
@@ -7,6 +7,7 @@ import WhatIDo from "./components/WhatIDo"
 import Work from "./components/Work"
 import GrainOverlay from "./components/chrome/GrainOverlay"
 import Header from "./components/chrome/Header"
+import NotFound from "./pages/NotFound"
 
 // Recharts pulls its own weight — split it out of the main bundle since it
 // only matters once someone scrolls to the newsletter section.
@@ -17,6 +18,25 @@ const PortfolioBuilder = lazy(() => import("./components/PortfolioBuilder/Portfo
 
 const NewslettersIndex = lazy(() => import("./pages/NewslettersIndex"))
 const NewsletterIssue = lazy(() => import("./pages/NewsletterIssue"))
+
+// Keeps <head> in sync on client-side navigation and resets scroll for
+// plain route changes. The first render is skipped: the prerendered HTML
+// already carries that route's head tags.
+function RouteEffects() {
+  const { pathname, hash } = useLocation()
+  const firstRender = useRef(true)
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false
+      return
+    }
+    if (!hash) window.scrollTo(0, 0)
+    import("./lib/seo").then(({ applyRouteMeta }) => applyRouteMeta(pathname))
+  }, [pathname, hash])
+
+  return null
+}
 
 function Home() {
   const location = useLocation()
@@ -49,6 +69,7 @@ export default function App() {
     <>
       <GrainOverlay />
       <Header />
+      <RouteEffects />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route
@@ -75,6 +96,7 @@ export default function App() {
             </Suspense>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   )

@@ -1,56 +1,20 @@
-import { useEffect } from "react"
-import { Link, Navigate, useParams } from "react-router-dom"
+import { Link, useParams } from "react-router-dom"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { issuesByDate } from "../data/newsletter"
 import { IssueBody, IssueChart, Lightbox, useLightbox } from "../components/IssueContent"
 import { links } from "../data/links"
 import GithubMark from "../components/icons/GithubMark"
-
-function useIssueMeta(issue) {
-  useEffect(() => {
-    if (!issue) return
-    const previousTitle = document.title
-    document.title = `${issue.title} — Shantanu Somwanshi`
-
-    const metaTags = [
-      { name: "description", content: issue.hook },
-      { property: "og:title", content: issue.title },
-      { property: "og:description", content: issue.hook },
-      { property: "og:image", content: issue.coverImage ?? "" },
-      { property: "og:type", content: "article" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: issue.title },
-      { name: "twitter:description", content: issue.hook },
-      { name: "twitter:image", content: issue.coverImage ?? "" },
-    ]
-
-    const created = metaTags.map(({ name, property, content }) => {
-      if (!content) return null
-      const el = document.createElement("meta")
-      if (name) el.setAttribute("name", name)
-      if (property) el.setAttribute("property", property)
-      el.setAttribute("content", content)
-      document.head.appendChild(el)
-      return el
-    })
-
-    return () => {
-      document.title = previousTitle
-      created.forEach((el) => el && document.head.removeChild(el))
-    }
-  }, [issue])
-}
+import NotFound from "./NotFound"
 
 export default function NewsletterIssue() {
   const { slug } = useParams()
   const reduceMotion = useReducedMotion()
   const index = issuesByDate.findIndex((i) => i.id === slug)
   const issue = index === -1 ? null : issuesByDate[index]
-  useIssueMeta(issue)
   const [lightboxImage, setLightboxImage] = useLightbox(issue?.id)
 
-  if (!issue) return <Navigate to="/newsletters" replace />
+  if (!issue) return <NotFound />
 
   // `issuesByDate` is newest-first; "previous" reads chronologically
   // earlier (higher array index), "next" chronologically later.
