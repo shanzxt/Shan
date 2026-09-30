@@ -105,11 +105,17 @@ panel). Nothing pushed. Content (copy, numbers, links) must stay word-for-word; 
 - Hero: canvas oscilloscope (`lib/signal.js`), probe filters noise, letter lens on the name, static SVG for SSR /
   reduced motion. `DataTicker.jsx` (figures generated from newsletter data).
 
+- Home sections: ProofStrip gauge rack (tick meters, M-01..04), WhatIDo channel bento with self-drawing schematics +
+  underdamped step-response plot, Newsletter + IssueCard featured "screen" (`SignalChart` phosphor Recharts that
+  mounts/draws in view), Work patch-bay list, Footer XY-mode Lissajous (`Lissajous.jsx`) + amber email tape band.
+  Shared: `SectionHeader.jsx` (CH-0X strip), `SplitHeading.jsx` (word reveal + wdth settle), `Magnetic.jsx`.
+  Verified 1440 + 390 at every scroll depth.
+
 ## In progress
-- Home sections: ProofStrip, WhatIDo, Newsletter, Work, Footer.
+- Newsletters index (`src/pages/NewslettersIndex.jsx`).
 
 ## Next
-- Newsletters index → issue page → tools/portfolio → 404/error → final perf/a11y pass + Lighthouse after.
+- Issue page → tools/portfolio → 404/error → final perf/a11y pass + Lighthouse after.
 
 ## Decisions
 - Canvas 2D instead of WebGL (see DESIGN.md → Dependencies). Only new dep: `lenis`.
@@ -124,4 +130,10 @@ panel). Nothing pushed. Content (copy, numbers, links) must stay word-for-word; 
 - Baseline (local `vite preview`, Lighthouse 12 mobile): home perf 75 / a11y 88 / BP 96 / SEO 100, LCP 4.5 s;
   issue page 75 / 94 / 96 / 100. Baseline gzip: main `index` 94.3 kB, CSS 7.5 kB. Lighthouse via
   `npx -y lighthouse@12` with `CHROME_PATH` set (not a project dependency).
+- Word/line reveals must be driven by the *parent* heading's whileInView (variants): a child span that starts fully
+  masked inside `overflow-hidden` is clipped out of IntersectionObserver's view and may never fire. KineticHeading
+  and SplitHeading both work this way now.
+- Bundle size: compare *total initial JS* (entry + modulepreloaded chunks from dist/index.html), not just `index-*.js`
+  — chunking moved framer-motion into the entry. Baseline total 133 kB gzip; after home rebuild 144 kB.
+- Git Bash `ln -s` on a directory copies it; don't symlink node_modules into worktrees.
 - Screenshot helper now supports `MOUSE="x,y;x,y"` for hover states.
