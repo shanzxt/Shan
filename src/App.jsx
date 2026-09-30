@@ -5,6 +5,7 @@ import Hero from "./components/Hero"
 import ProofStrip from "./components/ProofStrip"
 import WhatIDo from "./components/WhatIDo"
 import Work from "./components/Work"
+import ErrorBoundary from "./components/chrome/ErrorBoundary"
 import GrainOverlay from "./components/chrome/GrainOverlay"
 import Header from "./components/chrome/Header"
 import NotFound from "./pages/NotFound"
@@ -65,39 +66,43 @@ function Home() {
 }
 
 export default function App() {
+  const { pathname } = useLocation()
+
   return (
     <>
       <GrainOverlay />
       <Header />
       <RouteEffects />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/portfolio"
-          element={
-            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-              <PortfolioBuilder />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/newsletters"
-          element={
-            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-              <NewslettersIndex />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/newsletters/:slug"
-          element={
-            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-              <NewsletterIssue />
-            </Suspense>
-          }
-        />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <ErrorBoundary key={pathname}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/portfolio"
+            element={
+              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                <PortfolioBuilder />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/newsletters"
+            element={
+              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                <NewslettersIndex />
+              </Suspense>
+            }
+          />
+          <Route
+            path="/newsletters/:slug"
+            element={
+              <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+                <NewsletterIssue />
+              </Suspense>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ErrorBoundary>
     </>
   )
 }
