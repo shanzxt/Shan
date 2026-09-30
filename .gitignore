@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Env files (the site needs none today; keep secrets out of git if that changes)
+.env
+.env.*
+!.env.example
+
 # Claude Code local config
 .claude/
 
