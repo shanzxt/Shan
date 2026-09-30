@@ -4,7 +4,7 @@ import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform 
 
 const navItems = [
   { label: "What I do", href: "/#what-i-do" },
-  { label: "Newsletter", href: "/#newsletter" },
+  { label: "Newsletters", href: "/newsletters" },
   { label: "Work", href: "/#work" },
   { label: "Portfolio tool", href: "/portfolio" },
   { label: "Contact", href: "/#contact" },
