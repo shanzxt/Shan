@@ -1,9 +1,10 @@
 import { useMemo, useState } from "react";
 import HoverDetail from "./HoverDetail";
 
-// Hardcoded to match the site's actual --color-accent/--color-teal/--color-bg
-// tokens (index.css) — needed as literal hex here because SVG fill
-// interpolation happens in JS, not CSS, so var() alone can't be blended.
+// Literal hex because SVG fill interpolation happens in JS, not CSS. ACCENT
+// matches --color-accent. TEAL deliberately stays the original dark teal
+// (#4e7c7a) rather than the brighter site token: the caption below
+// describes the low end as "dark teal", and the scale must match it.
 const TEAL = [0x4e, 0x7c, 0x7a];
 const ACCENT = [0xff, 0xb0, 0x00];
 
@@ -62,7 +63,7 @@ function Legend({ min, max }) {
           background: `linear-gradient(to right, ${rgbStr(ACCENT)}, ${rgbStr(TEAL)})`,
         }}
       />
-      <div className="flex w-full max-w-xs justify-between font-mono text-[10px] text-paper/40">
+      <div className="flex w-full max-w-xs justify-between font-mono text-[10px] text-paper/55">
         <span className="flex flex-col items-start gap-0.5">
           <span>moves together</span>
           {max !== null && <span className="text-paper/60">{max.toFixed(2)}</span>}
@@ -107,7 +108,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
 
   const caption = (
     <>
-      <span className="font-mono text-xs tracking-wide text-teal">correlation heatmap</span>
+      <span className="readout text-teal">correlation heatmap</span>
       <p className="max-w-md text-[13px] text-paper/60">
         Each square shows how closely two funds move together, scaled to the
         spread actually present in your current selection. Bright amber =
@@ -123,7 +124,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
     return (
       <div className="flex flex-col gap-3">
         {caption}
-        <div className="rounded-lg border hr-line px-4 py-6 text-center text-sm text-paper/40">
+        <div className="panel px-4 py-6 text-center text-sm text-paper/55">
           Select at least two funds to see their correlation heatmap.
         </div>
       </div>
@@ -174,7 +175,10 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
               const textColor = luminance(rgb) > 140 ? "var(--color-bg)" : "var(--color-paper)";
               return (
                 <g key={`${fidA}-${fidB}`}>
+                  {/* cells ripple in along the diagonal as funds are added
+                      (CSS animation; instant under reduced motion) */}
                   <rect
+                    className="heat-cell"
                     x={x}
                     y={y}
                     width={CELL}
@@ -183,7 +187,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
                     stroke="var(--color-bg)"
                     strokeWidth={2}
                     opacity={isHovered ? 1 : 0.92}
-                    style={{ cursor: "pointer" }}
+                    style={{ cursor: "pointer", animationDelay: `${Math.min((i + j) * 18, 900)}ms` }}
                   />
                   {showCellText && (
                     <text
@@ -192,7 +196,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fontSize={18}
-                      fontFamily="'IBM Plex Mono', monospace"
+                      style={{ fontFamily: "var(--font-mono)" }}
                       fill={textColor}
                       opacity={0.85}
                       pointerEvents="none"
@@ -212,7 +216,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
               textAnchor="end"
               dominantBaseline="middle"
               fontSize={9}
-              fontFamily="'IBM Plex Mono', monospace"
+              style={{ fontFamily: "var(--font-mono)" }}
               fill="var(--color-paper)"
               opacity={0.4}
             >
@@ -226,7 +230,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
               y={LABEL_SPACE - 8}
               textAnchor="middle"
               fontSize={9}
-              fontFamily="'IBM Plex Mono', monospace"
+              style={{ fontFamily: "var(--font-mono)" }}
               fill="var(--color-paper)"
               opacity={0.4}
             >
@@ -242,7 +246,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
             <span className="text-paper/90">
               {fundsById.get(hovered.fidA)?.name}
             </span>
-            <span className="text-paper/40"> vs </span>
+            <span className="text-paper/55"> vs </span>
             <span className="text-paper/90">
               {fundsById.get(hovered.fidB)?.name}
             </span>

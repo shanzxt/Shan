@@ -279,3 +279,35 @@ html.crt #root {
     break-after: avoid;
   }
 }
+
+/* Portfolio tool: correlation cells ripple in along the diagonal. */
+@keyframes heat-cell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+}
+.heat-cell {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: heat-cell-in 0.5s var(--ease-settle) both;
+}
+
+/* Tools hub preview: cells brighten in a ripple from the corner on hover. */
+@keyframes pixel-ripple {
+  0%,
+  100% {
+    opacity: var(--base);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+.pixel-cell {
+  opacity: var(--base);
+  transition: opacity 0.4s;
+}
+.group:hover .pixel-cell {
+  animation: pixel-ripple 0.9s var(--ease-sweep) both;
+}

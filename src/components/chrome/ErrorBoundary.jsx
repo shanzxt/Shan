@@ -19,27 +19,27 @@ export default class ErrorBoundary extends Component {
     if (!this.state.error) return this.props.children
 
     return (
-      <div
-        role="alert"
-        className="flex min-h-screen flex-col justify-center bg-bg px-6 pb-24 pt-28 sm:px-10 lg:px-16"
-      >
-        <p className="font-mono text-sm text-teal">error</p>
-        <h1 className="mt-3 max-w-2xl font-display text-3xl font-light leading-tight text-paper sm:text-4xl">
+      <div role="alert" className="flex min-h-screen flex-col justify-center px-5 pb-24 pt-28 sm:px-8 lg:px-12">
+        <p className="readout flex items-center gap-2 text-alarm">
+          <span className="led" style={{ background: "var(--color-alarm)", boxShadow: "0 0 8px var(--color-alarm)" }} aria-hidden="true" />
+          error
+        </p>
+        <h1 className="mt-4 max-w-3xl font-display text-5xl font-[850] uppercase leading-[0.9] tracking-tight text-paper [font-stretch:80%] sm:text-7xl">
           Signal dropped.
         </h1>
-        <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-paper/70">
+        <p className="mt-4 max-w-xl text-lg leading-relaxed text-paper/75">
           Something on this page failed to load. A reload usually fixes it.
         </p>
-        <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 font-mono text-sm">
+        <div className="mt-10 flex flex-wrap gap-3 font-mono text-[13px]">
           <button
             type="button"
             onClick={() => window.location.reload()}
-            className="group inline-flex items-center gap-1.5 text-paper/80 transition-colors hover:text-accent"
+            className="group inline-flex h-11 items-center gap-2 bg-accent px-5 font-medium text-ink transition-colors hover:bg-paper"
           >
             <RotateCcw size={14} className="transition-transform group-hover:-rotate-45" />
             reload
           </button>
-          <a href="/" className="text-paper/80 transition-colors hover:text-accent">
+          <a href="/" className="inline-flex h-11 items-center border border-line px-5 text-paper transition-colors hover:border-accent hover:text-accent">
             back home
           </a>
         </div>

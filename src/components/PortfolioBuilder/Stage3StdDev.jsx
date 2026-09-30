@@ -167,10 +167,10 @@ export default function Stage3StdDev({ step }) {
                 >
                   {s}
                 </motion.span>
-                {i < SQUARED.length - 1 && <span className="text-paper/30">+</span>}
+                {i < SQUARED.length - 1 && <span className="text-paper/50">+</span>}
               </span>
             ))}
-            <span className="text-paper/30">=</span>
+            <span className="text-paper/50">=</span>
             <motion.span
               initial={{ opacity: 0, scale: 0.7 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -193,9 +193,9 @@ export default function Stage3StdDev({ step }) {
           >
             <div className="flex items-center gap-3 font-mono text-2xl tabular-nums">
               <span className="text-accent">{SUM_SQUARED}</span>
-              <span className="text-paper/30">/</span>
+              <span className="text-paper/50">/</span>
               <span className="text-paper">({DATASET.length} - 1)</span>
-              <span className="text-paper/30">=</span>
+              <span className="text-paper/50">=</span>
               <motion.span
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -205,7 +205,7 @@ export default function Stage3StdDev({ step }) {
                 {VARIANCE}
               </motion.span>
             </div>
-            <p className="text-xs text-paper/40">
+            <p className="text-xs text-paper/55">
               This is the <em>variance</em> — dividing by n&minus;1 (sample
               variance), not n.
             </p>
@@ -222,7 +222,7 @@ export default function Stage3StdDev({ step }) {
           >
             <div className="flex items-center gap-3 font-mono text-2xl tabular-nums">
               <span className="text-paper">&radic;{VARIANCE}</span>
-              <span className="text-paper/30">=</span>
+              <span className="text-paper/50">=</span>
               <motion.span
                 initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}

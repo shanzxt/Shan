@@ -178,10 +178,10 @@ export default function FundPickerTool() {
   return (
     <div className="w-full max-w-5xl flex flex-col gap-10">
       <div className="flex flex-col items-center gap-3 text-center">
-        <span className="font-mono text-xs tracking-wide text-teal">
+        <span className="readout text-teal">
           now with real funds
         </span>
-        <h2 className="max-w-2xl font-display text-2xl font-light text-paper sm:text-3xl">
+        <h2 className="max-w-3xl font-display text-4xl font-[800] uppercase leading-[0.92] tracking-tight text-paper [font-stretch:80%] sm:text-5xl">
           Build a portfolio from the 45-fund universe
         </h2>
         <p className="max-w-xl text-[15px] text-paper/60">
@@ -196,20 +196,28 @@ export default function FundPickerTool() {
       </p>
 
       <div className="flex flex-wrap justify-center gap-3 font-mono text-sm">
-        <button
-          type="button"
-          onClick={() => applyPreset(ALL_EQUITY_PRESET)}
-          className="rounded-md border hr-line px-4 py-2 text-paper/80 transition-colors hover:border-accent/50 hover:text-accent"
-        >
-          {ALL_EQUITY_PRESET.label}
-        </button>
-        <button
-          type="button"
-          onClick={() => applyPreset(EQUITY_PLUS_DEBT_PRESET)}
-          className="rounded-md border hr-line px-4 py-2 text-paper/80 transition-colors hover:border-accent/50 hover:text-accent"
-        >
-          {EQUITY_PLUS_DEBT_PRESET.label}
-        </button>
+        {[ALL_EQUITY_PRESET, EQUITY_PLUS_DEBT_PRESET].map((preset) => {
+          const on = highlightPreset === preset.label;
+          return (
+            <button
+              key={preset.label}
+              type="button"
+              onClick={() => applyPreset(preset)}
+              aria-pressed={on}
+              className={`group inline-flex items-center gap-2.5 border px-4 py-2.5 transition-[color,border-color,background-color,transform] duration-150 active:translate-y-px ${
+                on ? "border-accent bg-accent/10 text-accent" : "border-line bg-panel text-paper/80 hover:border-accent/50 hover:text-accent"
+              }`}
+            >
+              <span
+                aria-hidden="true"
+                className={`h-2 w-2 rounded-full transition-all duration-300 ${
+                  on ? "bg-accent shadow-[0_0_8px_var(--color-accent)]" : "bg-paper/20 group-hover:bg-accent/50"
+                }`}
+              />
+              {preset.label}
+            </button>
+          );
+        })}
         {weights.size > 0 && (
           <button
             type="button"
@@ -218,7 +226,7 @@ export default function FundPickerTool() {
               setHighlightPreset(null);
               clearPresetJump();
             }}
-            className="rounded-md px-4 py-2 text-paper/40 transition-colors hover:text-paper/70"
+            className="readout px-4 py-2 text-paper/60 transition-colors hover:text-alarm"
           >
             Clear
           </button>
@@ -256,7 +264,7 @@ export default function FundPickerTool() {
                 key="empty"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="rounded-lg border hr-line px-4 py-6 text-center text-sm text-paper/40"
+                className="panel px-4 py-6 text-center text-sm text-paper/55"
               >
                 Select at least one fund with a nonzero weight to see stats.
               </motion.p>

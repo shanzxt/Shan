@@ -47,14 +47,14 @@ export default function Stage2Mean({ step }) {
                 >
                   {v}
                 </motion.span>
-                {i < DATASET.length - 1 && <span className="text-paper/30">+</span>}
+                {i < DATASET.length - 1 && <span className="text-paper/50">+</span>}
               </span>
             ))}
             <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: DATASET.length * 0.3 }}
-              className="text-paper/30"
+              className="text-paper/50"
             >
               =
             </motion.span>
@@ -79,9 +79,9 @@ export default function Stage2Mean({ step }) {
             className="flex items-center gap-3 font-mono text-2xl tabular-nums"
           >
             <span className="text-accent">{TOTAL}</span>
-            <span className="text-paper/30">/</span>
+            <span className="text-paper/50">/</span>
             <span className="text-paper">{DATASET.length}</span>
-            <span className="text-paper/30">=</span>
+            <span className="text-paper/50">=</span>
             <motion.span
               initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

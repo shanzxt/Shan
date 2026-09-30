@@ -212,7 +212,7 @@ function ReadingLegend() {
           style={{ top: 46, background: "var(--color-accent)", opacity: 0.85 }}
         />
       </div>
-      <div className="flex flex-col gap-1 font-mono text-[10px] leading-tight text-paper/45">
+      <div className="flex flex-col gap-1 font-mono text-[10px] leading-tight text-paper/60">
         <span>sphere — a fund</span>
         <span>line — just spacing, ignore the length</span>
         <span>shadow — where it really sits, based on how it moves with the others</span>
@@ -238,9 +238,9 @@ export default function DiversificationScene({ stats, fundsById }) {
   const hoveredIndex = hoveredPoint ? points.indexOf(hoveredPoint) + 1 : null;
 
   return (
-    <div className="flex flex-col gap-4 rounded-lg border hr-line p-5">
+    <div className="flex flex-col gap-4 panel p-5">
       <div>
-        <span className="font-mono text-xs tracking-wide text-teal">
+        <span className="readout text-teal">
           what looks like vs. what actually is
         </span>
         <p className="mt-1 max-w-md text-[13px] text-paper/60">
@@ -271,7 +271,7 @@ export default function DiversificationScene({ stats, fundsById }) {
           >
             {/* Floor grid — decorative, sits in the same z=0 plane as every shadow below. */}
             <div
-              className="absolute rounded-md border hr-line opacity-40"
+              className="absolute border border-line opacity-40"
               style={{
                 left: "50%",
                 top: "50%",
@@ -487,7 +487,7 @@ export default function DiversificationScene({ stats, fundsById }) {
       <HoverDetail placeholder="Shadows close together = funds that move almost identically. A shadow standing apart = a fund that actually moves on its own. Hover or tap a sphere for the fund and its loadings.">
         {hoveredPoint ? (
           <span>
-            <span className="text-paper/40">{hoveredIndex}. </span>
+            <span className="text-paper/55">{hoveredIndex}. </span>
             <span className="text-paper/90">{hoveredPoint.name}</span>
             <span className="text-accent">
               {" "}
@@ -498,7 +498,7 @@ export default function DiversificationScene({ stats, fundsById }) {
         ) : null}
       </HoverDetail>
 
-      <div className="grid grid-cols-1 overflow-hidden rounded-lg border hr-line sm:grid-cols-2">
+      <div className="grid grid-cols-1 overflow-hidden panel sm:grid-cols-2">
         {points.map((p, i) => {
           const isIsolated = isolated?.fid === p.fid;
           return (
@@ -510,7 +510,7 @@ export default function DiversificationScene({ stats, fundsById }) {
                 hovered === p.fid ? "bg-paper/5" : ""
               } ${isIsolated ? "text-teal" : "text-paper/70"}`}
             >
-              <span className="w-4 shrink-0 font-mono text-[11px] text-paper/35">{i + 1}</span>
+              <span className="w-4 shrink-0 font-mono text-[11px] text-paper/55">{i + 1}</span>
               <span className="truncate" title={p.name}>
                 {p.name}
               </span>
@@ -519,7 +519,7 @@ export default function DiversificationScene({ stats, fundsById }) {
         })}
       </div>
 
-      <p className="text-center text-[11px] text-paper/35">
+      <p className="text-center text-[11px] text-paper/55">
         Each sphere's shadow is the fund's real position — its loading on the
         dominant shared factor(s) behind your current selection. The line
         between them is just the tether; height and size are depth cues, not

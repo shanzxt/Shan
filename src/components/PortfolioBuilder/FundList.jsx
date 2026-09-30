@@ -47,11 +47,11 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
       </p>
 
       {selectedFunds.length > 0 && (
-        <div className="flex flex-col gap-2 rounded-lg border hr-line p-4">
-          <span className="font-mono text-xs tracking-wide text-teal">
+        <div className="flex flex-col gap-2 panel p-4">
+          <span className="readout text-teal">
             selected ({selectedFunds.length})
           </span>
-          <p className="text-[12px] text-paper/45">
+          <p className="text-[12px] text-paper/60">
             Drag to change how much of the portfolio goes into each fund.
             These always add up to 100% — dragging one down means the others
             take up the slack.
@@ -74,7 +74,7 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
                     type="button"
                     onClick={() => onRemove(f.id)}
                     aria-label={`Remove ${f.name}`}
-                    className="shrink-0 text-paper/30 transition-colors hover:text-accent"
+                    className="shrink-0 text-paper/50 transition-colors hover:text-accent"
                   >
                     <X size={14} />
                   </button>
@@ -95,18 +95,18 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
       <div className="relative">
         <Search
           size={14}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-paper/30"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-paper/50"
         />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by fund name or category…"
-          className="w-full rounded-md border hr-line bg-transparent py-2 pl-9 pr-3 font-mono text-sm text-paper placeholder:text-paper/30 focus:border-accent focus:outline-none"
+          className="w-full border border-line bg-transparent py-2 pl-9 pr-3 font-mono text-sm text-paper placeholder:text-paper/50 focus:border-accent focus:outline-none"
         />
       </div>
 
-      <div className="max-h-[420px] overflow-y-auto rounded-lg border hr-line">
+      <div data-lenis-prevent className="max-h-[420px] overflow-y-auto panel">
         {categories
           .filter((cat) => filtered.some((f) => f.category === cat))
           .map((cat) => (
@@ -138,7 +138,7 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
             </div>
           ))}
         {filtered.length === 0 && (
-          <p className="px-3 py-6 text-center text-sm text-paper/30">No funds match "{query}".</p>
+          <p className="px-3 py-6 text-center text-sm text-paper/50">No funds match "{query}".</p>
         )}
       </div>
     </div>

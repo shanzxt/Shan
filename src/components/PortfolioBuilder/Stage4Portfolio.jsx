@@ -58,7 +58,7 @@ export default function Stage4Portfolio({ step }) {
                 <div className="font-mono font-semibold" style={{ color: DOT_COLORS[i] }}>
                   {a.name}
                 </div>
-                <div className="mt-1 font-mono text-xs text-paper/45 tabular-nums">
+                <div className="mt-1 font-mono text-xs text-paper/60 tabular-nums">
                   {a.returns.join(", ")}
                 </div>
               </motion.div>
@@ -108,7 +108,7 @@ export default function Stage4Portfolio({ step }) {
           <p className="max-w-lg text-center text-[15px] text-paper/70">
             Covariance measures how two assets' deviations move together —
             the same idea as squaring one deviation, extended to a pair.
-            <span className="block mt-1 text-xs text-paper/40">
+            <span className="block mt-1 text-xs text-paper/55">
               The diagonal (highlighted) is just each asset's own variance.
             </span>
           </p>
@@ -197,7 +197,7 @@ export default function Stage4Portfolio({ step }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9 }}
-            className="font-mono text-xs text-paper/40"
+            className="font-mono text-xs text-paper/55"
           >
             w<sup>T</sup>&Sigma;w
           </motion.div>
@@ -221,7 +221,7 @@ export default function Stage4Portfolio({ step }) {
               transition={{ type: "spring", stiffness: 240, damping: 18 }}
               className="flex flex-col items-center gap-1"
             >
-              <span className="text-xs text-paper/45">portfolio variance</span>
+              <span className="text-xs text-paper/60">portfolio variance</span>
               <span className="text-accent">{round(VARIANCE)}</span>
             </motion.div>
             <motion.div
@@ -230,7 +230,7 @@ export default function Stage4Portfolio({ step }) {
               transition={{ delay: 0.15, type: "spring", stiffness: 240, damping: 18 }}
               className="flex flex-col items-center gap-1"
             >
-              <span className="text-xs text-paper/45">portfolio std dev</span>
+              <span className="text-xs text-paper/60">portfolio std dev</span>
               <span className="text-accent">{round(STD)}</span>
             </motion.div>
           </div>
