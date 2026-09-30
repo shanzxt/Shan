@@ -1,86 +1,57 @@
-import { useEffect, useState } from "react"
-
-// Tracks the last heading scrolled past with a plain scroll listener rather
-// than IntersectionObserver (see CLAUDE.md: observers with a margin or
-// threshold stop re-firing in this environment).
-function useActiveHeading(ids) {
-  const [active, setActive] = useState(null)
-
-  useEffect(() => {
-    if (!ids.length) return
-    let frame = 0
-    const update = () => {
-      frame = 0
-      let current = null
-      for (const id of ids) {
-        const el = document.getElementById(id)
-        if (el && el.getBoundingClientRect().top <= 140) current = id
-      }
-      setActive(current)
-    }
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => {
-      window.removeEventListener("scroll", onScroll)
-      cancelAnimationFrame(frame)
-    }
-  }, [ids])
-
-  return active
-}
+import { sfx } from "../lib/sfx"
 
 function TocLinks({ headings, active }) {
   return (
-    <ol className="flex flex-col gap-2">
-      {headings.map((h) => (
-        <li key={h.id}>
-          <a
-            href={`#${h.id}`}
-            aria-current={active === h.id ? "location" : undefined}
-            className={`block border-l pl-3 leading-snug transition-colors hover:text-accent ${
-              active === h.id ? "border-accent text-paper" : "border-paper/15 text-paper/50"
-            }`}
-          >
-            {h.text}
-          </a>
-        </li>
-      ))}
+    <ol className="flex flex-col">
+      {headings.map((h, i) => {
+        const on = active === h.id
+        return (
+          <li key={h.id}>
+            <a
+              href={`#${h.id}`}
+              onClick={() => sfx("tick")}
+              aria-current={on ? "location" : undefined}
+              className={`group flex gap-3 border-l py-2 pl-3 font-mono text-[12px] leading-snug transition-colors ${
+                on ? "border-accent text-paper" : "border-line text-paper/55 hover:border-paper/40 hover:text-paper"
+              }`}
+            >
+              <span className={`shrink-0 transition-colors ${on ? "text-accent" : "text-paper/40 group-hover:text-accent"}`}>
+                §{String(i + 1).padStart(2, "0")}
+              </span>
+              <span>{h.text}</span>
+            </a>
+          </li>
+        )
+      })}
     </ol>
   )
 }
 
-// Sticky rail in the left margin on wide screens; a collapsed "In this
-// issue" list above the body everywhere else. Hidden for issues with fewer
-// than two sections.
-export default function IssueToc({ headings }) {
-  const [ids] = useState(() => headings.map((h) => h.id))
-  const active = useActiveHeading(ids)
-
+// Sticky channel list in the left rail on wide screens.
+export function TocRail({ headings, active }) {
   if (headings.length < 2) return null
-
   return (
-    <>
-      <nav
-        aria-label="In this issue"
-        className="print:hidden absolute right-full top-0 mr-12 hidden h-full w-52 xl:block"
-      >
-        <div className="sticky top-28 font-mono text-xs">
-          <p className="mb-3 uppercase tracking-wider text-paper/40">In this issue</p>
-          <TocLinks headings={headings} active={active} />
-        </div>
-      </nav>
+    <nav aria-label="In this issue" className="sticky top-28 print:hidden">
+      <p className="readout mb-4 flex items-center gap-2 text-paper/55">
+        <span className="led" aria-hidden="true" />
+        In this issue
+      </p>
+      <TocLinks headings={headings} active={active} />
+    </nav>
+  )
+}
 
-      <details className="print:hidden mb-8 border hr-line px-4 py-3 font-mono text-xs xl:hidden">
-        <summary className="cursor-pointer uppercase tracking-wider text-paper/50 hover:text-accent">
-          In this issue
-        </summary>
-        <div className="mt-3">
-          <TocLinks headings={headings} active={active} />
-        </div>
-      </details>
-    </>
+// Collapsible list above the body everywhere else.
+export function TocInline({ headings, active }) {
+  if (headings.length < 2) return null
+  return (
+    <details className="panel mb-10 px-4 py-3 print:hidden xl:hidden">
+      <summary className="readout cursor-pointer text-paper/65 transition-colors hover:text-accent">
+        In this issue · {headings.length} sections
+      </summary>
+      <div className="mt-3">
+        <TocLinks headings={headings} active={active} />
+      </div>
+    </details>
   )
 }

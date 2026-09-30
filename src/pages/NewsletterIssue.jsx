@@ -1,26 +1,101 @@
-import { Suspense, lazy, useMemo } from "react"
-import { Link, useParams } from "react-router-dom"
-import { motion, useReducedMotion } from "framer-motion"
+import { Suspense, lazy, useMemo, useRef } from "react"
+import { useParams } from "react-router-dom"
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion"
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { issuesByDate } from "../data/newsletter"
 import { IssueBody, Lightbox, useLightbox } from "../components/IssueContent"
 import { links } from "../data/links"
 import GithubMark from "../components/icons/GithubMark"
-import IssueToc from "../components/IssueToc"
+import { TocInline, TocRail } from "../components/IssueToc"
+import { useActiveHeading } from "../lib/useActiveHeading"
+import ReadingRecorder from "../components/ReadingRecorder"
 import ShareButton from "../components/ShareButton"
+import TransitionLink from "../components/chrome/TransitionLink"
 import { issueHeadings } from "../lib/headings"
+import { isInitialLoad } from "../lib/firstLoad"
+import { EASE_OUT } from "../lib/motion"
 import NotFound from "./NotFound"
 
 // Recharts only ships for issues that actually have a masthead chart.
 const IssueChart = lazy(() => import("../components/IssueChart"))
 
+function NavPanel({ issue, direction }) {
+  const prev = direction === "prev"
+  return (
+    <TransitionLink
+      to={`/newsletters/${issue.id}`}
+      data-cursor="lock"
+      className={`group relative flex flex-col gap-3 overflow-hidden border border-line p-5 sm:p-6 ${prev ? "" : "text-right sm:col-start-2"}`}
+    >
+      <span
+        aria-hidden="true"
+        className={`absolute inset-0 scale-x-0 bg-accent transition-transform duration-500 ease-sweep group-hover:scale-x-100 ${prev ? "origin-right" : "origin-left"}`}
+      />
+      <span className={`readout relative inline-flex items-center gap-1.5 text-paper/60 group-hover:text-ink ${prev ? "" : "justify-end"}`}>
+        {prev && <ArrowLeft size={12} />}
+        {prev ? "Previous issue" : "Next issue"}
+        {!prev && <ArrowRight size={12} />}
+      </span>
+      <span className="relative font-display text-xl font-[800] uppercase leading-tight text-paper [font-stretch:80%] group-hover:text-ink sm:text-2xl">
+        {issue.title}
+      </span>
+    </TransitionLink>
+  )
+}
+
+function IssueMasthead({ issue, enter }) {
+  const reduceMotion = useReducedMotion()
+  const mastRef = useRef(null)
+  const { scrollYProgress } = useScroll({ target: mastRef, offset: ["start start", "end start"] })
+  const numberY = useTransform(scrollYProgress, [0, 1], [0, 160])
+
+  return (
+    <header ref={mastRef} className="relative mt-10 overflow-hidden border-b border-line pb-12 lg:pb-16">
+      <motion.span
+        aria-hidden="true"
+        style={reduceMotion ? undefined : { y: numberY }}
+        className="text-outline pointer-events-none absolute -right-4 -top-6 select-none font-display text-[12rem] font-[900] leading-none text-accent/15 sm:text-[18rem] sm:text-accent/25 lg:text-[24rem] print:hidden"
+      >
+        {String(issue.number).padStart(2, "0")}
+      </motion.span>
+
+      <motion.div {...enter(0)} className="relative flex flex-wrap items-center gap-x-4 gap-y-2">
+        <span className="readout text-accent">CH-04 · Issue {issue.number}</span>
+        <span className="readout text-paper/60">{issue.date}</span>
+        {issue.readingTime && <span className="readout text-paper/60">{issue.readingTime}</span>}
+      </motion.div>
+      <motion.p {...enter(0.05)} className="readout relative mt-6 text-paper/60">
+        Shantanu Somwanshi
+      </motion.p>
+      <h1
+        className="relative mt-3 max-w-[15ch] font-display text-[clamp(2.6rem,7.2vw,6.8rem)] font-[850] uppercase leading-[0.88] tracking-[-0.02em] text-paper [font-stretch:76%]"
+        style={{ viewTransitionName: `issue-title-${issue.id}` }}
+      >
+        {issue.title}
+      </h1>
+      {issue.hook && (
+        <motion.p
+          {...enter(0.2)}
+          className="relative mt-6 max-w-2xl font-body text-xl italic leading-snug text-paper/80 sm:text-2xl"
+        >
+          {issue.hook}
+        </motion.p>
+      )}
+    </header>
+  )
+}
+
 export default function NewsletterIssue() {
   const { slug } = useParams()
   const reduceMotion = useReducedMotion()
+  const animateIn = !reduceMotion && !isInitialLoad()
   const index = issuesByDate.findIndex((i) => i.id === slug)
   const issue = index === -1 ? null : issuesByDate[index]
   const [lightboxImage, setLightboxImage] = useLightbox(issue?.id)
   const headings = useMemo(() => issueHeadings(issue?.content), [issue])
+  const headingIds = useMemo(() => headings.map((h) => h.id), [headings])
+  const active = useActiveHeading(headingIds)
+  const articleRef = useRef(null)
 
   if (!issue) return <NotFound />
 
@@ -29,115 +104,90 @@ export default function NewsletterIssue() {
   const prevIssue = issuesByDate[index + 1] ?? null
   const nextIssue = issuesByDate[index - 1] ?? null
 
+  // Masthead pieces arrive in sequence on client-side navigation (the title
+  // itself morphs in via its view-transition-name); the prerendered first
+  // load is static.
+  const enter = (delay) =>
+    animateIn
+      ? {
+          initial: { opacity: 0, y: 18 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.7, ease: EASE_OUT, delay },
+        }
+      : {}
+
   return (
     <>
-      <div className="min-h-screen bg-bg px-6 pb-24 pt-28 sm:px-10 sm:pt-32">
-        <Link
+      <div className="mx-auto max-w-[1400px] px-5 pb-24 pt-24 sm:px-8 lg:pt-28">
+        <TransitionLink
           to="/newsletters"
-          className="group inline-flex items-center gap-1.5 font-mono text-sm text-paper/60 transition-colors hover:text-accent print:hidden"
+          className="group readout inline-flex items-center gap-1.5 text-paper/60 transition-colors hover:text-accent print:hidden"
         >
-          <ArrowLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+          <ArrowLeft size={13} className="transition-transform group-hover:-translate-x-0.5" />
           all issues
-        </Link>
+        </TransitionLink>
 
-        <motion.article
-          initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="relative mx-auto mt-8 max-w-2xl"
-        >
-          <p className="font-mono text-xs uppercase tracking-wider text-paper/45">Shantanu Somwanshi</p>
-          <h1 className="mt-3 font-display text-3xl font-semibold leading-tight text-paper sm:text-4xl">
-            {issue.title}
-          </h1>
-          {issue.hook && (
-            <p className="mt-3 font-display text-lg italic leading-snug text-paper/55">{issue.hook}</p>
-          )}
-          <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1 border-b hr-line pb-6 font-mono text-xs text-paper/40">
-            <span className="text-teal">Issue {issue.number}</span>
-            <span>·</span>
-            <span>{issue.date}</span>
-            {issue.readingTime && (
-              <>
-                <span>·</span>
-                <span>{issue.readingTime}</span>
-              </>
+        <IssueMasthead issue={issue} enter={enter} />
+
+        <div className="mt-12 grid grid-cols-1 gap-10 xl:grid-cols-[210px_minmax(0,680px)_110px] xl:justify-between">
+          <aside className="hidden xl:block">
+            <TocRail headings={headings} active={active} />
+          </aside>
+
+          <motion.article ref={articleRef} {...enter(0.3)} className="min-w-0 max-w-[680px] justify-self-center">
+            <TocInline headings={headings} active={active} />
+
+            {issue.chart && (
+              <Suspense fallback={<div className="my-10 h-64 sm:h-80" />}>
+                <IssueChart issue={issue} />
+              </Suspense>
             )}
-          </div>
 
-          {issue.chart && (
-            <Suspense fallback={<div className="mt-8 h-64" />}>
-              <IssueChart issue={issue} />
-            </Suspense>
-          )}
-
-          <div className="border-t hr-line pt-8">
-            <IssueToc key={issue.id} headings={headings} />
             <IssueBody content={issue.content} onOpenImage={setLightboxImage} />
-          </div>
 
-          <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 border-t hr-line pt-6 font-mono text-sm print:hidden">
-            <a
-              href={issue.substackUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
-            >
-              Read on Substack
-              <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </a>
-            <a
-              href={issue.githubUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
-            >
-              <GithubMark size={14} />
-              View the code
-            </a>
-            <ShareButton title={issue.title} />
-            <a
-              href={links.newsletter}
-              target="_blank"
-              rel="noreferrer"
-              className="group inline-flex items-center gap-1.5 text-accent transition-opacity hover:opacity-80"
-            >
-              Subscribe on Substack
-              <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </a>
-          </div>
-
-          {(prevIssue || nextIssue) && (
-            <div className="mt-10 grid grid-cols-1 gap-4 border-t hr-line pt-6 sm:grid-cols-2 print:hidden">
-              {prevIssue ? (
-                <Link
-                  to={`/newsletters/${prevIssue.id}`}
-                  className="group flex flex-col gap-1 border hr-line p-4 transition-colors hover:border-accent/50"
-                >
-                  <span className="inline-flex items-center gap-1.5 font-mono text-xs text-paper/40">
-                    <ArrowLeft size={12} className="transition-transform group-hover:-translate-x-0.5" />
-                    Previous issue
-                  </span>
-                  <span className="text-paper transition-colors group-hover:text-accent">{prevIssue.title}</span>
-                </Link>
-              ) : (
-                <div />
-              )}
-              {nextIssue && (
-                <Link
-                  to={`/newsletters/${nextIssue.id}`}
-                  className="group flex flex-col gap-1 border hr-line p-4 text-right transition-colors hover:border-accent/50 sm:col-start-2"
-                >
-                  <span className="inline-flex items-center justify-end gap-1.5 font-mono text-xs text-paper/40">
-                    Next issue
-                    <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                  <span className="text-paper transition-colors group-hover:text-accent">{nextIssue.title}</span>
-                </Link>
-              )}
+            <div className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6 font-mono text-[13px] print:hidden">
+              <a
+                href={issue.substackUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
+              >
+                Read on Substack
+                <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+              <a
+                href={issue.githubUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex items-center gap-1.5 text-paper transition-colors hover:text-accent"
+              >
+                <GithubMark size={14} />
+                View the code
+              </a>
+              <ShareButton title={issue.title} />
+              <a
+                href={links.newsletter}
+                target="_blank"
+                rel="noreferrer"
+                className="group inline-flex h-11 items-center gap-1.5 bg-accent px-4 text-ink transition-colors hover:bg-paper"
+              >
+                Subscribe on Substack
+                <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
             </div>
-          )}
-        </motion.article>
+
+            {(prevIssue || nextIssue) && (
+              <nav aria-label="More issues" className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 print:hidden">
+                {prevIssue ? <NavPanel issue={prevIssue} direction="prev" /> : <div className="hidden sm:block" />}
+                {nextIssue && <NavPanel issue={nextIssue} direction="next" />}
+              </nav>
+            )}
+          </motion.article>
+
+          <aside className="hidden xl:block">
+            <ReadingRecorder targetRef={articleRef} headingIds={headingIds} />
+          </aside>
+        </div>
       </div>
       <Lightbox image={lightboxImage} onClose={() => setLightboxImage(null)} />
     </>
