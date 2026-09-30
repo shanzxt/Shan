@@ -1,7 +1,7 @@
 // Dev-only visual check: true-width viewport screenshot + horizontal-overflow report via
 // Chrome DevTools Protocol (Node's built-in WebSocket, no dependency). Needs `npm run preview` running.
 // Headless Chrome's --window-size can't go below ~500px, so this emulates the width instead.
-// usage: node scripts/screenshot.mjs <url> <width> <out.png> [scrollY] [js-to-run-before-capture]
+// usage: [MOUSE=x,y] node scripts/screenshot.mjs <url> <width> <out.png> [scrollY] [js-to-run-before-capture]
 import { spawn } from "node:child_process"
 const [url, width, out, scrollY = "0", js] = process.argv.slice(2)
 const chrome = spawn("C:/Program Files/Google/Chrome/Application/chrome.exe",
@@ -20,6 +20,15 @@ await sleep(2500)
 const ev = async (expr) => (await send("Runtime.evaluate", { expression: expr, returnByValue: true, awaitPromise: true })).result.value
 await ev(`window.scrollTo(0, ${scrollY})`); await sleep(1500)
 if (js) { await ev(js); await sleep(600) }
+// MOUSE="x,y[;x,y...]" moves the real (CDP) pointer through those points, for hover states.
+if (process.env.MOUSE) {
+  for (const pt of process.env.MOUSE.split(";")) {
+    const [x, y] = pt.split(",").map(Number)
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y, pointerType: "mouse" })
+    await sleep(120)
+  }
+  await sleep(700)
+}
 console.log(JSON.stringify(await ev(`({inner: innerWidth, scrollW: document.documentElement.scrollWidth,
   wide: [...document.querySelectorAll("body *")].filter(e => e.getBoundingClientRect().right > innerWidth + 1 && !e.closest("nav")).slice(0,5).map(e => e.tagName + "." + (e.className+"").slice(0,40))})`)))
 const { data } = await send("Page.captureScreenshot", { format: "png" })

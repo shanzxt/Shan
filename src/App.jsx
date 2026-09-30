@@ -6,21 +6,28 @@ import Hero from "./components/Hero"
 import ProofStrip from "./components/ProofStrip"
 import WhatIDo from "./components/WhatIDo"
 import Work from "./components/Work"
+import Effects from "./components/chrome/Effects"
 import ErrorBoundary from "./components/chrome/ErrorBoundary"
 import GrainOverlay from "./components/chrome/GrainOverlay"
 import Header from "./components/chrome/Header"
+import RouteFallback from "./components/chrome/RouteFallback"
 import NotFound from "./pages/NotFound"
+import { isInitialLoad, trackLocation } from "./lib/firstLoad"
+import { routeChunks } from "./lib/routeChunks"
+import { scrollToElement, scrollToTop } from "./lib/scroll"
+import { supportsViewTransitions } from "./lib/transition"
 
-// Recharts pulls its own weight — split it out of the main bundle since it
-// only matters once someone scrolls to the newsletter section.
-const Newsletter = lazy(() => import("./components/Newsletter"))
+// Recharts and the newsletter data pull their own weight — split out of
+// the main bundle since they only matter once someone scrolls down.
+const Newsletter = lazy(routeChunks.newsletter)
+const DataTicker = lazy(() => import("./components/DataTicker"))
 
 // Framer Motion-heavy interactive demo, only needed on its own route.
-const PortfolioBuilder = lazy(() => import("./components/PortfolioBuilder/PortfolioBuilder"))
+const PortfolioBuilder = lazy(routeChunks.portfolio)
 
-const NewslettersIndex = lazy(() => import("./pages/NewslettersIndex"))
-const NewsletterIssue = lazy(() => import("./pages/NewsletterIssue"))
-const Tools = lazy(() => import("./pages/Tools"))
+const NewslettersIndex = lazy(routeChunks.newslettersIndex)
+const NewsletterIssue = lazy(routeChunks.newsletterIssue)
+const Tools = lazy(routeChunks.tools)
 
 // Keeps <head> in sync on client-side navigation and resets scroll for
 // plain route changes. The first render is skipped: the prerendered HTML
@@ -34,7 +41,7 @@ function RouteEffects() {
       firstRender.current = false
       return
     }
-    if (!hash) window.scrollTo(0, 0)
+    if (!hash) scrollToTop()
     import("./lib/seo").then(({ applyRouteMeta }) => applyRouteMeta(pathname))
   }, [pathname, hash])
 
@@ -50,12 +57,15 @@ function Home() {
   useEffect(() => {
     if (!location.hash) return
     const el = document.querySelector(location.hash)
-    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" })
+    if (el) scrollToElement(el)
   }, [location])
 
   return (
-    <div className="bg-bg">
+    <div>
       <Hero />
+      <Suspense fallback={<div className="h-[52px] border-y hr-line" />}>
+        <DataTicker />
+      </Suspense>
       <ProofStrip />
       <WhatIDo />
       <Suspense fallback={<div className="min-h-[400px]" />}>
@@ -67,8 +77,16 @@ function Home() {
   )
 }
 
+function Lazy({ children }) {
+  return <Suspense fallback={<RouteFallback />}>{children}</Suspense>
+}
+
 export default function App() {
-  const { pathname } = useLocation()
+  const { pathname, key } = useLocation()
+  trackLocation(key)
+  // Browsers without View Transitions get a CSS entrance on client-side
+  // route changes instead; the first (prerendered) route never animates.
+  const enterClass = !isInitialLoad() && !supportsViewTransitions() ? "route-enter" : ""
 
   return (
     <>
@@ -83,44 +101,19 @@ export default function App() {
       <RouteEffects />
       <main id="main" tabIndex={-1} className="outline-none">
         <ErrorBoundary key={pathname}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route
-              path="/portfolio"
-              element={
-                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                  <PortfolioBuilder />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/newsletters"
-              element={
-                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                  <NewslettersIndex />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/newsletters/:slug"
-              element={
-                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                  <NewsletterIssue />
-                </Suspense>
-              }
-            />
-            <Route
-              path="/tools"
-              element={
-                <Suspense fallback={<div className="min-h-screen bg-bg" />}>
-                  <Tools />
-                </Suspense>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className={enterClass}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/portfolio" element={<Lazy><PortfolioBuilder /></Lazy>} />
+              <Route path="/newsletters" element={<Lazy><NewslettersIndex /></Lazy>} />
+              <Route path="/newsletters/:slug" element={<Lazy><NewsletterIssue /></Lazy>} />
+              <Route path="/tools" element={<Lazy><Tools /></Lazy>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </ErrorBoundary>
       </main>
+      <Effects />
       {/* Cookieless page views; only reports on Vercel once enabled in the dashboard. */}
       <Analytics />
     </>
