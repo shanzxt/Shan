@@ -20,12 +20,16 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
   Chart images: PNG 90-380 kB -> WebP 45-170 kB.
 - Item 3: `chrome/ErrorBoundary.jsx` wraps `<Routes>`, keyed by pathname (navigation resets it); fallback offers
   reload (covers stale lazy chunks after a redeploy). 404 page + `dist/404.html` already done in item 1.
+- Item 4 reading experience: `h2` blocks get stable ids (`src/lib/headings.js`, tested for uniqueness); `IssueToc.jsx`
+  sticky left rail at xl+, collapsible `<details>` below xl; `ShareButton.jsx` (navigator.share, else clipboard copy);
+  `@media print` in index.css + `print:hidden` on header/grain/lightbox/tool panels/nav links. No separate progress bar:
+  Header already renders a scroll-progress hairline site-wide. Verified at 390 and 1440 (no horizontal overflow).
 
 ## In progress
 - (none)
 
 ## Next
-- Item 4 reading experience, then 5-9
+- Item 5 tools hub, then 6-9
 
 ## Decisions
 - Site URL for canonical/sitemap/feed: `https://www.shantests.in` (live domain per user; README/CLAUDE.md still say shantanusomwanshi.com).
@@ -43,6 +47,13 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
 - `seo.js` imports the full newsletter data — only `import()` it on the client, never statically from app code.
 - Lighthouse CLI not installed; skipped.
 - Live site deep links (`/newsletters/day-29`) return 404 on hard load: no SPA fallback configured on Vercel.
+
+- Chrome extension (claude-in-chrome) was not connected this session. Visual checks use `node scripts/screenshot.mjs
+  <url> <width> <out.png> [scrollY]` against `npx vite preview --port 4173`; it prints innerWidth/scrollWidth and any
+  element overflowing the viewport.
+- Pre-existing, left for item 7: header nav scrolls horizontally at 390px; the masthead chart's y-axis labels lose
+  their leading ₹ at narrow widths (`left: -16` margin in IssueChart).
+- PROGRESS.md was cp1252 + CRLF at one point; it is now UTF-8. Edit it as UTF-8.
 
 ## Manual / dashboard steps for the user
 - (none yet)
