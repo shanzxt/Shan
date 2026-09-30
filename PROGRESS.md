@@ -24,12 +24,15 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
   sticky left rail at xl+, collapsible `<details>` below xl; `ShareButton.jsx` (navigator.share, else clipboard copy);
   `@media print` in index.css + `print:hidden` on header/grain/lightbox/tool panels/nav links. No separate progress bar:
   Header already renders a scroll-progress hairline site-wide. Verified at 390 and 1440 (no horizontal overflow).
+- Item 5 tools hub: `src/pages/Tools.jsx` at `/tools` driven by existing `src/data/tools.js` (links tool + its issue);
+  in prerender/sitemap. `ToolDisclaimer.jsx` ("Educational, not investment advice. Fund names are examples from the
+  dataset, not recommendations.") on /tools, /portfolio under the fund picker, and in-issue tool panels.
 
 ## In progress
 - (none)
 
 ## Next
-- Item 5 tools hub, then 6-9
+- Item 6 correctness (route smoke test), then 7-9
 
 ## Decisions
 - Site URL for canonical/sitemap/feed: `https://www.shantests.in` (live domain per user; README/CLAUDE.md still say shantanusomwanshi.com).
@@ -38,6 +41,10 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
 - Unknown issue slugs now render the 404 page instead of redirecting to /newsletters.
 - Newsletter issues stay in `src/data/newsletter.js` (no MDX migration).
 - Existing credential wording in Hero/WhatIDo/index.html description left untouched (user rule: leave existing copy). No new meta/JSON-LD/OG text repeats it.
+
+- Header nav: "Portfolio tool" replaced by "Tools" (-> /tools) to keep 5 items; /portfolio stays reachable from the
+  hub, ProofStrip and Footer.
+- New disclaimer wording is mine (none existed); kept to one plain sentence pair.
 
 ## Gotchas
 - `vite preview` always serves the SPA fallback `index.html`, not the per-route prerendered files — check `dist/` directly
