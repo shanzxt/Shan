@@ -31,12 +31,17 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
   `npm run test:routes` builds dist-ssr and server-renders every route with `onError` collection (`render(url, options)`
   in entry-server.jsx), asserting an h1, no 404/error fallback, and 404 for unknown routes/slugs. It caught /portfolio
   having no h1 -> added an sr-only `<h1>Portfolio tool</h1>` (no visual change).
+- Item 7 design polish: below `sm` the header nav is a Menu button + solid dropdown (aria-expanded/controls, Escape,
+  closes on any navigation via location-keyed state); desktop nav unchanged. Skip-to-content link + `<main id="main">`
+  in App.jsx. Footer (amber surface) gets an ink focus ring. Fund search input focus border full accent. Masthead and
+  card charts: `left: 0` margin so y-axis ₹ labels aren't clipped. Global `:focus-visible` ring and reduced-motion CSS
+  already existed. Verified 390 (menu open) and 1440.
 
 ## In progress
 - (none)
 
 ## Next
-- Item 7 design polish (focus rings, skip link, mobile nav, chart ₹ label clip), then 8-9
+- Item 8 analytics (needs `npm install @vercel/analytics` + dashboard toggle), then 9 repo hygiene
 
 ## Decisions
 - Site URL for canonical/sitemap/feed: `https://www.shantests.in` (live domain per user; README/CLAUDE.md still say shantanusomwanshi.com).
@@ -62,8 +67,8 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
 - Chrome extension (claude-in-chrome) was not connected this session. Visual checks use `node scripts/screenshot.mjs
   <url> <width> <out.png> [scrollY]` against `npx vite preview --port 4173`; it prints innerWidth/scrollWidth and any
   element overflowing the viewport.
-- Pre-existing, left for item 7: header nav scrolls horizontally at 390px; the masthead chart's y-axis labels lose
-  their leading ₹ at narrow widths (`left: -16` margin in IssueChart).
+- Footer (`<footer id="contact">`) now sits inside `<main>` because it's rendered by Home; left as is to avoid
+  restructuring the landing page.
 - PROGRESS.md was cp1252 + CRLF at one point; it is now UTF-8. Edit it as UTF-8.
 
 ## Manual / dashboard steps for the user
