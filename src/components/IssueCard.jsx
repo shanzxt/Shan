@@ -11,7 +11,7 @@ import {
   YAxis,
 } from "recharts"
 import ClipReveal from "./ClipReveal"
-import { toChartData } from "./IssueContent"
+import { toChartData } from "./IssueChart"
 import GithubMark from "./icons/GithubMark"
 
 function CustomTooltip({ active, payload, label }) {

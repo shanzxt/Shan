@@ -1,98 +1,8 @@
 import { Suspense, useEffect, useState } from "react"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
 import { Maximize2, X } from "lucide-react"
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts"
 import { toolRegistry } from "../data/toolRegistry"
 import ClipReveal from "./ClipReveal"
-
-export function toChartData(chart) {
-  return chart.years.map((year, i) => {
-    const row = { year }
-    for (const s of chart.series) row[s.key] = s.values[i]
-    return row
-  })
-}
-
-function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null
-  return (
-    <div className="border hr-line bg-bg px-3 py-2 font-mono text-xs">
-      <div className="mb-1 text-paper/50">{label}</div>
-      {payload.map((p) => (
-        <div key={p.dataKey} style={{ color: p.color }}>
-          ₹{p.value}L
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// Issue 1 has a live Recharts time series masthead; issues without one
-// (e.g. issue 2's correlation study) have no masthead visual here — their
-// first content block is already an image, so nothing is skipped.
-export function IssueChart({ issue }) {
-  const reduceMotion = useReducedMotion()
-
-  if (!issue.chart) return null
-
-  const data = toChartData(issue.chart)
-
-  return (
-    <>
-      <ClipReveal className="mt-8 h-64 w-full" duration={0.7} amount={0}>
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -16 }}>
-            <CartesianGrid stroke="var(--color-line)" vertical={false} />
-            <XAxis
-              dataKey="year"
-              tick={{ fill: "rgba(237,234,226,0.5)", fontSize: 11, fontFamily: "var(--font-mono)" }}
-              axisLine={{ stroke: "var(--color-line)" }}
-              tickLine={false}
-            />
-            <YAxis
-              tick={{ fill: "rgba(237,234,226,0.5)", fontSize: 11, fontFamily: "var(--font-mono)" }}
-              axisLine={false}
-              tickLine={false}
-              width={48}
-              tickFormatter={(v) => `₹${v}L`}
-            />
-            <Tooltip content={<CustomTooltip />} cursor={{ stroke: "var(--color-line)" }} />
-            {issue.chart.series.map((s) => (
-              <Line
-                key={s.key}
-                type="monotone"
-                dataKey={s.key}
-                name={s.label}
-                stroke={s.color}
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4 }}
-                isAnimationActive={!reduceMotion}
-              />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
-      </ClipReveal>
-
-      <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 font-mono text-xs">
-        {issue.chart.series.map((s) => (
-          <div key={s.key} className="flex items-center gap-1.5 text-paper/60">
-            <span className="inline-block h-1.5 w-1.5 rounded-full" style={{ background: s.color }} />
-            {s.label} — {s.multiple}
-          </div>
-        ))}
-      </div>
-    </>
-  )
-}
 
 // Renders **bold**, *italic* and [text](url) markers inside plain text,
 // matching the lightweight formatting used in the newsletter data.
@@ -183,14 +93,18 @@ function Block({ block, onOpenImage }) {
               onClick={() => onOpenImage(block)}
               className="group relative block w-full cursor-zoom-in border hr-line"
             >
-              <img
-                src={block.src}
-                alt={block.alt}
-                loading="lazy"
-                width={block.width ?? 1456}
-                height={block.height ?? 860}
-                className="w-full transition-opacity group-hover:opacity-80"
-              />
+              <picture>
+                <source srcSet={block.src.replace(/\.png$/, ".webp")} type="image/webp" />
+                <img
+                  src={block.src}
+                  alt={block.alt}
+                  loading="lazy"
+                  decoding="async"
+                  width={block.width ?? 1456}
+                  height={block.height ?? 860}
+                  className="w-full transition-opacity group-hover:opacity-80"
+                />
+              </picture>
               <span className="absolute inset-0 hidden items-center justify-center bg-bg/40 opacity-0 transition-opacity group-hover:flex group-hover:opacity-100 sm:flex">
                 <span className="inline-flex items-center gap-1.5 border hr-line bg-bg px-3 py-1.5 font-mono text-xs text-paper">
                   <Maximize2 size={13} />

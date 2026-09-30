@@ -302,6 +302,8 @@ export const issues = [
       {
         type: "image",
         src: "/newsletters/44-funds-2-bets/4_debt_fund_effect.png",
+        width: 1456,
+        height: 860,
         alt: "Bar chart: median effective bets over 1,500 random equity portfolios before and after adding one more equity fund versus one liquid debt fund. Adding a debt fund lifts effective bets to about 1.95–1.97 in every case, while adding an equity fund barely moves them",
       },
       {
@@ -311,6 +313,8 @@ export const issues = [
       {
         type: "image",
         src: "/newsletters/44-funds-2-bets/5_risk_vs_correlation.png",
+        width: 1456,
+        height: 860,
         alt: "Line chart: portfolio risk of a 50/50 two-fund portfolio versus correlation between the funds. At correlation 0 risk falls about 29 percent; the typical pair in the data, at 0.89, cuts risk by only 3 percent",
       },
       {
@@ -324,6 +328,8 @@ export const issues = [
       {
         type: "image",
         src: "/newsletters/44-funds-2-bets/2_one_factor.png",
+        width: 1456,
+        height: 860,
         alt: "Bar chart of the share of total variation in fund returns explained by each hidden factor. The first factor explains 85 percent, the rest 4.6 percent or less",
       },
       {
@@ -334,6 +340,8 @@ export const issues = [
       {
         type: "image",
         src: "/newsletters/44-funds-2-bets/7_window_robustness.png",
+        width: 1456,
+        height: 860,
         alt: "Bar chart: effective independent bets stay between 2.04 and 2.55 across history windows from 22 to 128 months",
       },
       {

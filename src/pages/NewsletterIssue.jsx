@@ -1,11 +1,15 @@
+import { Suspense, lazy } from "react"
 import { Link, useParams } from "react-router-dom"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { issuesByDate } from "../data/newsletter"
-import { IssueBody, IssueChart, Lightbox, useLightbox } from "../components/IssueContent"
+import { IssueBody, Lightbox, useLightbox } from "../components/IssueContent"
 import { links } from "../data/links"
 import GithubMark from "../components/icons/GithubMark"
 import NotFound from "./NotFound"
+
+// Recharts only ships for issues that actually have a masthead chart.
+const IssueChart = lazy(() => import("../components/IssueChart"))
 
 export default function NewsletterIssue() {
   const { slug } = useParams()
@@ -57,7 +61,11 @@ export default function NewsletterIssue() {
             )}
           </div>
 
-          <IssueChart issue={issue} />
+          {issue.chart && (
+            <Suspense fallback={<div className="mt-8 h-64" />}>
+              <IssueChart issue={issue} />
+            </Suspense>
+          )}
 
           <div className="border-t hr-line pt-8">
             <IssueBody content={issue.content} onOpenImage={setLightboxImage} />
