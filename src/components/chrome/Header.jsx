@@ -157,7 +157,7 @@ export default function Header() {
             data-cursor="lock"
             className="group flex min-w-0 items-center gap-3 text-paper transition-colors hover:text-accent"
           >
-            <span className="led shrink-0" aria-hidden="true" />
+            <img src="/logo.png" alt="" width="24" height="24" className="h-6 w-6 shrink-0" />
             <span className="readout truncate text-[12px] text-paper/90 group-hover:text-accent">Shantanu Somwanshi</span>
           </TransitionLink>
 
