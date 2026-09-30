@@ -36,12 +36,14 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
   in App.jsx. Footer (amber surface) gets an ink focus ring. Fund search input focus border full accent. Masthead and
   card charts: `left: 0` margin so y-axis ₹ labels aren't clipped. Global `:focus-visible` ring and reduced-motion CSS
   already existed. Verified 390 (menu open) and 1440.
+- Item 8 analytics: `@vercel/analytics` `<Analytics />` in App.jsx (+~1 kB gzip on main chunk). Inert until enabled
+  in the Vercel dashboard (see manual steps).
 
 ## In progress
 - (none)
 
 ## Next
-- Item 8 analytics (needs `npm install @vercel/analytics` + dashboard toggle), then 9 repo hygiene
+- Item 9 repo hygiene (README, GitHub Action, .gitignore)
 
 ## Decisions
 - Site URL for canonical/sitemap/feed: `https://www.shantests.in` (live domain per user; README/CLAUDE.md still say shantanusomwanshi.com).
@@ -72,4 +74,5 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
 - PROGRESS.md was cp1252 + CRLF at one point; it is now UTF-8. Edit it as UTF-8.
 
 ## Manual / dashboard steps for the user
-- (none yet)
+- Enable analytics: vercel.com -> the site's project -> **Analytics** tab -> **Enable** (Web Analytics). Takes effect on
+  the next deployment; no cookies, no banner needed.
