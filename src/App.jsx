@@ -15,6 +15,9 @@ const Newsletter = lazy(() => import("./components/Newsletter"))
 // Framer Motion-heavy interactive demo, only needed on its own route.
 const PortfolioBuilder = lazy(() => import("./components/PortfolioBuilder/PortfolioBuilder"))
 
+const NewslettersIndex = lazy(() => import("./pages/NewslettersIndex"))
+const NewsletterIssue = lazy(() => import("./pages/NewsletterIssue"))
+
 function Home() {
   const location = useLocation()
 
@@ -53,6 +56,22 @@ export default function App() {
           element={
             <Suspense fallback={<div className="min-h-screen bg-bg" />}>
               <PortfolioBuilder />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/newsletters"
+          element={
+            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+              <NewslettersIndex />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/newsletters/:slug"
+          element={
+            <Suspense fallback={<div className="min-h-screen bg-bg" />}>
+              <NewsletterIssue />
             </Suspense>
           }
         />
