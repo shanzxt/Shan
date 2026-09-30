@@ -83,3 +83,45 @@ issue body chunk 112.3 -> 4.1 kB, Recharts (102.7 kB) only fetched for issues wi
 ## Manual / dashboard steps for the user
 - Enable analytics: vercel.com -> the site's project -> **Analytics** tab -> **Enable** (Web Analytics). Takes effect on
   the next deployment; no cookies, no banner needed.
+
+---
+
+# Creative overhaul (branch `feature/creative-overhaul`, cut from `staging` at `db5df72`)
+
+Concept + tokens + motion rules: **DESIGN.md** (SIGNAL / NOISE — the site as one phosphor oscilloscope / control
+panel). Nothing pushed. Content (copy, numbers, links) must stay word-for-word; only presentation changes.
+
+## Done
+- Phase 1: DESIGN.md.
+- Foundation: `@theme` tokens (Phosphor palette, Anybody / Martian Mono / Newsreader, `ease-sweep|settle|switch`,
+  `readout` / `panel` / `graticule` / `glow` utilities), CSS-only boot sequence in `index.html` (session-once, skippable,
+  off under reduced motion), `lib/env.js` (SSR-safe capability checks), `lib/settings.js` (probe / sound / crt toggles),
+  `lib/firstLoad.js` (first prerendered route never animates in; tracked by location key during App render),
+  `lib/transition.js` + `chrome/TransitionLink.jsx` (View Transitions navigation + chunk preload on hover),
+  `lib/routeChunks.js`, `lib/scroll.js` (Lenis-aware), `lib/sfx.js` + `lib/sound.js` (WebAudio, off by default).
+- Shell: new Header (channel nav, IST clock, sound toggle, ⌘K button, full-screen mobile channel selector),
+  `chrome/Effects.jsx` (Lenis, probe cursor, palette hotkeys, Konami → CRT mode, toast), `chrome/ProbeCursor.jsx`,
+  `chrome/CommandPalette.jsx`, `chrome/RouteFallback.jsx`.
+- Hero: canvas oscilloscope (`lib/signal.js`), probe filters noise, letter lens on the name, static SVG for SSR /
+  reduced motion. `DataTicker.jsx` (figures generated from newsletter data).
+
+## In progress
+- Home sections: ProofStrip, WhatIDo, Newsletter, Work, Footer.
+
+## Next
+- Newsletters index → issue page → tools/portfolio → 404/error → final perf/a11y pass + Lighthouse after.
+
+## Decisions
+- Canvas 2D instead of WebGL (see DESIGN.md → Dependencies). Only new dep: `lenis`.
+- Newsreader requested without the `opsz` axis: 24 kB vs 147 kB latin.
+- Hero letter lens changes letter widths (layout) — deliberate exception to "transform only", scoped with
+  `contain: layout` on the h1, desktop fine pointer only.
+
+## Gotchas
+- `font-variation-settings` with a CSS `var()` inside computed as invalid → fell back to regular weight. Use
+  `font-weight` / `font-stretch` (registered axes) instead.
+- Inline-block letter spans kill kerning ("SHANT ANU"); use plain inline spans.
+- Baseline (local `vite preview`, Lighthouse 12 mobile): home perf 75 / a11y 88 / BP 96 / SEO 100, LCP 4.5 s;
+  issue page 75 / 94 / 96 / 100. Baseline gzip: main `index` 94.3 kB, CSS 7.5 kB. Lighthouse via
+  `npx -y lighthouse@12` with `CHROME_PATH` set (not a project dependency).
+- Screenshot helper now supports `MOUSE="x,y;x,y"` for hover states.
