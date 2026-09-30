@@ -27,12 +27,16 @@ Branch: `feature/next-level` (from `staging`). Nothing pushed; commit locally on
 - Item 5 tools hub: `src/pages/Tools.jsx` at `/tools` driven by existing `src/data/tools.js` (links tool + its issue);
   in prerender/sitemap. `ToolDisclaimer.jsx` ("Educational, not investment advice. Fund names are examples from the
   dataset, not recommendations.") on /tools, /portfolio under the fund picker, and in-issue tool panels.
+- Item 6 correctness: `npm test` = 17 node:test unit tests (engine maths, newsletter images, heading ids);
+  `npm run test:routes` builds dist-ssr and server-renders every route with `onError` collection (`render(url, options)`
+  in entry-server.jsx), asserting an h1, no 404/error fallback, and 404 for unknown routes/slugs. It caught /portfolio
+  having no h1 -> added an sr-only `<h1>Portfolio tool</h1>` (no visual change).
 
 ## In progress
 - (none)
 
 ## Next
-- Item 6 correctness (route smoke test), then 7-9
+- Item 7 design polish (focus rings, skip link, mobile nav, chart ₹ label clip), then 8-9
 
 ## Decisions
 - Site URL for canonical/sitemap/feed: `https://www.shantests.in` (live domain per user; README/CLAUDE.md still say shantanusomwanshi.com).
