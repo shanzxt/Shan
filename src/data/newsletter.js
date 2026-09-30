@@ -42,7 +42,7 @@ export const sipScenarios = {
 export const issues = [
   {
     id: "day-29",
-    number: 29,
+    number: 1,
     title: "Day 29: Why You'll Quit Before the Maths Starts Working",
     hook: "Everyone quits on Day 28. This is a newsletter for Day 29 people.",
     date: "Sep 6, 2026",
