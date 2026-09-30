@@ -9,6 +9,9 @@ import FundPickerTool from "./FundPickerTool"
 export default function PortfolioBuilder() {
   return (
     <div className="min-h-screen bg-bg px-6 pb-16 pt-28 sm:px-10 sm:pt-32">
+      {/* The page opens on an animation rather than a heading; this gives
+          screen readers and the document outline a top-level title. */}
+      <h1 className="sr-only">Portfolio tool</h1>
       <Link
         to="/"
         className="group inline-flex items-center gap-1.5 font-mono text-sm text-paper/60 transition-colors hover:text-accent"

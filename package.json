@@ -8,6 +8,7 @@
     "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist-ssr && node scripts/prerender.mjs",
     "lint": "oxlint",
     "test": "node --test \"src/**/*.test.js\"",
+    "test:routes": "vite build --ssr src/entry-server.jsx --outDir dist-ssr && node --test scripts/routes.smoke.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
