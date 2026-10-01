@@ -10,18 +10,27 @@ import { useRef, useState } from "react"
 //
 // Nothing moves on its own: the lines follow the reader's hand only, so the
 // same behaviour is the reduced-motion version (no easing on the lines).
-export default function Crosshair({ read, className = "", children }) {
+export default function Crosshair({ read, onRead, className = "", style, children }) {
   const ref = useRef(null)
   const [hit, setHit] = useState(null)
+  const [width, setWidth] = useState(0)
 
   const measure = (e) => {
     const r = ref.current.getBoundingClientRect()
     const fx = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1)
     const fy = Math.min(Math.max((e.clientY - r.top) / r.height, 0), 1)
-    setHit(read(fx, fy))
+    const next = read(fx, fy)
+    setWidth(r.width)
+    setHit(next)
+    onRead?.(next)
+  }
+  const clear = () => {
+    setHit(null)
+    onRead?.(null)
   }
 
-  const flip = hit && hit.x > 0.62
+  // the box sits right of the point unless that would run off the edge
+  const flip = hit && hit.x * width > width - 270
   const low = hit && hit.y < 0.3
 
   return (
@@ -29,10 +38,11 @@ export default function Crosshair({ read, className = "", children }) {
       ref={ref}
       data-cursor="measure"
       className={`touch-pan-y select-none ${className}`}
+      style={style}
       onPointerMove={measure}
       onPointerDown={measure}
-      onPointerLeave={(e) => e.pointerType === "mouse" && setHit(null)}
-      onPointerCancel={() => setHit(null)}
+      onPointerLeave={(e) => e.pointerType === "mouse" && clear()}
+      onPointerCancel={clear}
     >
       {children}
       {hit && (
@@ -53,7 +63,7 @@ export default function Crosshair({ read, className = "", children }) {
           >
             <p className="engraved whitespace-nowrap text-paper/65">{hit.label}</p>
             <p className="mt-0.5 font-mono text-[15px] font-medium tabular-nums text-accent">{hit.value}</p>
-            {hit.note && <p className="engraved mt-1 whitespace-nowrap text-paper/60">{hit.note}</p>}
+            {hit.note && <p className="engraved mt-1 max-w-[16rem] text-paper/60">{hit.note}</p>}
           </div>
         </div>
       )}

@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { EASE_OUT } from "../../lib/motion";
 import SettleReadout from "../SettleReadout";
 import HoverDetail from "./HoverDetail";
+import Crosshair from "../Crosshair";
 
 // Literal hex because SVG fill interpolation happens in JS, not CSS. ACCENT
 // matches --color-accent. TEAL deliberately stays the original dark teal
@@ -55,6 +56,8 @@ function colorForCorrelation(r, domainMin, domainMax) {
 }
 
 const CELL = 100;
+// Fund names without the plan/option suffix, for the crosshair box.
+const shortName = (f) => f?.name.split(" - ")[0] ?? "";
 const LABEL_SPACE = 26;
 
 function Legend({ min, max }) {
@@ -142,36 +145,34 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
   const size = LABEL_SPACE + n * CELL;
   const showCellText = n <= MAX_FUNDS_FOR_CELL_TEXT;
 
-  // A single pointer-position handler on the <svg> (mapping coordinates to
-  // a cell) instead of onMouseEnter/onMouseLeave per <rect> — with ~n^2
-  // cells, per-cell listeners caused enter/leave to thrash across cell
-  // boundaries during a single mousemove and briefly froze the tab.
-  function cellFromEvent(e) {
-    const svg = e.currentTarget;
-    const rect = svg.getBoundingClientRect();
-    const scale = size / rect.width;
-    const px = (e.clientX - rect.left) * scale;
-    const py = (e.clientY - rect.top) * scale;
-    const j = Math.floor((px - LABEL_SPACE) / CELL);
-    const i = Math.floor((py - LABEL_SPACE) / CELL);
-    if (i < 0 || i >= n || j < 0 || j >= n) return null;
+  // The crosshair maps the pointer to a cell (one handler for all n^2
+  // cells: per-cell listeners thrashed enter/leave and froze the tab) and
+  // locks both hairlines onto that cell's centre.
+  function readCell(fx, fy) {
+    const i = Math.min(Math.floor(fy * n), n - 1);
+    const j = Math.min(Math.floor(fx * n), n - 1);
     const fidA = fundIds[i];
     const fidB = fundIds[j];
-    return { i, j, fidA, fidB, value: corr.get(fidA)?.get(fidB) ?? 0 };
+    const value = corr.get(fidA)?.get(fidB) ?? 0;
+    return {
+      x: (j + 0.5) / n,
+      y: (i + 0.5) / n,
+      label: `Correlation · ${i + 1} × ${j + 1}`,
+      value: value.toFixed(3),
+      note: `${shortName(fundsById.get(fidA))} vs ${shortName(fundsById.get(fidB))}`,
+      i,
+      j,
+      fidA,
+      fidB,
+      raw: value,
+    };
   }
 
   return (
     <div className="flex flex-col gap-3">
       {caption}
-      <div className="relative">
-        <svg
-          viewBox={`0 0 ${size} ${size}`}
-          className="w-full"
-          style={{ maxHeight: 420 }}
-          onMouseMove={(e) => setHovered(cellFromEvent(e))}
-          onMouseLeave={() => setHovered(null)}
-          onTouchStart={(e) => setHovered(cellFromEvent(e.touches[0]))}
-        >
+      <div className="relative mx-auto aspect-square w-full max-w-[640px]">
+        <svg viewBox={`0 0 ${size} ${size}`} className="absolute inset-0 h-full w-full" aria-hidden="true">
           {fundIds.map((fidA, i) =>
             fundIds.map((fidB, j) => {
               const value = corr.get(fidA)?.get(fidB) ?? 0;
@@ -193,8 +194,10 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
                     height={CELL}
                     stroke="var(--color-bg)"
                     strokeWidth={2}
-                    opacity={isHovered ? 1 : 0.92}
-                    style={{ cursor: "pointer", animationDelay: `${Math.min((i + j) * 18, 900)}ms` }}
+                    // fillOpacity, not opacity: the resolve animation holds
+                    // opacity at 1 once it finishes
+                    fillOpacity={!hovered || isHovered || hovered.i === i || hovered.j === j ? 1 : 0.45}
+                    style={{ animationDelay: `${Math.min((i + j) * 18, 900)}ms` }}
                   />
                   {showCellText && (
                     <motion.text
@@ -258,6 +261,12 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
             </text>
           ))}
         </svg>
+        <Crosshair
+          read={readCell}
+          onRead={setHovered}
+          className="absolute"
+          style={{ left: `${(LABEL_SPACE / size) * 100}%`, top: `${(LABEL_SPACE / size) * 100}%`, right: 0, bottom: 0 }}
+        />
       </div>
 
       <HoverDetail placeholder="Hover or tap a cell for the exact correlation.">
@@ -272,7 +281,7 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
             </span>
             <span className="text-accent">
               {" · "}
-              <SettleReadout value={hovered.value.toFixed(3)} />
+              <SettleReadout value={hovered.raw.toFixed(3)} />
             </span>
           </span>
         ) : null}

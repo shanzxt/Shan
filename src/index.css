@@ -365,16 +365,28 @@ html.crt #root {
 }
 
 /* Portfolio tool: correlation cells ripple in along the diagonal. */
+/* Cells resolve like a reading locking in: a faint first trace, one
+   dropout, then the settled value (a single flicker, well under 3/s). */
 @keyframes heat-cell-in {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(0.3);
+    transform: scale(0.35);
+  }
+  35% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.18;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 .heat-cell {
   transform-box: fill-box;
   transform-origin: center;
-  animation: heat-cell-in 0.5s var(--ease-settle) both;
+  animation: heat-cell-in 0.9s var(--ease-settle) both;
 }
 
 /* Tools hub preview: cells brighten in a ripple from the corner on hover. */
