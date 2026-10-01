@@ -55,3 +55,13 @@ export function seriesPath(values, w, h, max = Math.max(...values), points = 96)
 export function formatLakh(v) {
   return v >= 100 ? `₹${(v / 100).toFixed(2)}Cr` : `₹${v}L`
 }
+
+// The series an issue's sparkline draws: its own `spark` if it has one,
+// otherwise the first series of its chart (Day 29: the flat SIP corpus).
+export function issueSpark(issue) {
+  if (issue.spark) return issue.spark
+  const s = issue.chart?.series?.[0]
+  if (!s) return null
+  const { years } = issue.chart
+  return { label: `${s.label} · ${years[0]}–${years.at(-1)}`, unit: "₹ lakh", kind: "line", values: s.values }
+}
