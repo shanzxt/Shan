@@ -21,3 +21,21 @@ export function reveal(reduceMotion, { delay = 0, y = 18 } = {}) {
     transition: { duration: 0.6, ease: EASE_OUT, delay: reduceMotion ? 0 : delay },
   };
 }
+
+// The same curves as plain functions of progress, for code that eases by
+// hand (GSAP timelines, shaders): a CSS-style cubic-bezier solved for y at
+// x by bisection.
+export function bezierEase([x1, y1, x2, y2]) {
+  const bx = (t) => 3 * x1 * t * (1 - t) ** 2 + 3 * x2 * t * t * (1 - t) + t ** 3;
+  const by = (t) => 3 * y1 * t * (1 - t) ** 2 + 3 * y2 * t * t * (1 - t) + t ** 3;
+  return (x) => {
+    let lo = 0;
+    let hi = 1;
+    for (let i = 0; i < 20; i++) {
+      const mid = (lo + hi) / 2;
+      if (bx(mid) < x) lo = mid;
+      else hi = mid;
+    }
+    return by((lo + hi) / 2);
+  };
+}

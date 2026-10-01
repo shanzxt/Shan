@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import { EASE_IN_OUT } from "../lib/motion"
+import { EASE_IN_OUT, bezierEase } from "../lib/motion"
 
 // The hero's field: a WebGL layer over the whole hero with depth. Two grid
 // rulings (64px fine, 256px coarse) sit at different depths and shift
@@ -85,21 +85,10 @@ void main() {
 }
 `
 
-// A CSS-style cubic-bezier solved for y at x. The crest travels on the
-// shared `switch` curve (0.65, 0, 0.35, 1): it eases in, crosses at an even
-// pace a reader can follow, and eases out, rather than darting across.
-function bezier(x, [x1, y1, x2, y2]) {
-  const bx = (t) => 3 * x1 * t * (1 - t) ** 2 + 3 * x2 * t * t * (1 - t) + t ** 3
-  const by = (t) => 3 * y1 * t * (1 - t) ** 2 + 3 * y2 * t * t * (1 - t) + t ** 3
-  let lo = 0
-  let hi = 1
-  for (let i = 0; i < 20; i++) {
-    const mid = (lo + hi) / 2
-    if (bx(mid) < x) lo = mid
-    else hi = mid
-  }
-  return by((lo + hi) / 2)
-}
+// The crest travels on the shared `switch` curve (0.65, 0, 0.35, 1): it
+// eases in, crosses at an even pace a reader can follow, and eases out,
+// rather than darting across.
+const crestEase = bezierEase(EASE_IN_OUT)
 
 const SWEEP_MS = 2800
 const FADE_MS = 700
@@ -163,7 +152,7 @@ export default function HeroField({ glowRef, masked = false, onReady }) {
       raf = 0
       if (!start) start = now
       const t = now - start
-      const crest = -240 + bezier(Math.min(t / SWEEP_MS, 1), EASE_IN_OUT) * (W + 480)
+      const crest = -240 + crestEase(Math.min(t / SWEEP_MS, 1)) * (W + 480)
       const calm = t < SWEEP_MS ? 1 : Math.max(0, 1 - (t - SWEEP_MS) / FADE_MS)
       shift = [shift[0] + (target[0] - shift[0]) * 0.08, shift[1] + (target[1] - shift[1]) * 0.08]
       gl.uniform2f(u.uRes, canvas.width, canvas.height)

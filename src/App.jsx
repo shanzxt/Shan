@@ -64,7 +64,7 @@ function Home() {
   return (
     <div>
       <Hero />
-      <Suspense fallback={<div className="h-[52px] border-y hr-line" />}>
+      <Suspense fallback={<div className="h-[57px] border-y hr-line" />}>
         <DataTicker />
       </Suspense>
       <ProofStrip />

@@ -9,7 +9,7 @@ import { seriesPath } from "../lib/series"
 const W = 160
 const H = 48
 
-export default function Sparkline({ spark, className = "" }) {
+export default function Sparkline({ spark, tall = false, className = "" }) {
   // Prerendered first paint shows the finished trace; it only draws on
   // after a client-side navigation.
   const still = useReducedMotion() || isInitialLoad()
@@ -18,7 +18,13 @@ export default function Sparkline({ spark, className = "" }) {
 
   return (
     <figure className={className}>
-      <svg viewBox={`0 0 ${W} ${H}`} className="h-12 w-full overflow-visible" role="img" aria-label={summary}>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        preserveAspectRatio="none"
+        className={`${tall ? "h-32" : "h-12"} w-full overflow-visible`}
+        role="img"
+        aria-label={summary}
+      >
         <line x1="0" x2={W} y1={H} y2={H} stroke="rgba(235,231,220,0.18)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
         {spark.kind === "bars"
           ? spark.values.map((v, i) => {
@@ -45,12 +51,17 @@ export default function Sparkline({ spark, className = "" }) {
               d={seriesPath(spark.values, W, H, max)}
               fill="none"
               stroke="var(--color-accent)"
-              strokeWidth="1.75"
-              vectorEffect="non-scaling-stroke"
-              initial={still ? false : { pathLength: 0 }}
-              whileInView={{ pathLength: 1 }}
-              viewport={{ once: true, amount: 0 }}
-              transition={{ duration: 1.4, ease: EASE_OUT }}
+              strokeWidth="1.5"
+              // pathLength dashes and non-scaling strokes don't mix, so the
+              // stroke scales with the box; the first paint gets no dashes
+              {...(still
+                ? {}
+                : {
+                    initial: { pathLength: 0 },
+                    whileInView: { pathLength: 1 },
+                    viewport: { once: true, amount: 0 },
+                    transition: { duration: 1.4, ease: EASE_OUT },
+                  })}
             />
           )}
       </svg>

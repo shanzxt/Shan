@@ -10,8 +10,8 @@ import {
   YAxis,
 } from "recharts"
 
-// Recharts lives in this chunk only (lazy-loaded by NewsletterIssue and
-// IssueCard). Charts are drawn as phosphor traces on a graticule and only
+// Recharts lives in this chunk only (lazy-loaded by NewsletterIssue).
+// Charts are drawn as phosphor traces on a graticule and only
 // mount once scrolled into view, so the lines draw themselves where the
 // reader can see them.
 
