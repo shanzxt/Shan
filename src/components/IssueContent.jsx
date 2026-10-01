@@ -1,10 +1,11 @@
-import { Suspense, useEffect, useState } from "react"
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import { Maximize2, X } from "lucide-react"
+import { Suspense, useState } from "react"
+import { motion, useReducedMotion } from "framer-motion"
+import { Maximize2 } from "lucide-react"
 import { toolRegistry } from "../data/toolRegistry"
 import { headingId } from "../lib/headings"
 import { EASE_OUT } from "../lib/motion"
 import ClipReveal from "./ClipReveal"
+import Dialog from "./Dialog"
 import ToolDisclaimer from "./ToolDisclaimer"
 
 // Renders **bold**, *italic* and [text](url) markers inside plain text,
@@ -198,58 +199,24 @@ export function IssueBody({ content, onOpenImage }) {
 export function Lightbox({ image, onClose }) {
   const reduceMotion = useReducedMotion()
 
-  useEffect(() => {
-    if (!image) return
-    const onKeyDown = (e) => {
-      if (e.key === "Escape") onClose()
-    }
-    window.addEventListener("keydown", onKeyDown)
-    return () => window.removeEventListener("keydown", onKeyDown)
-  }, [image, onClose])
-
   return (
-    <AnimatePresence>
+    <Dialog open={Boolean(image)} onClose={onClose} title="Full size · esc to close" label={image?.alt}>
       {image && (
-        <motion.div
-          initial={reduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={reduceMotion ? undefined : { opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="graticule fixed inset-0 z-[60] flex items-center justify-center bg-bg/95 p-4 backdrop-blur-sm print:hidden sm:p-12"
-          onMouseDown={(e) => {
-            if (e.target === e.currentTarget) onClose()
-          }}
-          role="dialog"
-          aria-modal="true"
-          aria-label={image.alt}
-        >
-          <span className="readout absolute left-4 top-5 text-paper/55 sm:left-6 sm:top-7">Full size · esc to close</span>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            autoFocus
-            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center border border-line bg-bg text-paper/70 transition-colors hover:border-accent hover:text-accent sm:right-6 sm:top-6"
-          >
-            <X size={18} />
-          </button>
-          <motion.img
-            initial={reduceMotion ? false : { opacity: 0, scale: 0.96, clipPath: "inset(0 0 100% 0)" }}
-            animate={{ opacity: 1, scale: 1, clipPath: "inset(0 0 0% 0)" }}
-            exit={reduceMotion ? undefined : { opacity: 0, scale: 0.97 }}
-            transition={{ duration: 0.45, ease: EASE_OUT }}
-            src={image.src}
-            alt={image.alt}
-            className="max-h-full max-w-full border border-line object-contain"
-            onMouseDown={(e) => e.stopPropagation()}
-          />
-        </motion.div>
+        <motion.img
+          initial={reduceMotion ? false : { opacity: 0, scale: 0.96, clipPath: "inset(0 0 100% 0)" }}
+          animate={{ opacity: 1, scale: 1, clipPath: "inset(0 0 0% 0)" }}
+          exit={reduceMotion ? undefined : { opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.45, ease: EASE_OUT }}
+          src={image.src}
+          alt={image.alt}
+          className="max-h-full max-w-full border border-line object-contain"
+          onMouseDown={(e) => e.stopPropagation()}
+        />
       )}
-    </AnimatePresence>
+    </Dialog>
   )
 }
 
-// Closes the lightbox when the reader navigates to another issue.
 export function useLightbox(trackedKey) {
   const [lightboxImage, setLightboxImage] = useState(null)
   const [prevKey, setPrevKey] = useState(trackedKey)
