@@ -3,6 +3,37 @@
 > The market is a signal you learn to read. This site is the instrument you
 > read it on.
 
+## Direction (elegance pass, Oct 2026)
+
+A private research desk: a Bloomberg terminal's precision with the Financial
+Times' editorial calm, still on the same phosphor instrument. Key numbers are
+set huge with their units and labels small and engraved; every figure is
+tabular and right-aligned; sections open like line items on a statement
+("02 · Measurements ····· CH-02") under a rule that draws across like a page
+turning; card grids give way to ledger rows with hairlines and dotted leaders,
+all ruled to a visible 12-column grid with a soft vignette at the edges. The
+compounding curve is now the hero, drawn from the Day 29 issue's real samples,
+with the issue's headline figure as the single glowing thing in view. The
+signature interaction is a chart crosshair that reads real values (hero curve,
+issue chart, correlation heatmap), on touch by tap and drag.
+
+**Rules relaxed in this pass, and why**
+
+- *Stillness between readings* → the hero's WebGL field now **persists**
+  (grid layers, grain, glow) instead of running once and vanishing. It still
+  only renders when something happens (arrival, pointer, scroll) and holds
+  otherwise, so the spirit of stillness stays; a page at rest costs nothing.
+- *"Pinned / horizontal-scroll sections" (was Cut)* → the home newsletter
+  story pins on desktop as chapters (CSS sticky + GSAP ScrollTrigger scrub).
+  It is a story with an order, which pinning reads well; phones, reduced
+  motion and the prerender get stacked, unpinned chapters.
+- *"Continuous WebGL hero" (was Cut)* → see the first point; the trace itself
+  stays Canvas 2D.
+- *Avoid list: rounded card UI* → unchanged, but "card grids" are now avoided
+  on purpose too: archive, measurements and stats are statement rows.
+- *One glow per view* is now explicit: the hero glow moved from the surname
+  to the ₹4.72Cr figure; issue pages glow the headline stat only.
+
 ## The concept
 
 The whole site is **one calibrated measuring instrument**: a phosphor
@@ -24,7 +55,16 @@ treats every page the same way an engineer treats a noisy sensor:
   live trace (paused off-screen) and the data ticker (pauses on hover,
   static under reduced motion). When something moves, it's a reading.
 
-### The signature interaction: the probe
+### The signature interaction: the crosshair (was: the probe)
+
+`components/Crosshair.jsx` — hover (or tap and drag) a key chart and two
+hairlines lock onto the nearest real data point with a statement box of its
+value. It snaps only to real samples (five-year marks on the SIP curves,
+cell centres on the heatmap); interpolated line between samples never gets
+a reading. The global probe cursor hides its own hairlines there
+(`data-cursor="measure"`). The probe below still runs everywhere else.
+
+### The probe
 
 On fine-pointer devices the cursor becomes an **oscilloscope probe**: full-
 viewport crosshair hairlines with live X/Y readouts at the screen edges.
@@ -160,11 +200,11 @@ curve is the first paint and LCP stays the text); phones draw at 30 fps.
 
 ## Cut, and why
 
-- **Continuous WebGL / shader hero** — the trace stays Canvas 2D; WebGL is
-  used only for the one-shot arrival field.
-- **Pinned / horizontal-scroll sections** — only the Day 29 replay scrubs
-  with scroll (it is a sticky panel inside a tall section, not scroll-jacking
-  of the page); nothing else pins.
+- **Continuous shader trace** — the trace stays Canvas 2D; WebGL draws the
+  field behind it (render-on-demand, see Direction).
+- **Horizontal-scroll sections** — still cut. Pinning is allowed for the
+  Day 29 replay and the home newsletter chapters only (both sticky panels in
+  a tall section, not scroll-jacking).
 - **Light theme** — see Colour.
 - **Per-page custom OG images** — the existing credential-free card
   stays; not a visual-overhaul item.
