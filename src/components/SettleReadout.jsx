@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { motion, useReducedMotion } from "framer-motion"
 import { SETTLE } from "../lib/motion"
 
@@ -7,14 +7,16 @@ import { SETTLE } from "../lib/motion"
 // render is static so prerendered numbers are never hidden.
 export default function SettleReadout({ value, className = "" }) {
   const reduce = useReducedMotion()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  // arm on the first real change (derived during render, no effect needed)
+  const [initial] = useState(value)
+  const [armed, setArmed] = useState(false)
+  if (!armed && value !== initial) setArmed(true)
 
   return (
     <span className={`relative inline-flex overflow-hidden tabular-nums ${className}`}>
       <motion.span
         key={value}
-        initial={mounted && !reduce ? { y: "-0.55em", opacity: 0 } : false}
+        initial={armed && !reduce ? { y: "-0.55em", opacity: 0 } : false}
         animate={{ y: 0, opacity: 1 }}
         transition={SETTLE}
       >
