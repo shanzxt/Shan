@@ -192,6 +192,18 @@ Initial JS (entry + modulepreloads, gzip): 133 kB → 145 kB. CSS gzip
 7.5 kB → 12 kB. Web fonts: three variable faces, ~120 kB latin total
 (Newsreader requested without `opsz`: 24 kB instead of 147 kB).
 
+Elegance pass (Oct 2026), `/` mobile, same machine, staging build vs this
+build, three runs each: staging 73–75 perf / 100 a11y (LCP 4.5 s, TBT
+70–170 ms); after 75–76 / 100 (LCP 4.3 s, TBT 50–60 ms, CLS 0.001).
+Initial JS gzip 146.3 → 148.0 kB, CSS 12.4 → 13.2 kB. Two lessons:
+
+- The full-hero WebGL field is desktop + capable devices only. On phones
+  it cost ~1.2 s of extra render work and TBT rose to ~380 ms.
+- "₹" in the display or body face pulls those fonts' latin-ext files
+  (+80 kB) onto the critical path. `Amount.jsx` sets the sign raised and
+  small in Martian Mono (whose latin-ext file already loads); keep ₹ out of
+  Anybody/Newsreader above the fold.
+
 Budget rules that got perf back to baseline after the first build
 dropped it to 67: the boot curtain animates only transform / clip-path
 (no per-frame SVG `drop-shadow`, no `@property` counter); the hero

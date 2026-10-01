@@ -1,5 +1,6 @@
 import { useReducedMotion } from "framer-motion"
 import { issuesByDate } from "../data/newsletter"
+import Amount from "./Amount"
 import TransitionLink from "./chrome/TransitionLink"
 
 // Ticker tape of real figures, generated from the newsletter data itself
@@ -29,7 +30,7 @@ function Item({ item, duplicate = false }) {
         <span className="readout text-paper/65 group-hover:text-paper">{item.label}</span>
         <span aria-hidden="true" className="leader w-10 flex-none" />
         <span className="font-display text-[22px] font-[750] leading-none tabular-nums text-paper [font-stretch:85%] group-hover:text-accent">
-          {item.value}
+          <Amount value={item.value} />
         </span>
       </TransitionLink>
       <span className="h-4 w-px bg-line" aria-hidden="true" />

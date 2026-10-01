@@ -8,6 +8,7 @@ import TransitionLink from "../components/chrome/TransitionLink"
 import GithubMark from "../components/icons/GithubMark"
 import SectionHeader from "../components/SectionHeader"
 import Sparkline from "../components/Sparkline"
+import Amount from "../components/Amount"
 
 // The archive as a filings index: one statement row per issue, read left
 // to right like a ledger. Number, filing date, the issue itself, its
@@ -84,7 +85,7 @@ function FilingRow({ issue }) {
 
       <div className="col-span-6 lg:col-span-3 lg:text-right">
         <p className="font-display text-5xl font-[820] leading-[0.85] tabular-nums text-paper [font-stretch:82%] transition-colors duration-300 group-hover:text-accent lg:text-[3.6rem]">
-          {head.value}
+          <Amount value={head.value} />
         </p>
         <p className="engraved mt-2 text-paper/65">{head.label}</p>
       </div>

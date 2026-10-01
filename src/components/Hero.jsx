@@ -7,6 +7,7 @@ import { hasFinePointer, isCapableDevice, useMediaQuery, useReducedMotionPref } 
 import { whenBootDone } from "../lib/firstLoad"
 import { noise, probeFilter } from "../lib/signal"
 import { formatLakh, monotone, seriesPath } from "../lib/series"
+import Amount from "./Amount"
 import Crosshair from "./Crosshair"
 import GithubMark from "./icons/GithubMark"
 import LinkedinMark from "./icons/LinkedinMark"
@@ -322,10 +323,12 @@ export default function Hero() {
           <div className="graticule absolute inset-0 [mask-image:radial-gradient(ellipse_at_60%_55%,black_25%,transparent_80%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(rgba(255,176,0,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,176,0,0.08)_1px,transparent_1px)] bg-[size:256px_256px] [mask-image:radial-gradient(ellipse_at_60%_55%,black_15%,transparent_75%)]" />
         </div>
-        <div className="absolute -right-[10vw] top-[8%] h-[70vh] w-[55vw] rounded-full bg-accent/[0.09] blur-[140px]" />
-        {live && (
+        <div className="absolute -right-[10vw] top-24 h-[70vh] w-[55vw] rounded-full bg-accent/[0.09] blur-[140px]" />
+        {/* desktop only: a full-hero shader is too much GPU for phones,
+            which keep the static CSS layers */}
+        {live && wide && isCapableDevice() && (
           <Suspense fallback={null}>
-            <HeroField glowRef={figureRef} masked={wide} onReady={markField} />
+            <HeroField glowRef={figureRef} masked onReady={markField} />
           </Suspense>
         )}
         <div className="vignette absolute inset-0" />
@@ -398,9 +401,9 @@ export default function Hero() {
             </p>
             <p
               ref={figureRef}
-              className="mt-2 font-display text-[21vw] font-[820] leading-[0.82] tracking-[-0.03em] tabular-nums text-accent glow [font-stretch:82%] sm:text-[8rem] lg:text-[min(12vw,196px)]"
+              className="mt-2 whitespace-nowrap font-display text-[21vw] font-[820] leading-[0.82] tracking-[-0.03em] tabular-nums text-accent glow [font-stretch:82%] sm:text-[8rem] lg:text-[min(12vw,196px)]"
             >
-              {formatLakh(flat.corpus)}
+              <Amount value={formatLakh(flat.corpus)} />
             </p>
             <dl className="mt-4 grid gap-0 sm:max-w-md lg:ml-auto">
               {[
@@ -424,7 +427,7 @@ export default function Hero() {
           className="panel relative mt-10 h-64 sm:h-80 lg:pointer-events-auto lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-[62%] lg:mt-0 lg:h-auto lg:border-0 lg:bg-transparent lg:shadow-none"
         >
           <div aria-hidden="true" className="graticule absolute inset-0 opacity-70 lg:hidden" />
-          <p className="sr-only">
+          <p className="sr-only font-mono">
             Chart: {flat.label} SIP corpus by year, {YEARS.map((y, i) => `${y} ${formatLakh(flat.values[i])}`).join(", ")}.
           </p>
           <div className="absolute bottom-8 left-0 right-14 top-[8%] lg:bottom-10 lg:right-[8.5rem]">

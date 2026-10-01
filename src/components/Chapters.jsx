@@ -7,6 +7,7 @@ import { getLenis } from "../lib/scroll"
 import { issueSpark } from "../lib/series"
 import { driveWithGsap } from "../lib/ticker"
 import TransitionLink from "./chrome/TransitionLink"
+import Amount from "./Amount"
 import Sparkline from "./Sparkline"
 
 // The newsletter as a story told in chapters, oldest first. On desktop the
@@ -74,7 +75,7 @@ function Chapter({ issue, index, pinned }) {
         <div className="lg:col-span-4 lg:col-start-9">
           <p className="engraved text-paper/65">{head.label}</p>
           <p className="mt-2 font-display text-7xl font-[820] leading-[0.85] tabular-nums text-accent glow [font-stretch:82%] lg:text-[7.5rem]">
-            {head.value}
+            <Amount value={head.value} />
           </p>
           {spark && <Sparkline spark={spark} tall className="mt-8" />}
           <dl className="mt-6">

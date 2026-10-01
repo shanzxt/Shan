@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react"
 import { issuesByDate } from "../data/newsletter"
 import { IssueBody, Lightbox, useLightbox } from "../components/IssueContent"
 import { links } from "../data/links"
+import Amount from "../components/Amount"
 import GithubMark from "../components/icons/GithubMark"
 import { TocInline, TocRail } from "../components/IssueToc"
 import { useActiveHeading } from "../lib/useActiveHeading"
@@ -107,7 +108,7 @@ function IssueMasthead({ issue, enter }) {
                   head ? "text-accent glow" : "text-paper"
                 }`}
               >
-                {st.value}
+                <Amount value={st.value} />
               </dd>
             </div>
           )
