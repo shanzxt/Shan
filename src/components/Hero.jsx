@@ -1,53 +1,28 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react"
-import { motion, useScroll, useTransform } from "framer-motion"
+import { useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { links } from "../data/links"
-import { sipScenarios } from "../data/sipScenarios"
-import { hasFinePointer, isCapableDevice, useMediaQuery, useReducedMotionPref } from "../lib/env"
+import { hasFinePointer, isCapableDevice, useReducedMotionPref } from "../lib/env"
 import { whenBootDone } from "../lib/firstLoad"
-import { noise, probeFilter } from "../lib/signal"
-import { formatLakh, monotone, seriesPath } from "../lib/series"
-import Amount from "./Amount"
-import Crosshair from "./Crosshair"
+import { compounding, noise, probeFilter, signalPath } from "../lib/signal"
 import GithubMark from "./icons/GithubMark"
 import LinkedinMark from "./icons/LinkedinMark"
 import Magnetic from "./Magnetic"
 
-// CH-01. The compounding curve is the hero: the Day 29 issue's flat
-// ₹10k/mo SIP on the Nifty 50, Aug 1991 – Aug 2026, drawn from its real
-// five-year samples (src/data/newsletter.js) across the whole page. The
-// trace arrives buried in noise, resolves, then holds; the one glowing
-// thing in view is where it ends, the issue's own headline figure. Point
-// at the chart (or tap and drag) and the crosshair reads the real value
-// at the nearest sampled year.
+// CH-01. The site's one live object (DESIGN.md → Hero): a phosphor trace
+// of the compounding curve buried in noise. It locks once the boot
+// sequence lifts, the probe (cursor or finger) filters the noise around
+// it, and scrolling fast shakes it loose again. The name reacts too:
+// letters near the probe thin out and widen (Anybody's wght/wdth axes),
+// and the whole name stretches with scroll velocity.
 //
 // First paint (prerender, reduced motion) is a static, fully visible
-// render: the clean curve as SVG and the name at rest. Nothing is hidden
+// render: the clean curve as SVG and the name at rest — nothing is hidden
 // waiting for JS, which also keeps the h1 as an early LCP.
 
-// The WebGL field (grid layers, grain, glow) is its own chunk, fetched only
-// once the canvas goes live; the CSS grid layers are its static fallback.
-const HeroField = lazy(() => import("./HeroField"))
-
 const NAME = ["Shantanu", "Somwanshi"]
-const flat = sipScenarios.series.find((s) => s.key === "flat")
-const YEARS = sipScenarios.years
-const Y_MAX = 500 // axis ceiling in lakh (₹5Cr), just above the ₹4.72Cr finish
-const Y_TICKS = [0, 100, 200, 300, 400, 500]
-const curve = monotone(flat.values)
-
-// Snap the crosshair to the nearest real five-year sample; the line between
-// samples is only a drawing aid, so it never gets a reading of its own.
-function readCurve(fx) {
-  const i = Math.round(fx * (YEARS.length - 1))
-  const t = i / (YEARS.length - 1)
-  return {
-    x: t,
-    y: 1 - flat.values[i] / Y_MAX,
-    label: `${YEARS[i]} · ${flat.label}`,
-    value: formatLakh(flat.values[i]),
-  }
-}
+const TOP = 0.1 // curve peak, fraction of height
+const BOTTOM = 0.9 // flat baseline
+const TICKS = [5, 10, 15, 20, 25, 30]
 
 const subscribeNoop = () => () => {}
 const useIsClient = () =>
@@ -83,9 +58,7 @@ export default function Hero() {
   // has lifted and the browser is idle, so first paint and the page's own
   // loading work never compete with the animation loop.
   const [armed, setArmed] = useState(false)
-  const [fieldOn, setFieldOn] = useState(false)
   const live = isClient && !reduced && armed
-  const wide = useMediaQuery("(min-width: 1024px)")
 
   useEffect(() => {
     if (reduced) return
@@ -102,19 +75,11 @@ export default function Hero() {
     }
   }, [reduced])
 
-  const markField = useCallback(() => setFieldOn(true), [])
   const sectionRef = useRef(null)
   const canvasRef = useRef(null)
   const nameRef = useRef(null)
-  const figureRef = useRef(null)
   const noiseReadRef = useRef(null)
   const stateReadRef = useRef(null)
-
-  // Depth: the name drifts up faster than the chart as the page scrolls,
-  // so the hero reads as layers rather than one flat sheet.
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start start", "end start"] })
-  const nameY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : -110])
-  const chartY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : 50])
 
   useEffect(() => {
     if (!live) return
@@ -156,10 +121,10 @@ export default function Hero() {
     const ro = new ResizeObserver(measure)
     ro.observe(canvas.parentElement)
 
-    // state: the trace starts noisy, resolves, then holds almost still
-    let level = 0.8
-    const target = 0.06
-    let probe = null // pointer x as fraction of the plot width
+    // state
+    let level = 0.7 // global noise amplitude: starts noisy, then locks
+    let target = 0.14
+    let probe = null // pointer x as fraction of canvas width
     let probeSmooth = null
     let pointer = null // client coords, for the letter lens
     let lastScroll = window.scrollY
@@ -169,20 +134,20 @@ export default function Hero() {
     let running = false
     const letterState = letters.map(() => ({ wght: 820, wdth: baseWdth }))
 
-    const plot = canvas.parentElement
-    const onPlotMove = (e) => {
-      const r = plot.getBoundingClientRect()
+
+    const onPointerMove = (e) => {
+      const r = canvas.getBoundingClientRect()
       probe = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1)
+      pointer = { x: e.clientX, y: e.clientY }
     }
-    const onPlotLeave = () => (probe = null)
-    const onPointerMove = (e) => (pointer = { x: e.clientX, y: e.clientY })
-    const onPointerLeave = () => (pointer = null)
-    plot.addEventListener("pointermove", onPlotMove, { passive: true })
-    plot.addEventListener("pointerleave", onPlotLeave)
+    const onPointerLeave = () => {
+      probe = null
+      pointer = null
+    }
     section.addEventListener("pointermove", onPointerMove, { passive: true })
     section.addEventListener("pointerleave", onPointerLeave)
 
-    const yAt = (t) => H - (curve(t) / Y_MAX) * H
+    const yAt = (t) => BOTTOM * H - compounding(t) * (BOTTOM - TOP) * H
 
     const draw = (time) => {
       frame++
@@ -191,7 +156,7 @@ export default function Hero() {
       velocity = velocity * 0.86 + Math.abs(sy - lastScroll) * 0.14
       lastScroll = sy
       const boost = Math.min(velocity / 30, 0.9)
-      level += (target + boost - level) * 0.035
+      level += (target + boost - level) * 0.045
 
       if (probe != null) probeSmooth = probeSmooth == null ? probe : probeSmooth + (probe - probeSmooth) * 0.18
       else if (probeSmooth != null) probeSmooth = null
@@ -202,7 +167,7 @@ export default function Hero() {
       ctx.fillRect(0, 0, W, H)
       ctx.globalCompositeOperation = "source-over"
 
-      const amp = H * 0.08
+      const amp = H * 0.075
       const pts = new Float32Array((samples + 1) * 2)
       for (let i = 0; i <= samples; i++) {
         const t = i / samples
@@ -218,29 +183,39 @@ export default function Hero() {
       }
       ctx.lineJoin = "round"
       ctx.lineCap = "round"
-      // Phosphor colours are the accent token as rgba (canvas can't read
-      // CSS variables): bloom pass, then core.
+      // bloom pass, then core
       path()
-      ctx.strokeStyle = "rgba(255,176,0,0.14)"
-      ctx.lineWidth = desktop ? 12 : 7
+      ctx.strokeStyle = "rgba(255,176,0,0.10)"
+      ctx.lineWidth = desktop ? 9 : 6
       ctx.stroke()
       path()
-      ctx.strokeStyle = "rgba(255,196,70,1)"
-      ctx.lineWidth = desktop ? 2.4 : 1.8
+      ctx.strokeStyle = "rgba(255,190,60,0.95)"
+      ctx.lineWidth = desktop ? 2 : 1.6
       ctx.stroke()
 
       // sweep beam head
-      const period = 4200
+      const period = 3400
       const s = (time % period) / period
       const si = Math.round(s * samples)
       const bx = pts[si * 2]
       const by = pts[si * 2 + 1]
       const g = ctx.createRadialGradient(bx, by, 0, bx, by, 18)
-      g.addColorStop(0, "rgba(255,236,190,0.9)")
-      g.addColorStop(0.3, "rgba(255,176,0,0.4)")
+      g.addColorStop(0, "rgba(255,236,190,0.95)")
+      g.addColorStop(0.3, "rgba(255,176,0,0.45)")
       g.addColorStop(1, "rgba(255,176,0,0)")
       ctx.fillStyle = g
       ctx.fillRect(bx - 18, by - 18, 36, 36)
+
+      // probe marker on the clean signal
+      if (probeSmooth != null) {
+        const px = probeSmooth * W
+        const py = yAt(probeSmooth)
+        ctx.strokeStyle = "rgba(90,209,193,0.9)"
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        ctx.arc(px, py, 5, 0, Math.PI * 2)
+        ctx.stroke()
+      }
 
       // name: letters near the pointer thin and widen; everything stretches
       // a little with scroll velocity
@@ -267,7 +242,7 @@ export default function Hero() {
       if (frame % 6 === 0) {
         if (noiseReadRef.current) noiseReadRef.current.textContent = (level * (probeSmooth != null ? 0.4 : 1)).toFixed(2)
         if (stateReadRef.current)
-          stateReadRef.current.textContent = level > 0.5 ? "Acquiring" : boost > 0.15 ? "Tracking" : "Holding"
+          stateReadRef.current.textContent = level > 0.6 ? "Acquiring" : boost > 0.15 ? "Tracking" : "Locked"
       }
     }
 
@@ -299,8 +274,6 @@ export default function Hero() {
       io.disconnect()
       ro.disconnect()
       document.removeEventListener("visibilitychange", onVisibility)
-      plot.removeEventListener("pointermove", onPlotMove)
-      plot.removeEventListener("pointerleave", onPlotLeave)
       section.removeEventListener("pointermove", onPointerMove)
       section.removeEventListener("pointerleave", onPointerLeave)
       letters.forEach((el) => {
@@ -313,66 +286,86 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative isolate overflow-hidden border-b hr-line lg:min-h-[100svh]"
+      className="relative overflow-hidden border-b hr-line lg:min-h-[100svh]"
       aria-labelledby="hero-name"
     >
-      {/* static depth: fine graticule over a coarse 256px ruling, fading out
-          toward the edges; the WebGL field draws over it once live */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-        <div className={`absolute inset-0 transition-opacity duration-700 ${fieldOn ? "opacity-0" : ""}`}>
-          <div className="graticule absolute inset-0 [mask-image:radial-gradient(ellipse_at_60%_55%,black_25%,transparent_80%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,176,0,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,176,0,0.08)_1px,transparent_1px)] bg-[size:256px_256px] [mask-image:radial-gradient(ellipse_at_60%_55%,black_15%,transparent_75%)]" />
-        </div>
-        <div className="absolute -right-[10vw] top-24 h-[70vh] w-[55vw] rounded-full bg-accent/[0.09] blur-[140px]" />
-        {/* desktop only: a full-hero shader is too much GPU for phones,
-            which keep the static CSS layers */}
-        {live && wide && isCapableDevice() && (
-          <Suspense fallback={null}>
-            <HeroField glowRef={figureRef} masked onReady={markField} />
-          </Suspense>
-        )}
-        <div className="vignette absolute inset-0" />
-      </div>
+      {/* graticule, fading out toward the edges */}
+      <div
+        aria-hidden="true"
+        className="graticule pointer-events-none absolute inset-0 [mask-image:radial-gradient(ellipse_at_40%_45%,black_20%,transparent_75%)]"
+      />
+      {/* amber bloom behind the bend */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-40 -top-40 h-[70vh] w-[60vw] rounded-full bg-accent/10 blur-[120px]"
+      />
 
-      <div className="relative mx-auto flex max-w-[1600px] flex-col px-5 pb-8 pt-24 sm:px-8 lg:min-h-[100svh] lg:px-12 lg:pb-10 lg:pt-28">
+      <div className="relative z-10 mx-auto flex max-w-[1600px] flex-col px-5 pb-10 pt-24 sm:px-8 lg:min-h-[100svh] lg:px-12 lg:pb-12 lg:pt-28">
         <div className="flex items-center justify-between gap-4">
           <p className="readout text-paper/60">
             <span className="text-accent">CH-01</span>
             <span className="hidden sm:inline"> · Signal / Noise</span>
           </p>
           <p className="readout text-paper/60" aria-hidden="true">
-            Noise <span ref={noiseReadRef} className="tabular-nums text-accent">{live ? "0.80" : "0.00"}</span> ·{" "}
+            Noise <span ref={noiseReadRef} className="tabular-nums text-accent">{live ? "0.70" : "0.00"}</span> ·{" "}
             <span ref={stateReadRef} className="text-teal">
-              {live ? "Acquiring" : "Holding"}
+              {live ? "Acquiring" : "Locked"}
             </span>
           </p>
         </div>
 
-        {/* masthead: the name as one line across the full measure on desktop */}
-        <motion.div style={{ y: nameY }} className="mt-8 lg:mt-10">
+        <div className="mt-10 lg:mt-[12vh]">
+          <p className="readout text-teal">Day 30 — trace resolved</p>
           <h1
             id="hero-name"
             ref={nameRef}
-            className="font-display font-[820] uppercase leading-[0.8] tracking-[-0.035em] text-paper [--hero-wdth:74] [contain:layout] [font-stretch:calc(var(--hero-wdth)*1%)] text-[18.5vw] lg:flex lg:justify-between lg:[--hero-wdth:100] lg:text-[min(7.15vw,114px)]"
+            className="mt-4 font-display font-[820] uppercase leading-[0.8] tracking-[-0.035em] text-paper [--hero-wdth:74] [contain:layout] [font-stretch:calc(var(--hero-wdth)*1%)] text-[18.5vw] lg:[--hero-wdth:100] lg:text-[min(10.5vw,188px)]"
           >
             <span className="sr-only">Shantanu Somwanshi</span>
             {NAME.map((word, w) => (
               <span key={word} aria-hidden="true" className="block whitespace-nowrap">
                 {[...word].map((ch, i) => (
-                  <span key={i} data-letter className={w === 1 ? "text-accent" : undefined}>
+                  <span key={i} data-letter className={w === 1 ? "text-accent glow" : undefined}>
                     {ch}
                   </span>
                 ))}
               </span>
             ))}
           </h1>
-          <span aria-hidden="true" className="mt-5 block h-px bg-paper/25 lg:mt-6" />
-        </motion.div>
+        </div>
 
-        {/* statement row: who, on the left; the issue's headline figure set
-            large on the right, sitting directly over where the curve ends */}
-        <div className="mt-6 grid gap-8 lg:mt-8 lg:grid-cols-12 lg:gap-4">
-          <div className="order-2 lg:order-1 lg:col-span-5">
+        {/* the screen: full-bleed behind everything on desktop, its own
+            inset instrument panel on phones */}
+        <div
+          aria-hidden="true"
+          className="panel relative mt-8 h-56 overflow-hidden sm:h-72 lg:pointer-events-none lg:-z-10 lg:absolute lg:inset-0 lg:mt-0 lg:h-auto lg:border-0 lg:bg-transparent lg:shadow-none"
+        >
+          <div className="graticule absolute inset-0 opacity-70 lg:hidden" />
+          {live ? (
+            <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
+          ) : (
+            <svg viewBox="0 0 1000 1000" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+              <path
+                d={signalPath(1000, 1000, TOP * 1000, BOTTOM * 1000)}
+                fill="none"
+                stroke="var(--color-accent)"
+                strokeWidth="2"
+                vectorEffect="non-scaling-stroke"
+                style={{ filter: "drop-shadow(0 0 6px rgba(255,176,0,.6))" }}
+              />
+            </svg>
+          )}
+          <div className="absolute inset-x-0 bottom-2 hidden justify-between px-[1.5%] lg:bottom-4 lg:flex">
+            {TICKS.map((d) => (
+              <span key={d} className="readout text-paper/35">
+                D{String(d).padStart(2, "0")}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-8 lg:mt-auto lg:grid-cols-[minmax(0,34rem)_1fr] lg:pb-20">
+          <div>
             <p className="max-w-xl text-lg leading-relaxed text-paper/85 sm:text-xl">
               Instrumentation engineer, currently pursuing the CFA Program
               (Level I passed). I write a newsletter on personal finance and
@@ -394,85 +387,7 @@ export default function Hero() {
               </HeroLink>
             </div>
           </div>
-
-          <div className="order-1 lg:order-2 lg:col-span-6 lg:col-start-7 lg:text-right">
-            <p className="engraved text-paper/65">
-              Day 29 · {flat.label} · Nifty 50 · Aug 1991 – Aug 2026
-            </p>
-            <p
-              ref={figureRef}
-              className="mt-2 whitespace-nowrap font-display text-[21vw] font-[820] leading-[0.82] tracking-[-0.03em] tabular-nums text-accent glow [font-stretch:82%] sm:text-[8rem] lg:text-[min(12vw,196px)]"
-            >
-              <Amount value={formatLakh(flat.corpus)} />
-            </p>
-            <dl className="mt-4 grid gap-0 sm:max-w-md lg:ml-auto">
-              {[
-                ["Invested", formatLakh(flat.invested)],
-                ["Multiple", flat.multiple],
-              ].map(([k, v]) => (
-                <div key={k} className="ledger-row py-1.5">
-                  <dt className="engraved text-paper/65">{k}</dt>
-                  <span aria-hidden="true" className="leader" />
-                  <dd className="font-mono text-[14px] tabular-nums text-paper">{v}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
         </div>
-
-        {/* the chart: an inset instrument screen on phones, the lower half of
-            the page on desktop, running edge to edge */}
-        <motion.div
-          style={{ y: chartY }}
-          className="panel relative mt-10 h-64 sm:h-80 lg:pointer-events-auto lg:absolute lg:inset-x-0 lg:bottom-0 lg:top-[62%] lg:mt-0 lg:h-auto lg:border-0 lg:bg-transparent lg:shadow-none"
-        >
-          <div aria-hidden="true" className="graticule absolute inset-0 opacity-70 lg:hidden" />
-          <p className="sr-only font-mono">
-            Chart: {flat.label} SIP corpus by year, {YEARS.map((y, i) => `${y} ${formatLakh(flat.values[i])}`).join(", ")}.
-          </p>
-          <div className="absolute bottom-8 left-0 right-14 top-[8%] lg:bottom-10 lg:right-[8.5rem]">
-            {live ? (
-              <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 h-full w-full" />
-            ) : (
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 1000 1000"
-                preserveAspectRatio="none"
-                className="absolute inset-0 h-full w-full overflow-visible"
-              >
-                <path
-                  d={seriesPath(flat.values, 1000, 1000, Y_MAX)}
-                  fill="none"
-                  stroke="var(--color-accent)"
-                  strokeWidth="2.4"
-                  vectorEffect="non-scaling-stroke"
-                  style={{ filter: "drop-shadow(0 0 7px rgba(255,176,0,.7))" }}
-                />
-              </svg>
-            )}
-            {/* y rules + right-aligned figure column */}
-            <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-              {Y_TICKS.map((v) => (
-                <div key={v} className="absolute inset-x-0 flex items-center" style={{ top: `${(1 - v / Y_MAX) * 100}%` }}>
-                  <span className="h-px flex-1 bg-paper/[0.07]" />
-                  <span className="readout absolute left-full top-1/2 w-12 -translate-y-1/2 translate-x-2 text-right text-paper/60 lg:w-24 lg:translate-x-4">
-                    {v ? `₹${v / 100}Cr` : "₹0"}
-                  </span>
-                </div>
-              ))}
-              {YEARS.map((y, i) => (
-                <span
-                  key={y}
-                  className={`readout absolute top-full mt-2 text-paper/60 ${i % 2 ? "max-lg:hidden" : ""}`}
-                  style={{ left: `${(i / (YEARS.length - 1)) * 100}%`, transform: `translateX(${i ? (i === YEARS.length - 1 ? "-100%" : "-50%") : "0"})` }}
-                >
-                  {y}
-                </span>
-              ))}
-            </div>
-            <Crosshair read={readCurve} className="absolute inset-0" />
-          </div>
-        </motion.div>
       </div>
     </section>
   )

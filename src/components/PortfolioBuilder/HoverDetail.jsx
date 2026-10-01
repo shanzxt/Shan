@@ -4,7 +4,7 @@
 export default function HoverDetail({ placeholder, children }) {
   return (
     <div className="flex min-h-[3rem] items-center justify-center border border-line px-4 py-2 text-center font-mono text-xs tabular-nums text-paper/70">
-      {children ?? <span className="text-paper/60">{placeholder}</span>}
+      {children ?? <span className="text-paper/50">{placeholder}</span>}
     </div>
   );
 }

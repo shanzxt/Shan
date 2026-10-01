@@ -16,8 +16,6 @@ import FundList from "./FundList";
 import CorrelationHeatmap from "./CorrelationHeatmap";
 import StatsPanel from "./StatsPanel";
 import DiversificationScene from "./DiversificationScene";
-import EigenSpectrum from "./EigenSpectrum";
-import RiskContribution from "./RiskContribution";
 
 const UNIVERSE_FUND_IDS = fundsData.funds
   .map((f) => f.id)
@@ -178,7 +176,7 @@ export default function FundPickerTool() {
   }, [stats]);
 
   return (
-    <div className="w-full max-w-6xl flex flex-col gap-10">
+    <div className="w-full max-w-5xl flex flex-col gap-10">
       <div className="flex flex-col items-center gap-3 text-center">
         <span className="readout text-teal">
           now with real funds
@@ -206,8 +204,8 @@ export default function FundPickerTool() {
               type="button"
               onClick={() => applyPreset(preset)}
               aria-pressed={on}
-              className={`keycap group inline-flex items-center gap-2.5 px-4 py-2.5 ${
-                on ? "keycap-on text-accent" : "text-paper/80 hover:text-accent"
+              className={`group inline-flex items-center gap-2.5 border px-4 py-2.5 transition-[color,border-color,background-color,transform] duration-150 active:translate-y-px ${
+                on ? "border-accent bg-accent/10 text-accent" : "border-line bg-panel text-paper/80 hover:border-accent/50 hover:text-accent"
               }`}
             >
               <span
@@ -273,23 +271,13 @@ export default function FundPickerTool() {
             )}
           </AnimatePresence>
 
-          <EigenSpectrum stats={stats} />
-
-          <DiversificationScene stats={stats} fundsById={FUNDS_BY_ID} />
-        </div>
-      </div>
-
-      {/* the matrix, large, beside where the risk actually sits */}
-      <div className="grid grid-cols-1 gap-10 border-t border-line pt-10 lg:grid-cols-12 lg:gap-8">
-        <div className="lg:col-span-7">
           <CorrelationHeatmap
             fundIds={selectedIds}
             fundsById={FUNDS_BY_ID}
             corr={UNIVERSE_CORR}
           />
-        </div>
-        <div className="lg:col-span-5">
-          <RiskContribution weights={weights} cov={UNIVERSE_COV} fundsById={FUNDS_BY_ID} />
+
+          <DiversificationScene stats={stats} fundsById={FUNDS_BY_ID} />
         </div>
       </div>
     </div>

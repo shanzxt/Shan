@@ -190,7 +190,7 @@ function computeFloorPositions(stats, fundsById) {
 // never mistaken for another data point.
 function ReadingLegend() {
   return (
-    <div className="mx-auto flex w-full max-w-xs items-center gap-3 border border-dashed hr-line bg-paper/[0.03] px-3 py-2.5">
+    <div className="mx-auto flex w-full max-w-xs items-center gap-3 rounded-md border border-dashed hr-line bg-paper/[0.03] px-3 py-2.5">
       <div className="relative h-16 w-8 shrink-0">
         <div
           className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 rounded-full border hr-line"

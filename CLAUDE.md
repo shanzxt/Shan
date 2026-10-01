@@ -94,22 +94,12 @@ one overshoot, settle).
 **Keep:** near-black instrument surfaces, a single hot colour (amber),
 graticule grids, hairline borders, square corners, mono readouts with
 units, huge condensed display type, traces that draw themselves,
-stillness between readings (render on demand, hold at rest).
-
-**Finance layer (elegance pass, see `DESIGN.md` → Direction):** a private
-research desk. Key numbers huge, labels small and `engraved`; figures
-tabular and right-aligned; section openers are statement line items
-(`SectionHeader`: "02 · Label ···· CH-02" under a drawing rule); ledger
-rows with hairlines and dotted `leader`s instead of card grids; a visible
-12-column ruling (`chrome/ColumnRules`) and a soft vignette; **one glow per
-view**. Signature interaction: `Crosshair` on key charts (snaps to real
-samples only).
+stillness between readings.
 
 **Avoid:** rounded "card" UI and pill badges, gradients as decoration,
-drop-shadowed floating cards, card grids where a statement row would
-do, emoji, stock icons as illustration, light theme, more than one
-accent colour on a component, motion that loops without meaning,
-anything that looks like a SaaS template.
+drop-shadowed floating cards, emoji, stock icons as illustration,
+light theme, more than one accent colour on a component, motion that
+loops without meaning, anything that looks like a SaaS template.
 
 ## 5. Design tokens (Tailwind v4, `src/index.css` `@theme`)
 
@@ -146,7 +136,7 @@ is 100 — keep it there). Decorative-only glyphs may go lower.
 | --- | --- | --- |
 | Display | **Anybody** (variable `wdth` 50–150, `wght` 300–900) | `font-display font-[800]`–`[850]` `uppercase`, `tracking-tight` or `tracking-[-0.02em]`–`[-0.035em]`, leading `0.8`–`0.95`, width via `[font-stretch:76%]`–`[85%]` (rest), `100%` on hover |
 | Body / reading | **Newsreader** (wght 400–600, italic 400) | `font-body`; body 17px default; article text `text-[18px] sm:text-[19px] leading-[1.8]`; hooks/subtitles `italic text-xl` |
-| Readout / UI | **Martian Mono** (wdth 75–112.5, wght 300–600) | `.readout` = 11px, `wdth 87.5`, `tracking-[0.12em]`, uppercase. `.engraved` = 10px, `wdth 80`, `tracking-[0.18em]` (labels under big figures). Buttons/links `font-mono text-[12px]`–`[13px]` |
+| Readout / UI | **Martian Mono** (wdth 75–112.5, wght 300–600) | `.readout` = 11px, `wdth 87.5`, `tracking-[0.12em]`, uppercase. Buttons/links `font-mono text-[12px]`–`[13px]` |
 
 Loaded from Google Fonts in `index.html`, non-blocking (preload +
 `media="print"` swap + `<noscript>`). Newsreader is requested **without**
@@ -168,13 +158,7 @@ Display scale (use these, fluid where shown):
 - Stat numbers: `text-5xl sm:text-6xl lg:text-7xl tabular-nums`
 - Article section heads: `text-3xl sm:text-[2.6rem]`
 
-Every number shown as data uses `tabular-nums` (also set on `body`, so
-figures line up site-wide). Statement utilities in `index.css`:
-`engraved`, `leader` (dotted leader, flex filler), `ledger-row`
-(baseline flex row + hairline), `vignette`.
-
-- Hero key figure: `text-[21vw]` → `lg:text-[min(12vw,196px)]`; hero name
-  is a one-line masthead at `lg` (`min(7.15vw,114px)`, two lines on phones)
+Every number shown as data uses `tabular-nums`.
 
 ### Spacing and layout grid
 
@@ -234,8 +218,7 @@ Rules:
    **data changes**. Otherwise still. The only continuous loops are the
    hero trace, the footer Lissajous, the data ticker and LED pulse —
    all paused off-screen (IntersectionObserver + `visibilitychange`),
-   ticker pauses on hover/focus. The hero WebGL field (`HeroField`)
-   persists but renders only on arrival, pointer and scroll, then holds.
+   ticker pauses on hover/focus.
 2. Animate `transform`, `opacity`, `clip-path`, canvas — never layout.
    (Documented exceptions: hero letter lens and heading `font-stretch`.)
 3. Nothing flashes more than 3×/second.
@@ -258,12 +241,6 @@ Rules:
 8. Scroll-linked effects use `useScroll` + `useTransform` (parallax
    ±50–160px, progress bars `scaleX`/`scaleY`, springs
    `stiffness 120, damping 24`).
-9. Scroll-*scrubbed* sequences (the Day 29 replay, home `Chapters`) use
-   GSAP + ScrollTrigger, dynamically imported by that component, driven
-   through `driveWithGsap` (`lib/ticker.js`) so Lenis and ScrollTrigger
-   share one frame; pin with CSS `sticky` inside a tall section, never
-   GSAP `pin`. Ease with `bezierEase(EASE_IN_OUT)` from `lib/motion.js`.
-   Desktop + motion only; everything else gets the stacked static version.
 
 **Reduced motion is a designed alternative, not just "off"**: check
 `useReducedMotion()` (Framer) or `useReducedMotionPref()` (`lib/env.js`,
@@ -290,13 +267,13 @@ src/
                        ProbeCursor, CommandPalette, TransitionLink, ErrorBoundary,
                        GrainOverlay, RouteFallback
     PortfolioBuilder/  the portfolio tool (engine-backed; presentation only may change)
-    Hero, DataTicker, ProofStrip, WhatIDo, Newsletter (Chapters), Work, Footer   (home, in order)
+    Hero, DataTicker, ProofStrip, WhatIDo, Newsletter, IssueCard, Work, Footer  (home, in order)
     IssueChart (SignalChart, ChartLegend), IssueContent (IssueBody, Lightbox),
     IssueToc (TocRail, TocInline), ReadingRecorder                                (issue page)
     SectionHeader, SplitHeading, KineticHeading, ClipReveal, Magnetic,
-    Crosshair, Sparkline, ToolDisclaimer, ShareButton, Lissajous, Flatline, icons/ (shared)
+    ToolDisclaimer, ShareButton, Lissajous, Flatline, icons/                      (shared)
   pages/               NewslettersIndex, NewsletterIssue, Tools, NotFound
-  lib/                 motion, env, firstLoad, settings, transition, routeChunks, scroll, series,
+  lib/                 motion, env, firstLoad, settings, transition, routeChunks, scroll,
                        signal, sfx/sound, palette, seo, headings, useCountUp,
                        useActiveHeading, portfolioEngine/ (maths + tests — do not change)
   data/                newsletter.js, projects.js, links.js, tools.js, toolRegistry.js
@@ -335,14 +312,9 @@ Reusable building blocks (use these before writing new ones):
   underline-offset-4 hover:decoration-accent`.
 - **Row hover:** absolute span `bg-accent` (or `/7`) with
   `origin-left scale-x-0 group-hover:scale-x-100 duration-500 ease-sweep`.
-- **Cursor states:** add `data-cursor="lock" | "read" | "probe" | "drag" | "measure"`
+- **Cursor states:** add `data-cursor="lock" | "read" | "probe" | "drag"`
   to interactive elements (links/buttons default to `lock`, issue
-  cards `read`, charts `probe`; `Crosshair` sets `measure`, which hides
-  the probe's hairlines so only one crosshair shows).
-- **Crosshair:** `<Crosshair read={(fx, fy) => ({ x, y, label, value, note })} />`
-  absolutely over a plot box; `read` must snap to a real data point.
-- **Statement row:** `<div className="ledger-row py-2"><dt className="engraved …">Label</dt>
-  <span aria-hidden="true" className="leader" /><dd className="font-mono tabular-nums …">₹4.72Cr</dd></div>`.
+  cards `read`, charts `probe`).
 - **Scroll containers** inside the page need `data-lenis-prevent`.
 
 Recharts styling (see `IssueChart.jsx` → `SignalChart`):
@@ -357,9 +329,8 @@ Recharts styling (see `IssueChart.jsx` → `SignalChart`):
   `animationDuration={1700}`, `animationBegin={i * 220}`,
   `isAnimationActive={!reduceMotion}`; mount the chart only once in view
   (`useInView`) so lines draw where the reader can see them.
-- No Recharts `Tooltip`: a `Crosshair` overlay over the plot area
-  (YAxis width + margins) snaps to the sampled year and nearest series;
-  the y domain is set explicitly so overlay and lines share one scale.
+- Tooltip: custom `.panel` box, readout label, `tabular-nums`; cursor
+  `stroke: var(--color-teal), strokeDasharray: "3 3"`.
 - Legend: `ChartLegend` — 16px × 2px glowing line swatch + label.
 
 lucide-react styling: icons are small and functional only — `size`
@@ -374,10 +345,7 @@ LinkedinMark), not lucide.
 Each entry in `issues`: `id` (URL slug), `number`, `title`, `hook`,
 `date` ("Sep 30, 2026"), `readingTime`, `coverImage`, `substackUrl`,
 `githubUrl`, optional `tool` (key in `toolRegistry.js`), `stats` (4
-`{ label, value }` callouts), `headline` (index of the stat shown as the
-headline figure), optional `chart` (`{ years, series }`), optional `spark`
-(`{ label, unit, kind: "line" | "bars", values }` — only real computed
-values; without it the filings index draws the chart's first series),
+`{ label, value }` callouts), optional `chart` (`{ years, series }`),
 and `content` blocks:
 
 - `{ type: "p", text }` — supports `**bold**`, `*italic*`, `[text](url)`

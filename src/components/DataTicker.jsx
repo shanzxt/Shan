@@ -1,6 +1,5 @@
 import { useReducedMotion } from "framer-motion"
 import { issuesByDate } from "../data/newsletter"
-import Amount from "./Amount"
 import TransitionLink from "./chrome/TransitionLink"
 
 // Ticker tape of real figures, generated from the newsletter data itself
@@ -19,21 +18,18 @@ function Item({ item, duplicate = false }) {
         to={`/newsletters/${item.issue.id}`}
         tabIndex={duplicate ? -1 : undefined}
         data-cursor="lock"
-        className="group flex items-baseline gap-3 px-6 py-4"
+        className="group flex items-center gap-3 px-6 py-3.5"
       >
-        <span className="readout text-accent/90">#{String(item.issue.number).padStart(2, "0")}</span>
+        <span className="readout text-paper/40 group-hover:text-accent">#{String(item.issue.number).padStart(2, "0")}</span>
         <span
-          className="h-1.5 w-1.5 -translate-y-px self-center rounded-full"
+          className="h-1.5 w-1.5 rounded-full"
           style={{ background: item.color ?? "var(--color-teal)" }}
           aria-hidden="true"
         />
-        <span className="readout text-paper/65 group-hover:text-paper">{item.label}</span>
-        <span aria-hidden="true" className="leader w-10 flex-none" />
-        <span className="font-display text-[22px] font-[750] leading-none tabular-nums text-paper [font-stretch:85%] group-hover:text-accent">
-          <Amount value={item.value} />
-        </span>
+        <span className="readout text-paper/70 group-hover:text-paper">{item.label}</span>
+        <span className="font-mono text-[13px] font-medium tabular-nums text-accent">{item.value}</span>
       </TransitionLink>
-      <span className="h-4 w-px bg-line" aria-hidden="true" />
+      <span className="h-3 w-px bg-line" aria-hidden="true" />
     </li>
   )
 }

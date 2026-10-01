@@ -42,7 +42,7 @@ export default function Stage4Portfolio({ step }) {
             A single number series was just "one asset." A real portfolio
             holds several at once.
           </p>
-          <p className="max-w-md border hr-line bg-accent/[0.06] px-4 py-3 text-center text-sm text-accent">
+          <p className="max-w-md rounded-md border hr-line bg-accent/[0.06] px-4 py-3 text-center text-sm text-accent">
             This is the whole point of this tool: the same variance math,
             just applied to a weighted mix of assets instead of one.
           </p>
@@ -53,7 +53,7 @@ export default function Stage4Portfolio({ step }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.15, ease: EASE_OUT }}
-                className="border hr-line p-3 text-sm"
+                className="rounded-lg border hr-line p-3 text-sm"
               >
                 <div className="font-mono font-semibold" style={{ color: DOT_COLORS[i] }}>
                   {a.name}

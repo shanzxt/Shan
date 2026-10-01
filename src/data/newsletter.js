@@ -1,8 +1,43 @@
-// The Day 29 series lives in its own module so the home hero can draw it
-// without pulling every issue's text into the first-load bundle.
-import { sipScenarios } from "./sipScenarios.js"
+// Real figures from the Day 29 issue and its companion repo:
+// github.com/shanzxt/n1-Compounding-newsletter
+//
+// Three scenarios, same ₹10k/mo starting contribution, Aug 1991 – Aug 2026
+// (35 years), sampled at 5-year marks so the chart stays legible without
+// rendering the full monthly series.
 
-export { sipScenarios }
+export const sipScenarios = {
+  years: [1991, 1996, 2001, 2006, 2011, 2016, 2021, 2026],
+  series: [
+    {
+      key: "flat",
+      label: "Flat ₹10k/mo",
+      color: "var(--color-accent)",
+      invested: 42.1, // lakh
+      corpus: 472, // lakh (₹4.72 cr)
+      multiple: "11.2x",
+      // sampled corpus values in lakh, roughly tracing a 12%/yr compounding curve
+      values: [0, 8.6, 21, 40, 71, 121, 212, 472],
+    },
+    {
+      key: "stepup",
+      label: "10% step-up SIP",
+      color: "var(--color-teal)",
+      invested: 328, // lakh
+      corpus: 1424, // lakh (₹14.24 cr)
+      multiple: "4.3x",
+      values: [0, 14, 38, 84, 172, 344, 682, 1424],
+    },
+    {
+      key: "panic",
+      label: "Panic-sell at −20%",
+      color: "#8a5a5a",
+      invested: 21.2, // lakh
+      corpus: 43, // lakh (₹0.43 cr)
+      multiple: "~2x",
+      values: [0, 5, 11, 17, 22, 28, 35, 43],
+    },
+  ],
+}
 
 export const issues = [
   {
@@ -22,9 +57,6 @@ export const issues = [
       { label: "Panic-sell corpus", value: "₹0.43Cr" },
     ],
     chart: sipScenarios,
-    replay: "flat",
-    // index of the stat shown as this issue's headline figure in the filings index
-    headline: 1,
     // Full issue body, rendered in the reader modal, matching the Substack
     // post word-for-word. Blocks: "p" (paragraph, supports **bold** and
     // *italic*), "h2" (subheading), "quote" (pull quote), "list" (bulleted
@@ -235,17 +267,6 @@ export const issues = [
       { label: "Driven by one factor", value: "85%" },
       { label: "Effective bets", value: "~2" },
     ],
-    headline: 3,
-    // Sparkline for the filings index: share of total variation (%) per
-    // factor, largest first, across the 44 funds in their common window.
-    // Computed by the portfolio engine from funds_aligned.json (85.21% →
-    // the issue's "85%"); newsletter.test.js re-derives it so it can't drift.
-    spark: {
-      label: "Share of variation by factor",
-      unit: "%",
-      kind: "bars",
-      values: [85.21, 4.63, 4.01, 1.71, 1.24, 0.83, 0.6, 0.49],
-    },
     content: [
       {
         type: "p",

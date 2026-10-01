@@ -1,17 +1,17 @@
 import { useRef } from "react"
 import { useInView, useReducedMotion } from "framer-motion"
-import Crosshair from "./Crosshair"
 import {
   CartesianGrid,
   Line,
   LineChart,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from "recharts"
 
-// Recharts lives in this chunk only (lazy-loaded by NewsletterIssue).
-// Charts are drawn as phosphor traces on a graticule and only
+// Recharts lives in this chunk only (lazy-loaded by NewsletterIssue and
+// IssueCard). Charts are drawn as phosphor traces on a graticule and only
 // mount once scrolled into view, so the lines draw themselves where the
 // reader can see them.
 
@@ -25,44 +25,38 @@ export function toChartData(chart) {
 
 const tick = { fill: "rgba(235,231,220,0.62)", fontSize: 10, fontFamily: "var(--font-mono)" }
 
+function ScopeTooltip({ active, payload, label, series }) {
+  if (!active || !payload?.length) return null
+  return (
+    <div className="panel px-3 py-2 font-mono text-[11px]">
+      <div className="readout mb-1 text-paper/60">{label}</div>
+      {payload.map((p) => (
+        <div key={p.dataKey} className="flex items-center gap-2" style={{ color: p.color }}>
+          <span className="text-paper/60">{series.find((s) => s.key === p.dataKey)?.label}</span>
+          <span className="tabular-nums">₹{p.value}L</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function SignalChart({ chart }) {
   const reduceMotion = useReducedMotion()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, amount: 0 })
   const data = toChartData(chart)
-  // An explicit ceiling (next ₹400L step) so the crosshair overlay and the
-  // plotted lines share one y scale.
-  const yMax = Math.ceil(Math.max(...chart.series.flatMap((s) => s.values)) / 400) * 400
-
-  // Snap to the nearest sampled year, then to whichever series is closest
-  // to the pointer there; the box shows that series' real value.
-  const read = (fx, fy) => {
-    const i = Math.round(fx * (chart.years.length - 1))
-    const s = chart.series.reduce((best, s) =>
-      Math.abs(1 - s.values[i] / yMax - fy) < Math.abs(1 - best.values[i] / yMax - fy) ? s : best,
-    )
-    return {
-      x: i / (chart.years.length - 1),
-      y: 1 - s.values[i] / yMax,
-      label: `${chart.years[i]} · ${s.label}`,
-      value: `₹${s.values[i]}L`,
-    }
-  }
 
   return (
-    <div ref={ref} className="relative h-full w-full">
+    <div ref={ref} data-cursor="probe" className="h-full w-full">
       {(inView || reduceMotion) && (
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 10, bottom: 0, left: 0 }}>
             <CartesianGrid stroke="rgba(255,176,0,0.08)" />
             <XAxis dataKey="year" tick={tick} axisLine={{ stroke: "var(--color-line)" }} tickLine={false} />
-            <YAxis
-              tick={tick}
-              axisLine={false}
-              tickLine={false}
-              width={52}
-              domain={[0, yMax]}
-              tickFormatter={(v) => `₹${v}L`}
+            <YAxis tick={tick} axisLine={false} tickLine={false} width={52} tickFormatter={(v) => `₹${v}L`} />
+            <Tooltip
+              content={<ScopeTooltip series={chart.series} />}
+              cursor={{ stroke: "var(--color-teal)", strokeDasharray: "3 3" }}
             />
             {chart.series.map((s, i) => (
               <Line
@@ -73,7 +67,7 @@ export function SignalChart({ chart }) {
                 stroke={s.color}
                 strokeWidth={2.25}
                 dot={false}
-                activeDot={false}
+                activeDot={{ r: 4, stroke: "var(--color-bg)", strokeWidth: 2 }}
                 isAnimationActive={!reduceMotion}
                 animationDuration={1700}
                 animationBegin={i * 220}
@@ -84,8 +78,6 @@ export function SignalChart({ chart }) {
           </LineChart>
         </ResponsiveContainer>
       )}
-      {/* plot area: YAxis width 52 + right margin 10, top margin 8 + XAxis 30 */}
-      <Crosshair read={read} className="absolute bottom-[30px] left-[52px] right-[10px] top-[8px]" />
     </div>
   )
 }

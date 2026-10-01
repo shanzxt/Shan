@@ -116,7 +116,7 @@ export default function IntroAnimation() {
                 onClick={() =>
                   document.getElementById("fund-picker")?.scrollIntoView({ behavior: "smooth" })
                 }
-                className="mt-2 bg-accent px-5 py-2 font-mono text-sm text-ink transition-colors hover:bg-accent/85"
+                className="mt-2 rounded-md bg-accent px-5 py-2 font-mono text-sm text-ink transition-colors hover:bg-accent/85"
               >
                 Try it on real funds ↓
               </button>
@@ -144,7 +144,7 @@ export default function IntroAnimation() {
             type="button"
             onClick={handleBack}
             disabled={!canGoBack}
-            className="border hr-line px-4 py-2 text-paper/70 transition-colors hover:border-paper/30 hover:text-paper disabled:cursor-not-allowed disabled:opacity-25"
+            className="rounded-md border hr-line px-4 py-2 text-paper/70 transition-colors hover:border-paper/30 hover:text-paper disabled:cursor-not-allowed disabled:opacity-25"
           >
             Back
           </button>
@@ -152,7 +152,7 @@ export default function IntroAnimation() {
             <button
               type="button"
               onClick={handleNext}
-              className="bg-accent px-5 py-2 text-ink transition-colors hover:bg-accent/85"
+              className="rounded-md bg-accent px-5 py-2 text-ink transition-colors hover:bg-accent/85"
             >
               {isLastMicroStep && isLastStage ? "Finish" : "Next"}
             </button>

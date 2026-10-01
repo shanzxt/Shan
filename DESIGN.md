@@ -3,37 +3,6 @@
 > The market is a signal you learn to read. This site is the instrument you
 > read it on.
 
-## Direction (elegance pass, Oct 2026)
-
-A private research desk: a Bloomberg terminal's precision with the Financial
-Times' editorial calm, still on the same phosphor instrument. Key numbers are
-set huge with their units and labels small and engraved; every figure is
-tabular and right-aligned; sections open like line items on a statement
-("02 · Measurements ····· CH-02") under a rule that draws across like a page
-turning; card grids give way to ledger rows with hairlines and dotted leaders,
-all ruled to a visible 12-column grid with a soft vignette at the edges. The
-compounding curve is now the hero, drawn from the Day 29 issue's real samples,
-with the issue's headline figure as the single glowing thing in view. The
-signature interaction is a chart crosshair that reads real values (hero curve,
-issue chart, correlation heatmap), on touch by tap and drag.
-
-**Rules relaxed in this pass, and why**
-
-- *Stillness between readings* → the hero's WebGL field now **persists**
-  (grid layers, grain, glow) instead of running once and vanishing. It still
-  only renders when something happens (arrival, pointer, scroll) and holds
-  otherwise, so the spirit of stillness stays; a page at rest costs nothing.
-- *"Pinned / horizontal-scroll sections" (was Cut)* → the home newsletter
-  story pins on desktop as chapters (CSS sticky + GSAP ScrollTrigger scrub).
-  It is a story with an order, which pinning reads well; phones, reduced
-  motion and the prerender get stacked, unpinned chapters.
-- *"Continuous WebGL hero" (was Cut)* → see the first point; the trace itself
-  stays Canvas 2D.
-- *Avoid list: rounded card UI* → unchanged, but "card grids" are now avoided
-  on purpose too: archive, measurements and stats are statement rows.
-- *One glow per view* is now explicit: the hero glow moved from the surname
-  to the ₹4.72Cr figure; issue pages glow the headline stat only.
-
 ## The concept
 
 The whole site is **one calibrated measuring instrument**: a phosphor
@@ -55,16 +24,7 @@ treats every page the same way an engineer treats a noisy sensor:
   live trace (paused off-screen) and the data ticker (pauses on hover,
   static under reduced motion). When something moves, it's a reading.
 
-### The signature interaction: the crosshair (was: the probe)
-
-`components/Crosshair.jsx` — hover (or tap and drag) a key chart and two
-hairlines lock onto the nearest real data point with a statement box of its
-value. It snaps only to real samples (five-year marks on the SIP curves,
-cell centres on the heatmap); interpolated line between samples never gets
-a reading. The global probe cursor hides its own hairlines there
-(`data-cursor="measure"`). The probe below still runs everywhere else.
-
-### The probe
+### The signature interaction: the probe
 
 On fine-pointer devices the cursor becomes an **oscilloscope probe**: full-
 viewport crosshair hairlines with live X/Y readouts at the screen edges.
@@ -172,13 +132,11 @@ Rules:
 - **lenis** — smooth scrolling with native scroll semantics (anchors,
   sticky, `useScroll` all keep working); lazy-loaded, desktop fine-pointer
   only, never under reduced motion.
-- No WebGL library: the phosphor trace is Canvas 2D. The hero's one-shot
-  arrival field (`HeroField.jsx`) is raw WebGL, ~2 kB gzip, lazy, runs
-  about 3 s once and stops; the CSS graticule is its fallback and rest state.
-- **gsap** (+ ScrollTrigger) — only for scroll-scrubbed sequences, dynamically
-  imported by the component that uses it (Day 29 replay, ~44 kB gzip, that
-  page only). Lenis and GSAP share one frame loop (`lib/ticker.js`).
-  Framer Motion remains the UI animation runtime. See `REFERENCES.md`.
+- No WebGL library: the phosphor trace is Canvas 2D — cheaper than a
+  shader on mid-range phones, zero dependency, and a shader field would
+  have added texture, not meaning.
+- No GSAP: Framer Motion (already shipped) covers springs, scroll-linked
+  values and presence; a second animation runtime would double the cost.
 
 ## Result (measured, local `vite preview`, Lighthouse 12 mobile)
 
@@ -192,18 +150,6 @@ Initial JS (entry + modulepreloads, gzip): 133 kB → 145 kB. CSS gzip
 7.5 kB → 12 kB. Web fonts: three variable faces, ~120 kB latin total
 (Newsreader requested without `opsz`: 24 kB instead of 147 kB).
 
-Elegance pass (Oct 2026), `/` mobile, same machine, staging build vs this
-build, three runs each: staging 73–75 perf / 100 a11y (LCP 4.5 s, TBT
-70–170 ms); after 75–76 / 100 (LCP 4.3 s, TBT 50–60 ms, CLS 0.001).
-Initial JS gzip 146.3 → 148.0 kB, CSS 12.4 → 13.2 kB. Two lessons:
-
-- The full-hero WebGL field is desktop + capable devices only. On phones
-  it cost ~1.2 s of extra render work and TBT rose to ~380 ms.
-- "₹" in the display or body face pulls those fonts' latin-ext files
-  (+80 kB) onto the critical path. `Amount.jsx` sets the sign raised and
-  small in Martian Mono (whose latin-ext file already loads); keep ₹ out of
-  Anybody/Newsreader above the fold.
-
 Budget rules that got perf back to baseline after the first build
 dropped it to 67: the boot curtain animates only transform / clip-path
 (no per-frame SVG `drop-shadow`, no `@property` counter); the hero
@@ -212,11 +158,11 @@ curve is the first paint and LCP stays the text); phones draw at 30 fps.
 
 ## Cut, and why
 
-- **Continuous shader trace** — the trace stays Canvas 2D; WebGL draws the
-  field behind it (render-on-demand, see Direction).
-- **Horizontal-scroll sections** — still cut. Pinning is allowed for the
-  Day 29 replay and the home newsletter chapters only (both sticky panels in
-  a tall section, not scroll-jacking).
+- **WebGL / shader hero** — Canvas 2D gives the phosphor look at a
+  fraction of the cost and without a dependency.
+- **Pinned / horizontal-scroll sections** — only two issues and three
+  projects exist; pinning that little content would be scroll-jacking
+  for its own sake.
 - **Light theme** — see Colour.
 - **Per-page custom OG images** — the existing credential-free card
   stays; not a visual-overhaul item.

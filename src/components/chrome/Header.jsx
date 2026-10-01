@@ -172,7 +172,7 @@ export default function Header() {
                   aria-current={active ? "page" : undefined}
                   className="group relative flex items-baseline gap-1.5 px-3 py-2"
                 >
-                  <span className={`readout transition-colors ${active ? "text-accent" : "text-paper/60 group-hover:text-accent"}`}>
+                  <span className={`readout transition-colors ${active ? "text-accent" : "text-paper/45 group-hover:text-accent"}`}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span

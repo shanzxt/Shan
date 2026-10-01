@@ -1,59 +1,118 @@
-import { motion, useReducedMotion } from "framer-motion"
+import { useRef } from "react"
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion"
 import { ArrowLeft, ArrowUpRight, BookOpen, Sparkles } from "lucide-react"
 import { issuesByDate } from "../data/newsletter"
 import { EASE_OUT } from "../lib/motion"
-import { issueSpark } from "../lib/series"
 import { isInitialLoad } from "../lib/firstLoad"
 import TransitionLink from "../components/chrome/TransitionLink"
 import GithubMark from "../components/icons/GithubMark"
 import SectionHeader from "../components/SectionHeader"
-import Sparkline from "../components/Sparkline"
-import Amount from "../components/Amount"
 
-// The archive as a filings index: one statement row per issue, read left
-// to right like a ledger. Number, filing date, the issue itself, its
-// headline figure set large and right-aligned, and a trace drawn from the
-// issue's own data. The title morphs into the issue page's h1.
-const pad = (n) => String(n).padStart(2, "0")
-
-function FilingRow({ issue }) {
+// The archive as a signal timeline: a trace spine that records itself as
+// you scroll, a node per issue, and each issue as a large "screen" —
+// cover art in parallax, a giant outlined issue number drifting behind,
+// readouts, and a title that morphs into the issue page's h1.
+function IssueEntry({ issue, index }) {
+  const reduceMotion = useReducedMotion()
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] })
+  const coverY = useTransform(scrollYProgress, [0, 1], [-50, 50])
+  const numberY = useTransform(scrollYProgress, [0, 1], [120, -120])
   const readHref = `/newsletters/${issue.id}`
-  const head = issue.stats[issue.headline ?? 0]
-  const spark = issueSpark(issue)
+  const flip = index % 2 === 1
 
   return (
-    <article className="group relative isolate grid grid-cols-12 gap-x-4 gap-y-5 border-b border-line py-10 lg:py-14">
+    <motion.article
+      ref={ref}
+      initial={reduceMotion ? false : { opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0 }}
+      transition={{ duration: 0.8, ease: EASE_OUT }}
+      className="relative grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12"
+    >
+      {/* timeline node */}
       <span
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 origin-left scale-x-0 bg-accent/[0.035] transition-transform duration-500 ease-sweep group-hover:scale-x-100"
+        className="absolute -left-[calc(2rem+5px)] top-3 hidden h-[11px] w-[11px] rotate-45 border border-accent bg-bg shadow-phosphor lg:block"
       />
-      <p className="col-span-3 font-display text-5xl font-[850] leading-[0.8] tabular-nums text-accent [font-stretch:80%] lg:col-span-1 lg:text-6xl">
-        {pad(issue.number)}
-      </p>
-      <div className="col-span-9 lg:col-span-2 lg:pt-1">
-        <p className="font-mono text-[13px] tabular-nums text-paper/85">{issue.date}</p>
-        {issue.readingTime && <p className="engraved mt-1.5 text-paper/60">{issue.readingTime}</p>}
-        {issue.tool && (
-          <p className="engraved mt-3 inline-flex items-center gap-1.5 border border-accent/50 px-2 py-1 text-accent">
-            <Sparkles size={11} />
-            Interactive tool
-          </p>
-        )}
+
+      <motion.span
+        aria-hidden="true"
+        style={reduceMotion ? undefined : { y: numberY }}
+        className={`text-outline pointer-events-none absolute -top-28 select-none font-display text-[9rem] font-[900] leading-none text-accent/20 sm:text-[14rem] lg:-top-52 lg:text-[20rem] ${
+          flip ? "left-0 lg:left-[-2%]" : "right-0 lg:right-[-2%]"
+        }`}
+      >
+        {String(issue.number).padStart(2, "0")}
+      </motion.span>
+
+      <div className={`relative lg:col-span-7 ${flip ? "lg:order-2" : ""}`}>
+        <TransitionLink
+          to={readHref}
+          data-cursor="read"
+          aria-label={`Read ${issue.title}`}
+          className="group panel relative block aspect-[4/3] overflow-hidden"
+        >
+          <motion.div style={reduceMotion ? undefined : { y: coverY }} className="absolute -inset-y-16 inset-x-0">
+            <picture>
+              <source srcSet={issue.coverImage.replace(/\.png$/, ".webp")} type="image/webp" />
+              <img
+                src={issue.coverImage}
+                alt=""
+                loading={index === 0 ? "eager" : "lazy"}
+                decoding="async"
+                className="h-full w-full object-cover object-top opacity-80 saturate-[.55] transition duration-700 ease-sweep group-hover:scale-[1.03] group-hover:opacity-100 group-hover:saturate-100"
+              />
+            </picture>
+          </motion.div>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[repeating-linear-gradient(to_bottom,rgba(0,0,0,0.14)_0_1px,transparent_1px_3px)] transition-opacity duration-500 group-hover:opacity-0"
+          />
+          <span aria-hidden="true" className="pointer-events-none absolute inset-0 shadow-[inset_0_0_80px_rgba(0,0,0,0.65)]" />
+          <span className="readout absolute left-3 top-3 flex items-center gap-2 bg-bg/80 px-2 py-1 text-paper/70">
+            <span className="led" aria-hidden="true" />
+            Issue {String(issue.number).padStart(2, "0")}
+          </span>
+          <span className="readout absolute bottom-3 right-3 flex translate-y-2 items-center gap-1.5 bg-accent px-2.5 py-1.5 text-ink opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+            Read <ArrowUpRight size={12} />
+          </span>
+        </TransitionLink>
       </div>
 
-      <div className="col-span-12 lg:col-span-4">
-        <h2>
+      <div className={`relative flex flex-col lg:col-span-5 ${flip ? "lg:order-1" : ""}`}>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span className="readout text-accent">{issue.date}</span>
+          {issue.readingTime && <span className="readout text-paper/55">· {issue.readingTime}</span>}
+          {issue.tool && (
+            <span className="readout inline-flex items-center gap-1 border border-accent/50 px-2 py-0.5 text-accent">
+              <Sparkles size={11} />
+              Interactive tool
+            </span>
+          )}
+        </div>
+        <h2 className="mt-4">
           <TransitionLink
             to={readHref}
             data-cursor="read"
-            className="block font-display text-4xl font-[800] uppercase leading-[0.9] tracking-tight text-paper [font-stretch:78%] transition-[color,font-stretch] duration-500 ease-sweep hover:text-accent sm:text-5xl lg:text-[3rem] lg:hover:[font-stretch:86%]"
+            className="block font-display text-4xl font-[800] uppercase leading-[0.92] tracking-tight text-paper [font-stretch:78%] transition-colors hover:text-accent sm:text-5xl lg:text-[3.6rem]"
             style={{ viewTransitionName: `issue-title-${issue.id}` }}
           >
             {issue.title}
           </TransitionLink>
         </h2>
-        <p className="mt-4 max-w-xl font-body text-xl italic leading-snug text-paper/75">{issue.hook}</p>
-        <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[13px]">
+        <p className="mt-4 font-body text-xl italic leading-snug text-paper/75">{issue.hook}</p>
+
+        <dl className="mt-8 grid grid-cols-2 border-t border-line">
+          {issue.stats.map((s, i) => (
+            <div key={s.label} className={`border-b border-line py-3.5 ${i % 2 === 0 ? "border-r pr-4" : "pl-4"}`}>
+              <dt className="readout text-paper/55">{s.label}</dt>
+              <dd className="mt-1 font-display text-2xl font-[750] tabular-nums text-paper [font-stretch:85%]">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+
+        <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 font-mono text-[13px]">
           <TransitionLink
             to={readHref}
             data-cursor="lock"
@@ -66,48 +125,32 @@ function FilingRow({ issue }) {
             href={issue.substackUrl}
             target="_blank"
             rel="noreferrer"
-            className="group/l inline-flex items-center gap-1.5 text-paper/70 transition-colors hover:text-accent"
+            className="group inline-flex items-center gap-1.5 text-paper/70 transition-colors hover:text-accent"
           >
             Substack
-            <ArrowUpRight size={14} className="transition-transform group-hover/l:translate-x-0.5 group-hover/l:-translate-y-0.5" />
+            <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
           </a>
           <a
             href={issue.githubUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-1.5 text-paper/70 transition-colors hover:text-accent"
+            className="group inline-flex items-center gap-1.5 text-paper/70 transition-colors hover:text-accent"
           >
             <GithubMark size={14} />
             Code
           </a>
         </div>
       </div>
-
-      <div className="col-span-6 lg:col-span-3 lg:text-right">
-        <p className="font-display text-5xl font-[820] leading-[0.85] tabular-nums text-paper [font-stretch:82%] transition-colors duration-300 group-hover:text-accent lg:text-[3.6rem]">
-          <Amount value={head.value} />
-        </p>
-        <p className="engraved mt-2 text-paper/65">{head.label}</p>
-      </div>
-      <div className="col-span-6 lg:col-span-2">{spark && <Sparkline spark={spark} />}</div>
-
-      {/* the rest of the issue's statement, as a ledger beneath the title */}
-      <dl className="col-span-12 grid gap-x-8 sm:grid-cols-2 lg:col-span-9 lg:col-start-4 lg:grid-cols-4">
-        {issue.stats.map((s) => (
-          <div key={s.label} className="ledger-row py-2">
-            <dt className="engraved text-paper/60">{s.label}</dt>
-            <span aria-hidden="true" className="leader" />
-            <dd className="font-mono text-[13px] tabular-nums text-paper/90">{s.value}</dd>
-          </div>
-        ))}
-      </dl>
-    </article>
+    </motion.article>
   )
 }
 
 export default function NewslettersIndex() {
   const reduceMotion = useReducedMotion()
   const animateIn = !reduceMotion && !isInitialLoad()
+  const timelineRef = useRef(null)
+  const { scrollYProgress } = useScroll({ target: timelineRef, offset: ["start 70%", "end 60%"] })
+  const spine = useSpring(scrollYProgress, { stiffness: 120, damping: 24 })
 
   return (
     <div className="mx-auto max-w-[1600px] px-5 pb-28 pt-24 sm:px-8 lg:px-12 lg:pt-32">
@@ -144,18 +187,20 @@ export default function NewslettersIndex() {
         </div>
       </div>
 
-      <section aria-label="Filings" className="mt-20 lg:mt-28">
-        <div aria-hidden="true" className="hidden grid-cols-12 gap-x-4 border-b border-paper/25 pb-3 lg:grid">
-          <span className="engraved col-span-1 text-paper/60">No.</span>
-          <span className="engraved col-span-2 text-paper/60">Filed</span>
-          <span className="engraved col-span-4 text-paper/60">Issue</span>
-          <span className="engraved col-span-3 text-right text-paper/60">Headline figure</span>
-          <span className="engraved col-span-2 text-paper/60">Trace</span>
+      <div ref={timelineRef} className="relative mt-20 lg:mt-28 lg:pl-8">
+        {/* spine: the record trace, drawn by scroll */}
+        <div aria-hidden="true" className="absolute bottom-0 left-0 top-0 hidden w-px bg-line lg:block">
+          <motion.div
+            className="absolute inset-0 origin-top bg-accent shadow-phosphor"
+            style={reduceMotion ? undefined : { scaleY: spine }}
+          />
         </div>
-        {issuesByDate.map((issue) => (
-          <FilingRow key={issue.id} issue={issue} />
-        ))}
-      </section>
+        <div className="flex flex-col gap-28 lg:gap-40">
+          {issuesByDate.map((issue, i) => (
+            <IssueEntry key={issue.id} issue={issue} index={i} />
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

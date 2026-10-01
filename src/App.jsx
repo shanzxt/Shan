@@ -8,7 +8,6 @@ import WhatIDo from "./components/WhatIDo"
 import Work from "./components/Work"
 import Effects from "./components/chrome/Effects"
 import ErrorBoundary from "./components/chrome/ErrorBoundary"
-import ColumnRules from "./components/chrome/ColumnRules"
 import GrainOverlay from "./components/chrome/GrainOverlay"
 import Header from "./components/chrome/Header"
 import RouteFallback from "./components/chrome/RouteFallback"
@@ -64,7 +63,7 @@ function Home() {
   return (
     <div>
       <Hero />
-      <Suspense fallback={<div className="h-[57px] border-y hr-line" />}>
+      <Suspense fallback={<div className="h-[52px] border-y hr-line" />}>
         <DataTicker />
       </Suspense>
       <ProofStrip />
@@ -97,7 +96,6 @@ export default function App() {
       >
         Skip to content
       </a>
-      <ColumnRules />
       <GrainOverlay />
       <Header />
       <RouteEffects />

@@ -1,5 +1,4 @@
 import { ArrowLeft } from "lucide-react"
-import { issues } from "../../data/newsletter"
 import ClipReveal from "../ClipReveal"
 import TransitionLink from "../chrome/TransitionLink"
 import SectionHeader from "../SectionHeader"
@@ -7,9 +6,6 @@ import ToolDisclaimer from "../ToolDisclaimer"
 import UnderTheHood from "../UnderTheHood"
 import IntroAnimation from "./IntroAnimation"
 import FundPickerTool from "./FundPickerTool"
-
-// The universe this tool runs on, as the issue itself states it.
-const source = issues.find((i) => i.tool === "fund-picker")
 
 const screws = ["left-2.5 top-2.5", "right-2.5 top-2.5", "bottom-2.5 left-2.5", "bottom-2.5 right-2.5"]
 
@@ -26,6 +22,9 @@ function Screws() {
 export default function PortfolioBuilder() {
   return (
     <div className="mx-auto max-w-[1600px] px-4 pb-16 pt-24 sm:px-8 lg:px-12 lg:pt-28">
+      {/* The page opens on an animation rather than a heading; this gives
+          screen readers and the document outline a top-level title. */}
+      <h1 className="sr-only">Portfolio tool</h1>
       <div className="flex items-center justify-between gap-4">
         <TransitionLink
           to="/"
@@ -40,36 +39,12 @@ export default function PortfolioBuilder() {
         </span>
       </div>
 
-      {/* masthead: the title set large, the issue's own figures beside it
-          as a statement */}
-      <div className="mt-10 grid gap-8 border-b border-paper/25 pb-10 lg:grid-cols-12 lg:items-end lg:gap-4">
-        <h1 className="font-display text-[19vw] font-[850] uppercase leading-[0.8] tracking-[-0.03em] text-paper [font-stretch:78%] lg:col-span-8 lg:text-[min(10vw,10.5rem)]">
-          Portfolio tool
-        </h1>
-        {source && (
-          <dl className="lg:col-span-4">
-            <dt className="engraved mb-2 text-paper/60">
-              #{String(source.number).padStart(2, "0")} · {source.title}
-            </dt>
-            {source.stats.map((st) => (
-              <dd key={st.label} className="ledger-row py-2">
-                <span className="engraved text-paper/65">{st.label}</span>
-                <span aria-hidden="true" className="leader" />
-                <span className="font-display text-3xl font-[800] leading-none tabular-nums text-paper [font-stretch:82%]">
-                  {st.value}
-                </span>
-              </dd>
-            ))}
-          </dl>
-        )}
-      </div>
-
       {/* The intro animation is the site's own strongest motion moment —
           only its container entrance gets the clip-path treatment, its
           internal stages are untouched. */}
       <ClipReveal className="panel graticule relative mt-6 flex min-h-[75vh] flex-col items-center justify-center overflow-hidden px-2 py-10" amount={0}>
         <Screws />
-        <span className="readout absolute left-5 top-4 text-paper/60">Scope · the idea</span>
+        <span className="readout absolute left-5 top-4 text-paper/50">Scope · the idea</span>
         <IntroAnimation />
       </ClipReveal>
 

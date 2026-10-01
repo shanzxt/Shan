@@ -50,20 +50,20 @@ function Stat({ stat, index }) {
       onViewportEnter={onViewportEnter}
       viewport={{ once: true, amount: 0 }}
       transition={{ duration: 0.6, delay: reduceMotion ? 0 : index * 0.08, ease: EASE_OUT }}
-      className={`relative border-line px-4 py-7 sm:px-6 lg:py-10 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b lg:border-b-0" : ""} lg:border-r lg:last:border-r-0`}
+      className={`relative border-line p-5 sm:p-7 ${index % 2 === 0 ? "border-r" : ""} ${index < 2 ? "border-b lg:border-b-0" : ""} lg:border-r lg:last:border-r-0`}
     >
       <div className="flex items-center justify-between">
-        <span className="engraved text-paper/60">M-{String(index + 1).padStart(2, "0")}</span>
+        <span className="readout text-paper/50">M-{String(index + 1).padStart(2, "0")}</span>
         {stat.highlight && <span className="led" aria-hidden="true" />}
       </div>
       <div
-        className={`mt-6 font-display text-[3.6rem] font-[820] leading-[0.8] tabular-nums tracking-[-0.02em] [font-stretch:80%] sm:text-7xl lg:text-[min(8vw,8rem)] ${
+        className={`mt-4 font-display text-5xl font-[800] leading-none tabular-nums tracking-tight [font-stretch:80%] sm:text-6xl lg:text-7xl ${
           stat.highlight ? "text-accent glow" : "text-paper"
         }`}
       >
         {stat.decimals ? display.toFixed(stat.decimals) : display}
       </div>
-      <div className="engraved mt-4 text-paper/65">{stat.label}</div>
+      <div className="mt-2 font-mono text-[12px] leading-snug text-paper/65">{stat.label}</div>
       <TickMeter scale={stat.scale} lit={display} highlight={stat.highlight} />
     </motion.div>
   )
@@ -76,9 +76,11 @@ export default function ProofStrip() {
     <section aria-label="Measurements" className="mx-auto max-w-[1600px] px-5 pb-8 pt-20 sm:px-8 lg:px-12 lg:pb-12 lg:pt-28">
       <SectionHeader channel="CH-02" label="measurements" />
 
-      {/* a statement of measurements: open columns between hairlines, the
-          figures set as large as the section heads */}
-      <div className="relative mt-10 grid grid-cols-2 border-y border-paper/25 lg:grid-cols-4">
+      <div className="panel relative mt-10 grid grid-cols-2 lg:grid-cols-4">
+        {/* rack screws */}
+        {["left-2 top-2", "right-2 top-2", "bottom-2 left-2", "bottom-2 right-2"].map((pos) => (
+          <span key={pos} aria-hidden="true" className={`absolute ${pos} h-1.5 w-1.5 rounded-full bg-paper/15`} />
+        ))}
         {stats.map((s, i) => (
           <Stat key={s.label} stat={s} index={i} />
         ))}
