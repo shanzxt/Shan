@@ -60,16 +60,24 @@ function IssueMasthead({ issue, enter }) {
         {String(issue.number).padStart(2, "0")}
       </motion.span>
 
-      <motion.div {...enter(0)} className="relative flex flex-wrap items-center gap-x-4 gap-y-2">
-        <span className="readout text-accent">CH-04 · Issue {issue.number}</span>
-        <span className="readout text-paper/60">{issue.date}</span>
-        {issue.readingTime && <span className="readout text-paper/60">{issue.readingTime}</span>}
-      </motion.div>
-      <motion.p {...enter(0.05)} className="readout relative mt-6 text-paper/60">
-        Shantanu Somwanshi
-      </motion.p>
+      {/* filing header: the issue's particulars as a statement row */}
+      <motion.dl {...enter(0)} className="relative grid grid-cols-2 border-y border-paper/25 sm:grid-cols-4">
+        {[
+          ["Filing", `No. ${String(issue.number).padStart(2, "0")}`, "text-accent"],
+          ["Filed", issue.date],
+          ["Reading", issue.readingTime],
+          ["By", "Shantanu Somwanshi"],
+        ]
+          .filter(([, v]) => v)
+          .map(([k, v, tone], i) => (
+            <div key={k} className={`py-3 pr-4 ${i ? "sm:border-l sm:border-line sm:pl-4" : ""} ${i % 2 ? "border-l border-line pl-4" : ""}`}>
+              <dt className="engraved text-paper/60">{k}</dt>
+              <dd className={`mt-1 font-mono text-[13px] tabular-nums ${tone ?? "text-paper/90"}`}>{v}</dd>
+            </div>
+          ))}
+      </motion.dl>
       <h1
-        className="relative mt-3 max-w-[15ch] font-display text-[clamp(2.6rem,7.2vw,6.8rem)] font-[850] uppercase leading-[0.88] tracking-[-0.02em] text-paper [font-stretch:76%]"
+        className="relative mt-10 max-w-[16ch] font-display text-[clamp(2.8rem,8.2vw,8.2rem)] font-[850] uppercase leading-[0.86] tracking-[-0.025em] text-paper [font-stretch:76%] lg:mt-14"
         style={{ viewTransitionName: `issue-title-${issue.id}` }}
       >
         {issue.title}
@@ -82,6 +90,29 @@ function IssueMasthead({ issue, enter }) {
           {issue.hook}
         </motion.p>
       )}
+
+      {/* key figures: the issue's own stat callouts, set large and
+          right-aligned like the totals line of a statement */}
+      <motion.dl {...enter(0.28)} className="relative mt-12 grid grid-cols-2 border-t border-line lg:mt-16 lg:grid-cols-4">
+        {issue.stats.map((st, i) => {
+          const head = i === (issue.headline ?? 0)
+          return (
+            <div
+              key={st.label}
+              className={`border-b border-line py-5 pr-4 text-right ${i % 2 ? "border-l pl-4" : ""} ${i === 2 ? "lg:border-l lg:pl-4" : ""}`}
+            >
+              <dt className="engraved text-paper/60">{st.label}</dt>
+              <dd
+                className={`mt-2 font-display text-[2.15rem] font-[820] leading-[0.85] tabular-nums [font-stretch:80%] sm:text-6xl lg:text-6xl xl:text-7xl ${
+                  head ? "text-accent glow" : "text-paper"
+                }`}
+              >
+                {st.value}
+              </dd>
+            </div>
+          )
+        })}
+      </motion.dl>
     </header>
   )
 }
