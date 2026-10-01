@@ -9,6 +9,8 @@ import { sfx } from "../../lib/sfx"
 //   probe  [data-cursor="probe"] (charts) → hairlines brighten to measure
 //   drag   range inputs / [data-cursor="drag"]
 //   text   text fields → probe steps aside for the native caret
+//   measure [data-cursor="measure"] → hairlines hide; the element draws its
+//          own crosshair with the real value under it (Crosshair.jsx)
 // One rAF loop writes transforms directly; React only re-renders on mode
 // changes. Only mounted for fine pointers without reduced motion (Effects).
 const TARGETS = "a, button, summary, label, select, [role='button'], [data-cursor], input[type='range']"
@@ -138,7 +140,7 @@ export default function ProbeCursor() {
     }
   }, [])
 
-  const hairOpacity = { idle: 0.16, lock: 0.08, read: 0, probe: 0.55, drag: 0.3, text: 0 }[mode]
+  const hairOpacity = { idle: 0.16, lock: 0.08, read: 0, probe: 0.55, drag: 0.3, text: 0, measure: 0 }[mode]
   const bracket = "absolute h-2.5 w-2.5 border-accent"
 
   return (

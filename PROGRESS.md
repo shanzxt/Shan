@@ -179,3 +179,20 @@ panel). Nothing pushed. Content (copy, numbers, links) must stay word-for-word; 
 ## Gotchas
 - ScrollTrigger measures once; lazy content above it (Recharts, images) shifts the page, so `CompoundingScrub` refreshes on a body ResizeObserver.
 - `sweep` ease front-loads ~80% of travel; for something that should be watched crossing the screen use `switch`.
+
+## Session: elegance pass (2026-10-01, `feature/elegance-pass`)
+- Direction + relaxed rules: `DESIGN.md` → Direction. CLAUDE.md updated to match.
+- Type/grid: `body` tabular-nums; `engraved`, `leader`, `ledger-row`, `vignette` utilities; `chrome/ColumnRules.jsx` (12-col hairlines + vignette, lg only); `SectionHeader` is a statement line item.
+- Hero: real Day 29 flat-SIP samples (`data/sipScenarios.js`, `lib/series.js` monotone cubic) are the curve; masthead name; ₹4.72Cr key figure is the one glow; crosshair snaps to sampled years. `HeroField` now persists (parallax grids, grain, glow at the figure) and renders on demand; desktop only.
+- `Crosshair.jsx`: hero, issue chart (replaces the Recharts tooltip), correlation heatmap. Probe cursor hides on `data-cursor="measure"`.
+- Filings index (`NewslettersIndex`): number / filed / issue / headline figure / sparkline. 44-fund spark = engine eigen spectrum (85.21%…), guarded by `newsletter.test.js`. New issue fields: `headline`, `spark`.
+- Issue page: filing header row, bigger title, stats as a right-aligned statement.
+- Portfolio: visible masthead; heatmap full width up to 640px with crosshair + row/col focus + resolve keyframes; `RiskContribution.jsx` (w_i(Σw)_i / wᵀΣw from `UNIVERSE_COV`).
+- Home newsletter: `Chapters.jsx` pinned page-turn (sticky + GSAP scrub, desktop). `IssueCard.jsx` removed.
+- `Amount.jsx`: ₹ raised in mono (font payload, see DESIGN.md Result).
+- Bundle: initial JS gzip 146.3 → 148.0 kB. Lighthouse `/` mobile 75–76 perf, 100 a11y.
+
+## Gotchas (elegance pass)
+- A CSS animation with `fill-mode: both` holds `opacity`, so the SVG `opacity` attribute is ignored afterwards. Dim heatmap cells with `fillOpacity`.
+- framer `pathLength` dashes break with `vectorEffect="non-scaling-stroke"`.
+- Lighthouse on this machine varies ±10 between runs. Compare against a staging build served on another port (`git worktree add`), not against old numbers.

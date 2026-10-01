@@ -1,15 +1,13 @@
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
-import { issuesByDate } from "../data/newsletter"
 import { EASE_OUT } from "../lib/motion"
 import TransitionLink from "./chrome/TransitionLink"
-import IssueCard from "./IssueCard"
+import Chapters from "./Chapters"
 import SectionHeader from "./SectionHeader"
 import SplitHeading from "./SplitHeading"
 
 export default function Newsletter() {
   const reduceMotion = useReducedMotion()
-  const latestIssue = issuesByDate[0]
 
   return (
     <section id="newsletter" className="mx-auto max-w-[1600px] scroll-mt-20 px-5 py-20 sm:px-8 lg:px-12 lg:py-28">
@@ -43,9 +41,7 @@ export default function Newsletter() {
         </div>
       </div>
 
-      <div className="mt-12">
-        <IssueCard issue={latestIssue} />
-      </div>
+      <Chapters />
     </section>
   )
 }
