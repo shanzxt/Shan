@@ -81,6 +81,7 @@ export default function CompoundingScrub({ chart, seriesKey }) {
     let cancelled = false
     let tween
     let offLenis
+    let ro
 
     Promise.all([import("gsap"), import("gsap/ScrollTrigger")]).then(([{ gsap }, { ScrollTrigger }]) => {
       if (cancelled || !sectionRef.current) return
@@ -115,10 +116,19 @@ export default function CompoundingScrub({ chart, seriesKey }) {
         })
         draw()
       })
+      // The lazy chart and images above this section change the page height
+      // after load; re-measure the trigger whenever the document resizes.
+      let pending = 0
+      ro = new ResizeObserver(() => {
+        cancelAnimationFrame(pending)
+        pending = requestAnimationFrame(() => ScrollTrigger.refresh())
+      })
+      ro.observe(document.body)
     })
 
     return () => {
       cancelled = true
+      ro?.disconnect()
       offLenis?.()
       tween?.scrollTrigger?.kill()
       tween?.kill()
@@ -138,7 +148,7 @@ export default function CompoundingScrub({ chart, seriesKey }) {
       className={`relative my-14 print:hidden ${scrubbing ? "h-[240vh]" : ""}`}
     >
       <div className={`panel graticule relative p-4 sm:p-6 ${scrubbing ? "sticky top-[12vh]" : ""}`}>
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <p className="readout text-paper/60">
             <span className="text-accent">CH-R</span> · Replay
           </p>
@@ -208,7 +218,14 @@ export default function CompoundingScrub({ chart, seriesKey }) {
                 transform: `translateX(${i === 0 ? "0" : i === years.length - 1 ? "-100%" : "-50%"})`,
               }}
             >
-              {i === 0 || i === years.length - 1 ? yr : `’${String(yr).slice(2)}`}
+              {i === 0 || i === years.length - 1 ? (
+                <>
+                  <span className="sm:hidden">’{String(yr).slice(2)}</span>
+                  <span className="hidden sm:inline">{yr}</span>
+                </>
+              ) : (
+                `’${String(yr).slice(2)}`
+              )}
             </span>
           ))}
         </div>

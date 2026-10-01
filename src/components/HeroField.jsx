@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { EASE_IN_OUT } from "../lib/motion"
 
 // The hero's arrival: a WebGL field where the graticule starts as noise
 // and resolves into the calm 64px grid as an amber crest sweeps through
@@ -54,7 +55,7 @@ void main() {
   float line = 1.0 - smoothstep(0.0, 1.1, min(g.x, g.y));
 
   float crest = exp(-(d * d) / (2.0 * 70.0 * 70.0));
-  float a = line * (0.10 * abs(ring) + 0.75 * crest) * uCalm + crest * 0.035 * uCalm;
+  float a = line * (0.06 * abs(ring) + 0.55 * crest) * uCalm + crest * 0.035 * uCalm;
 
   // desktop: same radial fade as the section graticule
   vec2 uv = p / (uRes / uDpr);
@@ -65,9 +66,10 @@ void main() {
 }
 `
 
-// The shared `sweep` curve, cubic-bezier(0.16, 0.9, 0.2, 1), solved for y at x.
-function sweep(x) {
-  const [x1, y1, x2, y2] = [0.16, 0.9, 0.2, 1]
+// A CSS-style cubic-bezier solved for y at x. The crest travels on the
+// shared `switch` curve (0.65, 0, 0.35, 1): it eases in, crosses at an even
+// pace a reader can follow, and eases out, rather than darting across.
+function bezier(x, [x1, y1, x2, y2]) {
   const bx = (t) => 3 * x1 * t * (1 - t) ** 2 + 3 * x2 * t * t * (1 - t) + t ** 3
   const by = (t) => 3 * y1 * t * (1 - t) ** 2 + 3 * y2 * t * t * (1 - t) + t ** 3
   let lo = 0
@@ -80,7 +82,7 @@ function sweep(x) {
   return by((lo + hi) / 2)
 }
 
-const SWEEP_MS = 2400
+const SWEEP_MS = 2800
 const FADE_MS = 700
 
 export default function HeroField({ masked = false }) {
@@ -135,7 +137,7 @@ export default function HeroField({ masked = false }) {
     const frame = (now) => {
       if (!start) start = now
       const t = now - start
-      const crest = -240 + sweep(Math.min(t / SWEEP_MS, 1)) * (W + 480)
+      const crest = -240 + bezier(Math.min(t / SWEEP_MS, 1), EASE_IN_OUT) * (W + 480)
       const calm = t < SWEEP_MS ? 1 : Math.max(0, 1 - (t - SWEEP_MS) / FADE_MS)
       gl.uniform2f(u.uRes, canvas.width, canvas.height)
       gl.uniform1f(u.uDpr, dpr)
