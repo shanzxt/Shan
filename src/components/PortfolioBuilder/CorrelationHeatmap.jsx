@@ -1,4 +1,7 @@
 import { useMemo, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
+import { EASE_OUT } from "../../lib/motion";
+import SettleReadout from "../SettleReadout";
 import HoverDetail from "./HoverDetail";
 
 // Literal hex because SVG fill interpolation happens in JS, not CSS. ACCENT
@@ -79,6 +82,10 @@ function Legend({ min, max }) {
 
 export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
   const [hovered, setHovered] = useState(null);
+  const reduce = useReducedMotion();
+  // When a fund is added or removed, existing cells slide to their new
+  // row/column and re-colour to the rescaled domain instead of jumping.
+  const cellMove = reduce ? { duration: 0 } : { duration: 0.6, ease: EASE_OUT };
 
   // Off-diagonal pairs only — a fund's correlation with itself is always
   // exactly 1 and would otherwise pin the amber end of the scale at 1
@@ -177,22 +184,23 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
                 <g key={`${fidA}-${fidB}`}>
                   {/* cells ripple in along the diagonal as funds are added
                       (CSS animation; instant under reduced motion) */}
-                  <rect
+                  <motion.rect
                     className="heat-cell"
-                    x={x}
-                    y={y}
+                    initial={false}
+                    animate={{ attrX: x, attrY: y, fill: rgbStr(rgb) }}
+                    transition={cellMove}
                     width={CELL}
                     height={CELL}
-                    fill={rgbStr(rgb)}
                     stroke="var(--color-bg)"
                     strokeWidth={2}
                     opacity={isHovered ? 1 : 0.92}
                     style={{ cursor: "pointer", animationDelay: `${Math.min((i + j) * 18, 900)}ms` }}
                   />
                   {showCellText && (
-                    <text
-                      x={x + CELL / 2}
-                      y={y + CELL / 2}
+                    <motion.text
+                      initial={false}
+                      animate={{ attrX: x + CELL / 2, attrY: y + CELL / 2 }}
+                      transition={cellMove}
                       textAnchor="middle"
                       dominantBaseline="middle"
                       fontSize={18}
@@ -202,11 +210,23 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
                       pointerEvents="none"
                     >
                       {value.toFixed(2)}
-                    </text>
+                    </motion.text>
                   )}
                 </g>
               );
             })
+          )}
+          {hovered && (
+            <rect
+              x={LABEL_SPACE + hovered.j * CELL + 1}
+              y={LABEL_SPACE + hovered.i * CELL + 1}
+              width={CELL - 2}
+              height={CELL - 2}
+              fill="none"
+              stroke="var(--color-accent)"
+              strokeWidth={2}
+              pointerEvents="none"
+            />
           )}
           {fundIds.map((fid, i) => (
             <text
@@ -250,7 +270,10 @@ export default function CorrelationHeatmap({ fundIds, fundsById, corr }) {
             <span className="text-paper/90">
               {fundsById.get(hovered.fidB)?.name}
             </span>
-            <span className="text-accent"> · {hovered.value.toFixed(3)}</span>
+            <span className="text-accent">
+              {" · "}
+              <SettleReadout value={hovered.value.toFixed(3)} />
+            </span>
           </span>
         ) : null}
       </HoverDetail>

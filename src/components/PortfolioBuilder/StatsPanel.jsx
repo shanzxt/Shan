@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Info, X } from "lucide-react";
 import { EASE_OUT, SPRING_SNAP } from "../../lib/motion";
+import SettleReadout from "../SettleReadout";
 import EffectiveNGauge from "./EffectiveNGauge";
 
 function formatPercent(x, decimals = 2) {
@@ -139,17 +140,15 @@ export default function StatsPanel({
         <div className="grid grid-cols-3 gap-4 font-mono text-sm tabular-nums">
           <div className="flex flex-col items-center gap-1">
             <span className="text-[11px] text-paper/60">annualized return</span>
-            <span className="text-paper">{formatPercent(stats.annual_return_display)}</span>
+            <SettleReadout value={formatPercent(stats.annual_return_display)} className="text-paper" />
           </div>
           <div className="flex flex-col items-center gap-1">
             <span className="text-[11px] text-paper/60">annualized std dev</span>
-            <span className="text-paper">{formatPercent(stats.annual_std)}</span>
+            <SettleReadout value={formatPercent(stats.annual_std)} className="text-paper" />
           </div>
           <div className="flex flex-col items-center gap-1">
             <span className="text-[11px] text-paper/60">Sharpe ratio</span>
-            <span className="text-paper">
-              {stats.sharpe_ratio === null ? "—" : stats.sharpe_ratio.toFixed(2)}
-            </span>
+            <SettleReadout value={stats.sharpe_ratio === null ? "—" : stats.sharpe_ratio.toFixed(2)} className="text-paper" />
           </div>
         </div>
         <p className="text-center text-[12px] text-teal">
