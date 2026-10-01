@@ -74,7 +74,7 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
                     type="button"
                     onClick={() => onRemove(f.id)}
                     aria-label={`Remove ${f.name}`}
-                    className="shrink-0 text-paper/50 transition-colors hover:text-accent"
+                    className="shrink-0 text-paper/60 transition-colors hover:text-accent"
                   >
                     <X size={14} />
                   </button>
@@ -95,14 +95,14 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
       <div className="relative">
         <Search
           size={14}
-          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-paper/50"
+          className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-paper/60"
         />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by fund name or category…"
-          className="w-full border border-line bg-transparent py-2 pl-9 pr-3 font-mono text-sm text-paper placeholder:text-paper/50 focus:border-accent focus:outline-none"
+          className="w-full border border-line bg-transparent py-2 pl-9 pr-3 font-mono text-sm text-paper placeholder:text-paper/60 focus:border-accent focus:outline-none"
         />
       </div>
 
@@ -138,7 +138,7 @@ export default function FundList({ funds, weights, onAdd, onRemove, onWeightChan
             </div>
           ))}
         {filtered.length === 0 && (
-          <p className="px-3 py-6 text-center text-sm text-paper/50">No funds match "{query}".</p>
+          <p className="px-3 py-6 text-center text-sm text-paper/60">No funds match "{query}".</p>
         )}
       </div>
     </div>

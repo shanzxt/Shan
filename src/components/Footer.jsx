@@ -129,7 +129,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 px-5 py-6 sm:px-8 lg:px-12">
         <span className="readout text-paper/60">Shantanu Somwanshi</span>
         <span className="readout text-paper/60">COEP Technological University — Instrumentation &amp; Control</span>
-        <span className="readout flex items-center gap-2 text-paper/45">
+        <span className="readout flex items-center gap-2 text-paper/60">
           <span className="led" aria-hidden="true" />
           end of transmission
         </span>

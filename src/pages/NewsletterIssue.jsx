@@ -10,6 +10,7 @@ import { TocInline, TocRail } from "../components/IssueToc"
 import { useActiveHeading } from "../lib/useActiveHeading"
 import ReadingRecorder from "../components/ReadingRecorder"
 import ShareButton from "../components/ShareButton"
+import CompoundingScrub from "../components/CompoundingScrub"
 import TransitionLink from "../components/chrome/TransitionLink"
 import { issueHeadings } from "../lib/headings"
 import { isInitialLoad } from "../lib/firstLoad"
@@ -144,6 +145,8 @@ export default function NewsletterIssue() {
             )}
 
             <IssueBody content={issue.content} onOpenImage={setLightboxImage} />
+
+            {issue.replay && issue.chart && <CompoundingScrub chart={issue.chart} seriesKey={issue.replay} />}
 
             <div className="mt-16 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-6 font-mono text-[13px] print:hidden">
               <a

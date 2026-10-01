@@ -57,6 +57,7 @@ export const issues = [
       { label: "Panic-sell corpus", value: "₹0.43Cr" },
     ],
     chart: sipScenarios,
+    replay: "flat",
     // Full issue body, rendered in the reader modal, matching the Substack
     // post word-for-word. Blocks: "p" (paragraph, supports **bold** and
     // *italic*), "h2" (subheading), "quote" (pull quote), "list" (bulleted

@@ -132,11 +132,13 @@ Rules:
 - **lenis** — smooth scrolling with native scroll semantics (anchors,
   sticky, `useScroll` all keep working); lazy-loaded, desktop fine-pointer
   only, never under reduced motion.
-- No WebGL library: the phosphor trace is Canvas 2D — cheaper than a
-  shader on mid-range phones, zero dependency, and a shader field would
-  have added texture, not meaning.
-- No GSAP: Framer Motion (already shipped) covers springs, scroll-linked
-  values and presence; a second animation runtime would double the cost.
+- No WebGL library: the phosphor trace is Canvas 2D. The hero's one-shot
+  arrival field (`HeroField.jsx`) is raw WebGL, ~2 kB gzip, lazy, runs
+  about 3 s once and stops; the CSS graticule is its fallback and rest state.
+- **gsap** (+ ScrollTrigger) — only for scroll-scrubbed sequences, dynamically
+  imported by the component that uses it (Day 29 replay, ~44 kB gzip, that
+  page only). Lenis and GSAP share one frame loop (`lib/ticker.js`).
+  Framer Motion remains the UI animation runtime. See `REFERENCES.md`.
 
 ## Result (measured, local `vite preview`, Lighthouse 12 mobile)
 
@@ -158,11 +160,11 @@ curve is the first paint and LCP stays the text); phones draw at 30 fps.
 
 ## Cut, and why
 
-- **WebGL / shader hero** — Canvas 2D gives the phosphor look at a
-  fraction of the cost and without a dependency.
-- **Pinned / horizontal-scroll sections** — only two issues and three
-  projects exist; pinning that little content would be scroll-jacking
-  for its own sake.
+- **Continuous WebGL / shader hero** — the trace stays Canvas 2D; WebGL is
+  used only for the one-shot arrival field.
+- **Pinned / horizontal-scroll sections** — only the Day 29 replay scrubs
+  with scroll (it is a sticky panel inside a tall section, not scroll-jacking
+  of the page); nothing else pins.
 - **Light theme** — see Colour.
 - **Per-page custom OG images** — the existing credential-free card
   stays; not a visual-overhaul item.

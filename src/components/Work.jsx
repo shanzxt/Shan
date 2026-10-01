@@ -93,7 +93,7 @@ export default function Work() {
             {p.href && (
               <div className="pointer-events-none relative hidden justify-end lg:col-span-1 lg:flex">
                 <span className="flex h-12 w-12 items-center justify-center border border-line text-paper/50 transition-colors duration-500 ease-sweep group-hover:border-accent group-hover:bg-accent group-hover:text-ink">
-                  <ArrowUpRight size={18} className="transition-transform duration-500 ease-settle group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:scale-125" />
+                  <ArrowUpRight size={18} className="transition-transform duration-500 ease-settle group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </span>
               </div>
             )}

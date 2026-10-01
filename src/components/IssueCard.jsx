@@ -95,7 +95,7 @@ export default function IssueCard({ issue }) {
             <span className="led" aria-hidden="true" />
             {issue.chart ? "live · rendered from the issue's data" : "from the issue"}
           </span>
-          <span className="readout text-paper/40">CH-04</span>
+          <span className="readout text-paper/60">CH-04</span>
         </div>
         {issue.chart ? (
           <>

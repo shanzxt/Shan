@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from "react"
+import { lazy, Suspense, useEffect, useRef, useState, useSyncExternalStore } from "react"
 import { ArrowUpRight } from "lucide-react"
 import { links } from "../data/links"
-import { hasFinePointer, isCapableDevice, useReducedMotionPref } from "../lib/env"
+import { hasFinePointer, isCapableDevice, useMediaQuery, useReducedMotionPref } from "../lib/env"
 import { whenBootDone } from "../lib/firstLoad"
 import { compounding, noise, probeFilter, signalPath } from "../lib/signal"
 import GithubMark from "./icons/GithubMark"
@@ -18,6 +18,10 @@ import Magnetic from "./Magnetic"
 // First paint (prerender, reduced motion) is a static, fully visible
 // render: the clean curve as SVG and the name at rest — nothing is hidden
 // waiting for JS, which also keeps the h1 as an early LCP.
+
+// The arrival field (WebGL) is its own chunk, fetched only once the canvas
+// goes live; the CSS graticule is its static fallback and resting state.
+const HeroField = lazy(() => import("./HeroField"))
 
 const NAME = ["Shantanu", "Somwanshi"]
 const TOP = 0.1 // curve peak, fraction of height
@@ -59,6 +63,7 @@ export default function Hero() {
   // loading work never compete with the animation loop.
   const [armed, setArmed] = useState(false)
   const live = isClient && !reduced && armed
+  const wide = useMediaQuery("(min-width: 1024px)")
 
   useEffect(() => {
     if (reduced) return
@@ -341,6 +346,11 @@ export default function Hero() {
           className="panel relative mt-8 h-56 overflow-hidden sm:h-72 lg:pointer-events-none lg:-z-10 lg:absolute lg:inset-0 lg:mt-0 lg:h-auto lg:border-0 lg:bg-transparent lg:shadow-none"
         >
           <div className="graticule absolute inset-0 opacity-70 lg:hidden" />
+          {live && (
+            <Suspense fallback={null}>
+              <HeroField masked={wide} />
+            </Suspense>
+          )}
           {live ? (
             <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
           ) : (

@@ -16,6 +16,7 @@ import FundList from "./FundList";
 import CorrelationHeatmap from "./CorrelationHeatmap";
 import StatsPanel from "./StatsPanel";
 import DiversificationScene from "./DiversificationScene";
+import EigenSpectrum from "./EigenSpectrum";
 
 const UNIVERSE_FUND_IDS = fundsData.funds
   .map((f) => f.id)
@@ -204,8 +205,8 @@ export default function FundPickerTool() {
               type="button"
               onClick={() => applyPreset(preset)}
               aria-pressed={on}
-              className={`group inline-flex items-center gap-2.5 border px-4 py-2.5 transition-[color,border-color,background-color,transform] duration-150 active:translate-y-px ${
-                on ? "border-accent bg-accent/10 text-accent" : "border-line bg-panel text-paper/80 hover:border-accent/50 hover:text-accent"
+              className={`keycap group inline-flex items-center gap-2.5 px-4 py-2.5 ${
+                on ? "keycap-on text-accent" : "text-paper/80 hover:text-accent"
               }`}
             >
               <span
@@ -276,6 +277,8 @@ export default function FundPickerTool() {
             fundsById={FUNDS_BY_ID}
             corr={UNIVERSE_CORR}
           />
+
+          <EigenSpectrum stats={stats} />
 
           <DiversificationScene stats={stats} fundsById={FUNDS_BY_ID} />
         </div>

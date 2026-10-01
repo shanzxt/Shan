@@ -162,3 +162,20 @@ panel). Nothing pushed. Content (copy, numbers, links) must stay word-for-word; 
   — chunking moved framer-motion into the entry. Baseline total 133 kB gzip; after home rebuild 144 kB.
 - Git Bash `ln -s` on a directory copies it; don't symlink node_modules into worktrees.
 - Screenshot helper now supports `MOUSE="x,y;x,y"` for hover states.
+
+---
+
+# Instrument upgrade (branch `feature/instrument-upgrade`, cut from `staging` `2137334`)
+
+- Hero: `HeroField.jsx` one-shot WebGL arrival (noise → graticule under an amber crest on the `switch` curve, underdamped ring-down), lazy, stops when settled, nothing on reduced motion.
+- Day 29: `CompoundingScrub.jsx` replays the flat SIP series with GSAP ScrollTrigger (lazy) + Lenis on one ticker (`lib/ticker.js`). Readouts snap to the issue's own 5-year marks (no interpolated figures); invested is the issue's ₹42.1L pro-rated by years (flat SIP accrues linearly). Data flag: `replay: "flat"` on the issue.
+- `SettleReadout.jsx`: value changes drop in on the `settle` spring; first render static. Used in replay, StatsPanel, heatmap hover, eigen strip.
+- Portfolio: heatmap cells slide/re-colour on update (`attrX/attrY` — framer treats SVG `x/y` as transforms), accent outline on the hovered cell, `EigenSpectrum.jsx`, `.keycap` preset keys.
+- `Dialog.jsx` + `lib/useModal.js` (focus trap, Esc, scroll lock, focus return); issue lightbox uses it.
+- Audit: readable text raised to ≥ /60, `rounded-md/lg` removed from tool stages, arrow hover no longer scales.
+- Bundle (gzip): initial JS 146.1 → 146.3 kB; lazy HeroField 2 kB; gsap + ScrollTrigger 43.6 kB on the Day 29 page only.
+- Not done: Taste Skill install and the 21st.dev / ThreeUI MCPs (install blocked by permission prompt / needs API key / paid). Lighthouse not re-run.
+
+## Gotchas
+- ScrollTrigger measures once; lazy content above it (Recharts, images) shifts the page, so `CompoundingScrub` refreshes on a body ResizeObserver.
+- `sweep` ease front-loads ~80% of travel; for something that should be watched crossing the screen use `switch`.
