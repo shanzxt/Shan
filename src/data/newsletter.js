@@ -1,43 +1,8 @@
-// Real figures from the Day 29 issue and its companion repo:
-// github.com/shanzxt/n1-Compounding-newsletter
-//
-// Three scenarios, same ₹10k/mo starting contribution, Aug 1991 – Aug 2026
-// (35 years), sampled at 5-year marks so the chart stays legible without
-// rendering the full monthly series.
+// The Day 29 series lives in its own module so the home hero can draw it
+// without pulling every issue's text into the first-load bundle.
+import { sipScenarios } from "./sipScenarios.js"
 
-export const sipScenarios = {
-  years: [1991, 1996, 2001, 2006, 2011, 2016, 2021, 2026],
-  series: [
-    {
-      key: "flat",
-      label: "Flat ₹10k/mo",
-      color: "var(--color-accent)",
-      invested: 42.1, // lakh
-      corpus: 472, // lakh (₹4.72 cr)
-      multiple: "11.2x",
-      // sampled corpus values in lakh, roughly tracing a 12%/yr compounding curve
-      values: [0, 8.6, 21, 40, 71, 121, 212, 472],
-    },
-    {
-      key: "stepup",
-      label: "10% step-up SIP",
-      color: "var(--color-teal)",
-      invested: 328, // lakh
-      corpus: 1424, // lakh (₹14.24 cr)
-      multiple: "4.3x",
-      values: [0, 14, 38, 84, 172, 344, 682, 1424],
-    },
-    {
-      key: "panic",
-      label: "Panic-sell at −20%",
-      color: "#8a5a5a",
-      invested: 21.2, // lakh
-      corpus: 43, // lakh (₹0.43 cr)
-      multiple: "~2x",
-      values: [0, 5, 11, 17, 22, 28, 35, 43],
-    },
-  ],
-}
+export { sipScenarios }
 
 export const issues = [
   {

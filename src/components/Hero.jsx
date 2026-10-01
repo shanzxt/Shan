@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExtern
 import { motion, useScroll, useTransform } from "framer-motion"
 import { ArrowUpRight } from "lucide-react"
 import { links } from "../data/links"
-import { issues, sipScenarios } from "../data/newsletter"
+import { sipScenarios } from "../data/sipScenarios"
 import { hasFinePointer, isCapableDevice, useMediaQuery, useReducedMotionPref } from "../lib/env"
 import { whenBootDone } from "../lib/firstLoad"
 import { noise, probeFilter } from "../lib/signal"
@@ -30,7 +30,6 @@ const HeroField = lazy(() => import("./HeroField"))
 
 const NAME = ["Shantanu", "Somwanshi"]
 const flat = sipScenarios.series.find((s) => s.key === "flat")
-const day29 = issues.find((i) => i.id === "day-29")
 const YEARS = sipScenarios.years
 const Y_MAX = 500 // axis ceiling in lakh (₹5Cr), just above the ₹4.72Cr finish
 const Y_TICKS = [0, 100, 200, 300, 400, 500]
@@ -395,7 +394,7 @@ export default function Hero() {
 
           <div className="order-1 lg:order-2 lg:col-span-6 lg:col-start-7 lg:text-right">
             <p className="engraved text-paper/65">
-              #{String(day29.number).padStart(2, "0")} · {flat.label} · Nifty 50 · Aug 1991 – Aug 2026
+              Day 29 · {flat.label} · Nifty 50 · Aug 1991 – Aug 2026
             </p>
             <p
               ref={figureRef}
