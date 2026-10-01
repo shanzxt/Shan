@@ -137,7 +137,7 @@ export default function CommandPalette({ onClose }) {
             <span className="led" aria-hidden="true" />
             Signal / Noise · command
           </span>
-          <span className="readout text-paper/50">esc</span>
+          <span className="readout text-paper/60">esc</span>
         </div>
         <div className="flex items-center gap-3 border-b hr-line px-4">
           <span className="font-mono text-accent" aria-hidden="true">
@@ -159,11 +159,11 @@ export default function CommandPalette({ onClose }) {
             placeholder="type a command or page…"
             spellCheck={false}
             autoComplete="off"
-            className="h-14 w-full bg-transparent font-mono text-[15px] text-paper caret-accent placeholder:text-paper/50 focus:outline-none focus-visible:outline-none"
+            className="h-14 w-full bg-transparent font-mono text-[15px] text-paper caret-accent placeholder:text-paper/60 focus:outline-none focus-visible:outline-none"
           />
         </div>
         <ul id="palette-list" ref={listRef} role="listbox" data-lenis-prevent className="max-h-[52vh] overflow-y-auto py-2">
-          {results.length === 0 && <li className="readout px-4 py-6 text-paper/50">No signal on that frequency.</li>}
+          {results.length === 0 && <li className="readout px-4 py-6 text-paper/60">No signal on that frequency.</li>}
           {results.map((c, i) => (
             <li
               key={c.label}
@@ -177,12 +177,12 @@ export default function CommandPalette({ onClose }) {
             >
               <span className={`readout w-7 ${i === activeIndex ? "text-ink/70" : "text-accent/70"}`}>{c.group}</span>
               <span className="min-w-0 flex-1 truncate font-mono text-[13px]">{c.label}</span>
-              <span className={`readout hidden sm:inline ${i === activeIndex ? "text-ink/60" : "text-paper/40"}`}>{c.hint}</span>
+              <span className={`readout hidden sm:inline ${i === activeIndex ? "text-ink/60" : "text-paper/60"}`}>{c.hint}</span>
             </li>
           ))}
         </ul>
         <div className="flex items-center justify-between border-t hr-line px-4 py-2">
-          <span className="readout text-paper/45">↑↓ move · ↵ run</span>
+          <span className="readout text-paper/60">↑↓ move · ↵ run</span>
           <span className="readout text-accent" aria-live="polite">
             {status}
           </span>

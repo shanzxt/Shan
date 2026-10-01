@@ -44,7 +44,7 @@ export default function PortfolioBuilder() {
           internal stages are untouched. */}
       <ClipReveal className="panel graticule relative mt-6 flex min-h-[75vh] flex-col items-center justify-center overflow-hidden px-2 py-10" amount={0}>
         <Screws />
-        <span className="readout absolute left-5 top-4 text-paper/50">Scope · the idea</span>
+        <span className="readout absolute left-5 top-4 text-paper/60">Scope · the idea</span>
         <IntroAnimation />
       </ClipReveal>
 

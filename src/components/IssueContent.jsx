@@ -58,12 +58,12 @@ function ToolPanel({ name }) {
             <span className="led" aria-hidden="true" />
             Try it yourself
           </p>
-          <span className="readout text-paper/45">live · runs in your browser</span>
+          <span className="readout text-paper/60">live · runs in your browser</span>
         </div>
         <Suspense
           fallback={
             <div className="flex min-h-[300px] items-center justify-center">
-              <span className="readout text-paper/50">Acquiring…</span>
+              <span className="readout text-paper/60">Acquiring…</span>
             </div>
           }
         >

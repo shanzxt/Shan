@@ -25,7 +25,7 @@ export default function Stage1Dataset() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.5 }}
-        className="font-mono text-sm text-paper/50 tabular-nums"
+        className="font-mono text-sm text-paper/60 tabular-nums"
       >
         {DATASET.join(", ")}
       </motion.p>

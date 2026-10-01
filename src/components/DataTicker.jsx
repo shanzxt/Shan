@@ -20,7 +20,7 @@ function Item({ item, duplicate = false }) {
         data-cursor="lock"
         className="group flex items-center gap-3 px-6 py-3.5"
       >
-        <span className="readout text-paper/40 group-hover:text-accent">#{String(item.issue.number).padStart(2, "0")}</span>
+        <span className="readout text-paper/60 group-hover:text-accent">#{String(item.issue.number).padStart(2, "0")}</span>
         <span
           className="h-1.5 w-1.5 rounded-full"
           style={{ background: item.color ?? "var(--color-teal)" }}

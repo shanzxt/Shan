@@ -202,7 +202,7 @@ export default function CompoundingScrub({ chart, seriesKey }) {
           {years.map((yr, i) => (
             <span
               key={yr}
-              className={`readout absolute top-0 tabular-nums ${i <= mark ? "text-paper/70" : "text-paper/40"}`}
+              className={`readout absolute top-0 tabular-nums ${i <= mark ? "text-paper/75" : "text-paper/55"}`}
               style={{
                 left: `${(x(yr) / VB_W) * 100}%`,
                 transform: `translateX(${i === 0 ? "0" : i === years.length - 1 ? "-100%" : "-50%"})`,

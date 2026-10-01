@@ -15,7 +15,7 @@ function TocLinks({ headings, active }) {
                 on ? "border-accent text-paper" : "border-line text-paper/55 hover:border-paper/40 hover:text-paper"
               }`}
             >
-              <span className={`shrink-0 transition-colors ${on ? "text-accent" : "text-paper/40 group-hover:text-accent"}`}>
+              <span className={`shrink-0 transition-colors ${on ? "text-accent" : "text-paper/60 group-hover:text-accent"}`}>
                 §{String(i + 1).padStart(2, "0")}
               </span>
               <span>{h.text}</span>
