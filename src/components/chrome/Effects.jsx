@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState } from "react"
 import { isCapableDevice, useFinePointer, useReducedMotionPref } from "../../lib/env"
 import { toggleSetting, useSetting } from "../../lib/settings"
 import { setSoundEngine, sfx } from "../../lib/sfx"
+import { onFrame } from "../../lib/ticker"
 
 // Client-only optional layers. Nothing here renders on the server and
 // every heavy piece is its own chunk, loaded only when it can run:
@@ -34,19 +35,23 @@ export default function Effects() {
   useEffect(() => {
     if (!fine || reduced || !isCapableDevice()) return
     let lenis
+    let stopFrames
     let cancelled = false
     import("lenis").then(({ default: Lenis }) => {
       if (cancelled) return
       lenis = new Lenis({
-        autoRaf: true,
+        autoRaf: false,
         lerp: 0.11,
         anchors: { offset: -80 },
         prevent: (node) => node.closest?.("[data-lenis-prevent]") != null,
       })
+      // driven by the shared ticker so a lazy-loaded GSAP can take it over
+      stopFrames = onFrame((time) => lenis.raf(time))
       window.__lenis = lenis
     })
     return () => {
       cancelled = true
+      stopFrames?.()
       lenis?.destroy()
       delete window.__lenis
     }
