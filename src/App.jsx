@@ -8,6 +8,7 @@ import WhatIDo from "./components/WhatIDo"
 import Work from "./components/Work"
 import Effects from "./components/chrome/Effects"
 import ErrorBoundary from "./components/chrome/ErrorBoundary"
+import ColumnRules from "./components/chrome/ColumnRules"
 import GrainOverlay from "./components/chrome/GrainOverlay"
 import Header from "./components/chrome/Header"
 import RouteFallback from "./components/chrome/RouteFallback"
@@ -96,6 +97,7 @@ export default function App() {
       >
         Skip to content
       </a>
+      <ColumnRules />
       <GrainOverlay />
       <Header />
       <RouteEffects />
